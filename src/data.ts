@@ -2,50 +2,69 @@ export const GAME_TITLE = "NEON REQUIEM";
 
 export const UI_TEXT = {
   heroEyebrow: "地下第七層・仮設礼拝ステージ",
-  subtitle: "灯里の歌で静寂を押し返し、忘れられた路地に拍手を灯す。",
+  subtitle: "灯里の歌で静寂を押し返し、忘れられた路地に灯りを戻す。",
+  compactSubtitle: "地下都市復興ライブ",
   resourcePanelLabel: "現在の資源",
   perSecondLabel: "毎秒",
   liveSectionLabel: "ライブ",
   liveButton: "ライブする",
+  settingsButtonLabel: "設定",
+  messageLabel: "最新メッセージ",
+  activeIdolLabel: "注目アイドル",
+  passiveEffectLabel: "パッシブ効果",
+  noActiveEffectLabel: "効果なし",
+  baseProductionLabel: "基礎生産",
+  productionMultiplierLabel: "生産倍率",
+  detailButtonLabel: "詳細を見る",
+  idolRosterLabel: "アイドル切替",
+  lockedIdolLabel: "未解放",
+  idolUnlockRequirementLabel: "解放条件",
+  restorationTabLabel: "復興区画",
+  songTabLabel: "歌",
+  idolTabLabel: "アイドル",
+  recordTabLabel: "記録",
+  recordCategoryLabel: "種別",
+  unreadRecordLabel: "未読",
+  readRecordLabel: "既読",
+  lockedRecordLabel: "未解放の記録",
+  readRecordButtonLabel: "読む",
+  idolSectionLabel: "アイドル",
+  facilitySectionLabel: "施設",
   initialIdolLabel: "初期アイドル",
+  unlockedIdolLabel: "解放アイドル",
   initialFacilityLabel: "初期施設",
+  unlockedFacilityLabel: "解放施設",
+  lockedFacilityLabel: "未解放施設",
   levelLabel: "Lv",
   upgradeCostLabel: "強化コスト",
   productionLabel: "生産量",
-  upgradeStageButton: "路地裏ステージを強化",
+  unlockRequirementLabel: "解放条件",
   initialLog: "薄いネオンが点滅している。オートセーブ準備完了。",
-  liveSuccessLog: "灯里の歌に、小さな拍手が返ってきました。",
-  notEnoughApplauseLog: "拍手がまだ足りません。",
+  liveSuccessLog: "灯里の歌に、小さな灯りが返ってきました。",
+  notEnoughLightsLog: "灯りがまだ足りません。",
+  lockedFacilityLog: "まだこの施設は解放されていません。",
+  purchasedSongLabel: "取得済み",
+  songEffectLabel: "効果",
+  songPriceLabel: "価格",
+  purchaseSongButtonLabel: "歌を取得",
+  lockedSongLog: "まだこの歌は解放されていません。",
+  alreadyPurchasedSongLog: "この歌は取得済みです。",
+  recordReadLog: "記録を確認しました。",
   autoSavedLog: "オートセーブしました。"
 } as const;
 
 export const RESOURCE_LABELS = {
-  applause: "拍手"
+  lights: "灯り"
 } as const;
 
-export const INITIAL_IDOL = {
-  id: "otowa-akari",
-  name: "音羽 灯里",
-  reading: "おとは あかり",
-  title: "路地裏の歌姫",
-  description:
-    "灯里は、明かりの消えた路地裏で歌い続けていた。聖歌のように澄んだ声が響くたび、ひび割れた街路に小さな光が戻っていく。"
-} as const;
-
-export const ALLEY_STAGE = {
-  id: "alley-stage",
-  name: "路地裏ステージ",
-  description:
-    "古いスピーカー、拾い集めたネオン管、小さな聖印で組まれた仮設ステージ。強化するほど、地下の静寂に届く音が増えていく。",
-  baseCost: 10,
-  costMultiplier: 1.15,
-  productionPerLevel: 0.1
-} as const;
-
-export function createOfflineRewardMessage(applause: string): string {
-  return `離れている間に、灯里が ${applause} 拍手を集めました。路地の灯りが少し強くなっています。`;
+export function createOfflineRewardMessage(lights: string): string {
+  return `離れている間に、灯里が ${lights} 灯りを集めました。路地の灯りが少し強くなっています。`;
 }
 
-export function createStageUpgradeMessage(cost: string): string {
-  return `路地裏ステージを強化しました。-${cost} 拍手`;
+export function createFacilityUpgradeMessage(facilityName: string, cost: string): string {
+  return `${facilityName}を強化しました。-${cost} 灯り`;
+}
+
+export function createSongPurchaseMessage(songName: string, cost: string): string {
+  return `${songName}を取得しました。-${cost} 灯り`;
 }
