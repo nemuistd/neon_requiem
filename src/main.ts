@@ -5,7 +5,8 @@ import { applyProduction, gainManualTomorusa, GameState, markRecordTabSeen, purc
 import { loadGame, saveGame, SAVE_KEY } from "./storage";
 import { getFacilityIdFromEvent, getIdolIdFromEvent, getItemIdFromEvent, getRecordIdFromEvent, getSongIdFromEvent, getTabIdFromEvent } from "./ui/events";
 import { formatAmount } from "./ui/format";
-import { renderLiveValues, renderState, setMessage } from "./ui/renderState";
+import { renderLiveValues } from "./ui/liveValues";
+import { renderState, setMessage } from "./ui/renderState";
 import { setupUi } from "./ui/setupUi";
 import type { ActiveTabId } from "./ui/types";
 

@@ -16,9 +16,9 @@ export const FACILITY_DEFINITIONS = defineContent([
     name: "ネオン掲示板",
     description:
       "ライブ告知とアイドルの名前を掲げる古い電光掲示板。通りすがりの人々が名前を目にするたび、路地に少しずつ賑わいが戻っていく。",
-    baseCost: 100,
-    costMultiplier: 1.2,
-    productionPerLevel: 0.3,
+    baseCost: 80,
+    costMultiplier: 1.18,
+    productionPerLevel: 0.35,
     unlockRequirement: {
       type: "facility.level",
       facilityId: "alleyStage",
@@ -30,7 +30,7 @@ export const FACILITY_DEFINITIONS = defineContent([
     name: "地下礼拝堂",
     description:
       "崩れかけた柱と古い紋章が残る小さな礼拝堂。地下深くに閉ざされていた響きを、後の復興段階で少しずつ調べていく場所。",
-    baseCost: 1000,
+    baseCost: 900,
     costMultiplier: 1.25,
     productionPerLevel: 1,
     unlockRequirement: {

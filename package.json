@@ -7,10 +7,12 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "check:content": "tsc --noEmit false --outDir node_modules/.cache/neon-requiem-content-check --module NodeNext --moduleResolution NodeNext src/checkContent.ts && node node_modules/.cache/neon-requiem-content-check/checkContent.js && node -e \"import('node:fs').then((fs) => fs.rmSync('node_modules/.cache/neon-requiem-content-check', { recursive: true, force: true }))\"",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run"
   },
   "devDependencies": {
     "typescript": "^5.8.3",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vitest": "^4.1.6"
   }
 }

@@ -1,19 +1,6 @@
 import { Effect } from "../engine/effects.js";
 import { Requirement } from "../engine/requirements.js";
 
-export type IdolId = "otowaAkari" | "mizukiShino" | "asagiriYui";
-
-export type SongId = "rojiuraIntro" | "chapelHarmony" | "twilightChorus";
-
-export type ItemId = "oldNeonTube" | "handwrittenPoster" | "recordedGreeting";
-
-export type RecordId =
-  | "alleyStageRestorationMemo"
-  | "lightResponseObservation"
-  | "undergroundChapelRestorationReport"
-  | "songAndHymnDistinction"
-  | "mistAndAnchorFacilityLog";
-
 export type RevealLevel = "surface" | "uncanny" | "technical" | "deep";
 
 export type IdolPassiveEffect = {
@@ -28,7 +15,7 @@ export type ResourceDefinition = {
 };
 
 export type IdolDefinition = {
-  id: IdolId;
+  id: string;
   name: string;
   reading: string;
   title: string;
@@ -51,7 +38,7 @@ export type FacilityDefinition = {
 };
 
 export type SongDefinition = {
-  id: SongId;
+  id: string;
   name: string;
   description: string;
   cost: number;
@@ -61,7 +48,7 @@ export type SongDefinition = {
 };
 
 export type ItemDefinition = {
-  id: ItemId;
+  id: string;
   name: string;
   description: string;
   cost: number;
@@ -71,7 +58,7 @@ export type ItemDefinition = {
 };
 
 export type RecordDefinition = {
-  id: RecordId;
+  id: string;
   title: string;
   category: "復旧報告" | "観測記録" | "施設ログ" | "断片記憶";
   revealLevel: RevealLevel;

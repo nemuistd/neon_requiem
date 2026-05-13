@@ -18,6 +18,12 @@ import {
   SongId,
   SONGS
 } from "./definitions";
+import {
+  Effect,
+  getFacilityProductionMultiplierFromEffects,
+  getManualGainBonus,
+  getOfflineRewardMultiplierFromEffects
+} from "./engine/effects";
 import { areRequirementsMet, isRequirementMet } from "./engine/requirements";
 
 export const SAVE_VERSION = 8;
@@ -253,34 +259,9 @@ export function getFacilityBaseTomorusaPerSecond(state: GameState, facilityId: F
 
 export function getFacilityProductionMultiplier(state: GameState): number {
   const idolMultiplier = getGlobalMultiplierEffects(state).reduce((multiplier, effect) => multiplier * effect.multiplier, 1);
-  const songMultiplier = SONG_ORDER.reduce((multiplier, songId) => {
-    if (!isSongPurchased(state, songId)) {
-      return multiplier;
-    }
+  const contentMultiplier = getFacilityProductionMultiplierFromEffects(getPurchasedContentEffects(state));
 
-    return SONGS[songId].effects.reduce((effectMultiplier, effect) => {
-      if (effect.type !== "facility.production.multiplier") {
-        return effectMultiplier;
-      }
-
-      return effectMultiplier * effect.multiplier;
-    }, multiplier);
-  }, 1);
-  const itemMultiplier = ITEM_ORDER.reduce((multiplier, itemId) => {
-    if (!isItemPurchased(state, itemId)) {
-      return multiplier;
-    }
-
-    return ITEMS[itemId].effects.reduce((effectMultiplier, effect) => {
-      if (effect.type !== "facility.production.multiplier") {
-        return effectMultiplier;
-      }
-
-      return effectMultiplier * effect.multiplier;
-    }, multiplier);
-  }, 1);
-
-  return idolMultiplier * songMultiplier * itemMultiplier;
+  return idolMultiplier * contentMultiplier;
 }
 
 export function getFacilityMultiplierEffects(state: GameState, facilityId: FacilityId): FacilityMultiplierEffect[] {
@@ -308,37 +289,30 @@ export function getTomorusaPerSecond(state: GameState): number {
 }
 
 export function getManualTomorusaGain(state: GameState): number {
-  const songGain = SONG_ORDER.reduce((gain, songId) => {
-    if (!isSongPurchased(state, songId)) {
-      return gain;
-    }
+  return 1 + getManualGainBonus(getPurchasedContentEffects(state), TOMORUSA_RESOURCE_ID);
+}
 
-    return SONGS[songId].effects.reduce((effectGain, effect) => {
-      if (effect.type !== "manual.gain.add" || effect.resourceId !== TOMORUSA_RESOURCE_ID) {
-        return effectGain;
-      }
+export function getOfflineRewardMultiplier(state: GameState): number {
+  return getOfflineRewardMultiplierFromEffects(getPurchasedContentEffects(state));
+}
 
-      return effectGain + effect.amount;
-    }, gain);
-  }, 1);
+export function getPurchasedContentEffects(state: GameState): Effect[] {
+  return [
+    ...getPurchasedSongEffects(state),
+    ...getPurchasedItemEffects(state)
+  ];
+}
 
-  return ITEM_ORDER.reduce((gain, itemId) => {
-    if (!isItemPurchased(state, itemId)) {
-      return gain;
-    }
+function getPurchasedSongEffects(state: GameState): Effect[] {
+  return SONG_ORDER.flatMap((songId) => (isSongPurchased(state, songId) ? SONGS[songId].effects : []));
+}
 
-    return ITEMS[itemId].effects.reduce((effectGain, effect) => {
-      if (effect.type !== "manual.gain.add" || effect.resourceId !== TOMORUSA_RESOURCE_ID) {
-        return effectGain;
-      }
-
-      return effectGain + effect.amount;
-    }, gain);
-  }, songGain);
+function getPurchasedItemEffects(state: GameState): Effect[] {
+  return ITEM_ORDER.flatMap((itemId) => (isItemPurchased(state, itemId) ? ITEMS[itemId].effects : []));
 }
 
 export function getOfflineTomorusa(state: GameState, offlineSeconds: number): number {
-  return getTomorusaPerSecond(state) * getCappedOfflineSeconds(offlineSeconds);
+  return getTomorusaPerSecond(state) * getCappedOfflineSeconds(offlineSeconds) * getOfflineRewardMultiplier(state);
 }
 
 export function gainManualTomorusa(state: GameState): GameState {

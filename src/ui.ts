@@ -8,5 +8,6 @@ export {
   getSongIdFromEvent,
   getTabIdFromEvent
 } from "./ui/events";
-export { renderLiveValues, renderState, setMessage } from "./ui/renderState";
+export { renderLiveValues } from "./ui/liveValues";
+export { renderState, setMessage } from "./ui/renderState";
 export { setupUi } from "./ui/setupUi";

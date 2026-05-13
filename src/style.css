@@ -451,7 +451,7 @@ h2 {
 
 .tab-strip {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   border-bottom: 1px solid rgba(127, 233, 255, 0.22);
 }
 
