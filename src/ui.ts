@@ -29,16 +29,22 @@ import {
   isSongPurchased,
   isSongUnlocked,
   isIdolUnlocked,
-  isFacilityUnlocked
+  isFacilityUnlocked,
+  resolveActiveIdolId
 } from "./game";
 
-export type ActiveTabId = "restoration" | "song" | "record";
+export type ActiveTabId = "restoration" | "song" | "idol" | "record";
 
 export type UiElements = {
   root: HTMLElement;
   lightsAmount: HTMLElement;
   lightsPerSecond: HTMLElement;
   liveButton: HTMLButtonElement;
+  settingsButton: HTMLButtonElement;
+  settingsPanel: HTMLElement;
+  settingsCloseButton: HTMLButtonElement;
+  settingsResetButton: HTMLButtonElement;
+  settingsVersion: HTMLElement;
   idolList: HTMLElement;
   contentList: HTMLElement;
   messageLog: HTMLElement;
@@ -69,7 +75,7 @@ export function setupUi(root: HTMLElement): UiElements {
           <button id="live-button" class="primary-action" type="button">${UI_TEXT.liveButton}</button>
         </section>
 
-        <button class="settings-button" type="button" disabled aria-label="${UI_TEXT.settingsButtonLabel}">
+        <button id="settings-button" class="settings-button" type="button" aria-label="${UI_TEXT.settingsButtonLabel}" aria-expanded="false" aria-controls="settings-panel">
           ⚙
         </button>
       </header>
@@ -88,11 +94,33 @@ export function setupUi(root: HTMLElement): UiElements {
           <nav class="tab-strip" aria-label="表示カテゴリ">
             <button class="tab-button active" type="button" data-tab-id="restoration" aria-current="page">${UI_TEXT.restorationTabLabel}</button>
             <button class="tab-button" type="button" data-tab-id="song">${UI_TEXT.songTabLabel}</button>
-            <button class="tab-button" type="button" disabled>${UI_TEXT.idolTabLabel}</button>
+            <button class="tab-button" type="button" data-tab-id="idol">${UI_TEXT.idolTabLabel}</button>
             <button class="tab-button" type="button" data-tab-id="record">${UI_TEXT.recordTabLabel}</button>
           </nav>
           <div id="content-list" class="facility-grid"></div>
         </section>
+      </section>
+
+      <section id="settings-panel" class="settings-panel" aria-hidden="true" hidden>
+        <div class="settings-panel-surface" role="dialog" aria-modal="true" aria-label="${UI_TEXT.settingsButtonLabel}">
+          <div class="settings-panel-header">
+            <h2>${UI_TEXT.settingsButtonLabel}</h2>
+            <button id="settings-close-button" class="settings-icon-button" type="button" aria-label="${UI_TEXT.closeButtonLabel}">×</button>
+          </div>
+
+          <div class="settings-panel-body">
+            <dl class="settings-list">
+              <div>
+                <dt>${UI_TEXT.versionLabel}</dt>
+                <dd id="settings-version"></dd>
+              </div>
+            </dl>
+
+            <button id="settings-reset-button" class="settings-danger-button" type="button">
+              ${UI_TEXT.resetSaveButtonLabel}
+            </button>
+          </div>
+        </div>
       </section>
     </main>
   `;
@@ -102,22 +130,25 @@ export function setupUi(root: HTMLElement): UiElements {
     lightsAmount: getElement(root, "lights-amount"),
     lightsPerSecond: getElement(root, "lights-per-second"),
     liveButton: getElement(root, "live-button", HTMLButtonElement),
+    settingsButton: getElement(root, "settings-button", HTMLButtonElement),
+    settingsPanel: getElement(root, "settings-panel"),
+    settingsCloseButton: getElement(root, "settings-close-button", HTMLButtonElement),
+    settingsResetButton: getElement(root, "settings-reset-button", HTMLButtonElement),
+    settingsVersion: getElement(root, "settings-version"),
     idolList: getElement(root, "idol-list"),
     contentList: getElement(root, "content-list"),
     messageLog: getElement(root, "message-log")
   };
 }
 
-export function renderState(elements: UiElements, state: GameState, activeIdolId: IdolId, activeTabId: ActiveTabId): IdolId {
-  const resolvedActiveIdolId = isIdolUnlocked(state, activeIdolId) ? activeIdolId : "otowaAkari";
+export function renderState(elements: UiElements, state: GameState, activeTabId: ActiveTabId): void {
+  const resolvedActiveIdolId = resolveActiveIdolId(state);
 
-  renderTabs(elements, activeTabId);
+  renderTabs(elements, state, activeTabId);
   renderLiveValues(elements, state);
   elements.idolList.innerHTML = renderIdolCards(state, resolvedActiveIdolId);
   elements.contentList.className = getContentListClassName(activeTabId);
   elements.contentList.innerHTML = renderActiveTabContent(state, activeTabId);
-
-  return resolvedActiveIdolId;
 }
 
 export function renderLiveValues(elements: UiElements, state: GameState): void {
@@ -210,7 +241,7 @@ export function getTabIdFromEvent(event: Event): ActiveTabId | null {
   const button = target.closest<HTMLButtonElement>("[data-tab-id]");
   const tabId = button?.dataset.tabId;
 
-  if (tabId === "restoration" || tabId === "song" || tabId === "record") {
+  if (tabId === "restoration" || tabId === "song" || tabId === "idol" || tabId === "record") {
     return tabId;
   }
 
@@ -220,6 +251,10 @@ export function getTabIdFromEvent(event: Event): ActiveTabId | null {
 function getContentListClassName(activeTabId: ActiveTabId): string {
   if (activeTabId === "song") {
     return "song-grid";
+  }
+
+  if (activeTabId === "idol") {
+    return "idol-grid";
   }
 
   if (activeTabId === "record") {
@@ -232,6 +267,10 @@ function getContentListClassName(activeTabId: ActiveTabId): string {
 function renderActiveTabContent(state: GameState, activeTabId: ActiveTabId): string {
   if (activeTabId === "song") {
     return renderSongCards(state);
+  }
+
+  if (activeTabId === "idol") {
+    return renderIdolTabCards(state);
   }
 
   if (activeTabId === "record") {
@@ -300,18 +339,75 @@ function renderIdolSwitcher(state: GameState, activeIdolId: IdolId): string {
     const isActive = activeIdolId === idolId;
 
     return `
-      <button
-        class="idol-switch ${isActive ? "active" : ""} ${isUnlocked ? "" : "locked"}"
+    <button
+        class="idol-switch ${isActive ? "active" : ""} ${isUnlocked ? "unlocked" : "locked"}"
         type="button"
         data-idol-id="${idolId}"
         ${isUnlocked ? "" : "disabled"}
         ${isActive ? 'aria-current="true"' : ""}
+        aria-pressed="${isActive ? "true" : "false"}"
       >
         <span>${idol.name}</span>
         <small>${isUnlocked ? idol.reading : getIdolUnlockRequirementText(idolId)}</small>
       </button>
     `;
   }).join("");
+}
+
+function renderIdolTabCards(state: GameState): string {
+  return IDOL_ORDER.map((idolId) => renderIdolTabCard(state, idolId)).join("");
+}
+
+function renderIdolTabCard(state: GameState, idolId: IdolId): string {
+  const idol = IDOLS[idolId];
+  const isUnlocked = isIdolUnlocked(state, idolId);
+  const activeIdolId = resolveActiveIdolId(state);
+  const isActive = activeIdolId === idolId;
+  const stateLabel = isActive
+    ? UI_TEXT.focusedIdolLabel
+    : isUnlocked
+      ? (idolId === "otowaAkari" ? UI_TEXT.initialIdolLabel : UI_TEXT.unlockedIdolLabel)
+      : UI_TEXT.lockedIdolLabel;
+
+  return `
+    <article class="card idol-tab-card ${isUnlocked ? "unlocked-card" : "locked-card"} ${isActive ? "active-card" : ""}">
+      <div class="idol-tab-header">
+        <div>
+          <span class="card-kicker">${stateLabel}</span>
+          <h2>${idol.name}</h2>
+        </div>
+        <span class="idol-tab-state">${stateLabel}</span>
+      </div>
+      <div class="idol-tab-main">
+        <div class="idol-tab-portrait" aria-hidden="true">
+          <img src="${idol.imageUrl}" alt="" style="object-position: ${idol.imagePosition};" />
+        </div>
+        <div class="idol-tab-body">
+          <p class="reading">${idol.reading}</p>
+          <p class="title-line">${idol.title}</p>
+          <p>${idol.description}</p>
+          <dl class="stats-list">
+            <div>
+              <dt>${UI_TEXT.passiveEffectLabel}</dt>
+              <dd>${isUnlocked ? idol.passiveDescription : UI_TEXT.lockedIdolLabel}</dd>
+            </div>
+            <div>
+              <dt>${UI_TEXT.unlockRequirementLabel}</dt>
+              <dd>${getIdolUnlockRequirementText(idolId)}</dd>
+            </div>
+          </dl>
+          <button
+            class="secondary-action idol-tab-action ${isActive ? "active" : isUnlocked ? "unlocked" : "locked"}"
+            type="button"
+            data-idol-id="${idolId}"
+            ${isUnlocked && !isActive ? "" : "disabled"}
+          >
+            ${isActive ? UI_TEXT.focusedIdolLabel : isUnlocked ? UI_TEXT.focusIdolButtonLabel : UI_TEXT.lockedIdolLabel}
+          </button>
+        </div>
+      </div>
+    </article>
+  `;
 }
 
 function renderFacilityCards(state: GameState): string {
@@ -394,10 +490,18 @@ function renderSongCard(state: GameState, songId: SongId): string {
   const isUnlocked = isSongUnlocked(state, songId);
   const isPurchased = isSongPurchased(state, songId);
   const canPurchase = isUnlocked && !isPurchased && state.lights >= song.cost;
+  const songStateLabel = isPurchased
+    ? UI_TEXT.purchasedSongLabel
+    : isUnlocked
+      ? UI_TEXT.unlockedSongLabel
+      : UI_TEXT.lockedSongLabel;
 
   return `
-    <article class="card song-card ${isUnlocked ? "" : "locked-card"} ${isPurchased ? "purchased-card" : ""}">
-      <span class="card-kicker">${isPurchased ? UI_TEXT.purchasedSongLabel : UI_TEXT.songTabLabel}</span>
+    <article class="card song-card ${isUnlocked ? "unlocked-card" : "locked-card"} ${isPurchased ? "purchased-card" : ""}">
+      <div class="song-card-heading">
+        <span class="card-kicker">${songStateLabel}</span>
+        <span class="song-state ${isPurchased ? "purchased" : isUnlocked ? "unlocked" : "locked"}">${songStateLabel}</span>
+      </div>
       <h2>${song.name}</h2>
       <p>${song.description}</p>
       <dl class="stats-list">
@@ -415,7 +519,7 @@ function renderSongCard(state: GameState, songId: SongId): string {
         </div>
       </dl>
       <button
-        class="secondary-action"
+        class="secondary-action song-action ${isPurchased ? "purchased" : isUnlocked ? "unlocked" : "locked"}"
         type="button"
         data-song-id="${songId}"
         ${canPurchase ? "" : "disabled"}
@@ -440,7 +544,7 @@ function renderRecordCard(state: GameState, recordId: RecordId): string {
       <article class="card record-card locked-card">
         <div class="record-card-heading">
           <span class="card-kicker">${UI_TEXT.lockedRecordLabel}</span>
-          <span class="record-state">${UI_TEXT.lockedIdolLabel}</span>
+          <span class="record-state locked">${UI_TEXT.lockedRecordLabel}</span>
         </div>
         <h2>${record.title}</h2>
         <dl class="stats-list">
@@ -457,7 +561,7 @@ function renderRecordCard(state: GameState, recordId: RecordId): string {
     <article class="card record-card ${isRead ? "read-record-card" : "unread-record-card"}">
       <div class="record-card-heading">
         <span class="card-kicker">${record.category}</span>
-        <span class="record-state">${isRead ? UI_TEXT.readRecordLabel : UI_TEXT.unreadRecordLabel}</span>
+        <span class="record-state ${isRead ? "read" : "unread"}">${isRead ? UI_TEXT.readRecordLabel : UI_TEXT.unreadRecordLabel}</span>
       </div>
       <h2>${record.title}</h2>
       <p>${record.body}</p>
@@ -487,7 +591,7 @@ function getIdolUnlockRequirementText(idolId: IdolId): string {
   const requirement = IDOLS[idolId].unlockRequirement;
 
   if (!requirement) {
-    return UI_TEXT.lockedIdolLabel;
+    return UI_TEXT.initialIdolLabel;
   }
 
   return `${UI_TEXT.idolUnlockRequirementLabel}: ${getUnlockRequirementTextFromRequirement(requirement)}`;
@@ -501,7 +605,7 @@ function getUnlockRequirementTextFromRequirement(requirement: UnlockRequirement)
   return `${FACILITIES[requirement.facilityId].name} Lv ${requirement.level}`;
 }
 
-function renderTabs(elements: UiElements, activeTabId: ActiveTabId): void {
+function renderTabs(elements: UiElements, state: GameState, activeTabId: ActiveTabId): void {
   elements.root.querySelectorAll<HTMLButtonElement>("[data-tab-id]").forEach((button) => {
     const isActive = button.dataset.tabId === activeTabId;
 
@@ -513,6 +617,51 @@ function renderTabs(elements: UiElements, activeTabId: ActiveTabId): void {
       button.removeAttribute("aria-current");
     }
   });
+
+  const songUnlockCount = getUnlockableSongCount(state, activeTabId);
+  const songButton = elements.root.querySelector<HTMLButtonElement>('[data-tab-id="song"]');
+  const recordUnreadCount = getUnreadRecordNotificationCount(state, activeTabId);
+  const recordButton = elements.root.querySelector<HTMLButtonElement>('[data-tab-id="record"]');
+
+  if (songButton) {
+    if (activeTabId === "song" || songUnlockCount <= 0) {
+      songButton.removeAttribute("data-song-unlock-count");
+    } else {
+      songButton.dataset.songUnlockCount = String(songUnlockCount);
+    }
+  }
+
+  if (recordButton) {
+    if (activeTabId === "record" || recordUnreadCount <= 0) {
+      recordButton.removeAttribute("data-record-unread-count");
+    } else {
+      recordButton.dataset.recordUnreadCount = String(recordUnreadCount);
+    }
+  }
+}
+
+function getUnlockableSongCount(state: GameState, activeTabId: ActiveTabId): number {
+  if (activeTabId === "song") {
+    return 0;
+  }
+
+  return SONG_ORDER.reduce((count, songId) => {
+    return count + (isSongUnlocked(state, songId) && !isSongPurchased(state, songId) ? 1 : 0);
+  }, 0);
+}
+
+function getUnreadRecordNotificationCount(state: GameState, activeTabId: ActiveTabId): number {
+  if (activeTabId === "record") {
+    return 0;
+  }
+
+  return RECORD_ORDER.reduce((count, recordId) => {
+    const record = RECORDS[recordId];
+    const isUnread = isRecordUnlocked(state, recordId) && !isRecordRead(state, recordId);
+    const isNewSinceLastView = record.introducedAtVersion > state.recordTabLastSeenContentVersion;
+
+    return count + (isUnread && isNewSinceLastView ? 1 : 0);
+  }, 0);
 }
 
 function getElement<T extends HTMLElement>(

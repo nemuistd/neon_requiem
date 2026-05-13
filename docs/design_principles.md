@@ -145,7 +145,7 @@ neon-requiem-save-v1
 現在のセーブデータバージョン:
 
 ```text
-saveVersion: 5
+saveVersion: 7
 ```
 
 原則:

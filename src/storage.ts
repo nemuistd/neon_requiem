@@ -1,4 +1,4 @@
-import { FACILITY_ORDER, FacilityId, RECORD_ORDER, RecordId, SONG_ORDER, SongId } from "./definitions";
+import { FACILITY_ORDER, FacilityId, IdolId, IDOLS, RECORD_ORDER, RecordId, SONG_ORDER, SongId } from "./definitions";
 import {
   applyProduction,
   createInitialFacilities,
@@ -8,7 +8,11 @@ import {
   FacilityState,
   GameState,
   getOfflineLights,
+  INITIAL_ACTIVE_IDOL_ID,
+  isIdolUnlocked,
   RecordState,
+  MAX_OFFLINE_SECONDS,
+  resolveActiveIdolId,
   SAVE_VERSION,
   SongState
 } from "./game";
@@ -26,6 +30,8 @@ type RawSaveData = {
   version?: unknown;
   applause?: unknown;
   lights?: unknown;
+  activeIdolId?: unknown;
+  recordTabLastSeenContentVersion?: unknown;
   alleyStageLevel?: unknown;
   facilities?: unknown;
   songs?: unknown;
@@ -55,8 +61,9 @@ export function loadGame(now = Date.now()): LoadResult {
 
   const offlineSeconds = Math.max(0, (now - savedState.lastSavedAt) / 1000);
   const offlineLights = getOfflineLights(savedState, offlineSeconds);
+  const appliedOfflineSeconds = Math.min(offlineSeconds, MAX_OFFLINE_SECONDS);
   const state = {
-    ...applyProduction(savedState, offlineSeconds),
+    ...applyProduction(savedState, appliedOfflineSeconds),
     lastSavedAt: now
   };
 
@@ -67,6 +74,7 @@ export function saveGame(state: GameState, now = Date.now()): GameState {
   const stateToSave: GameState = {
     ...state,
     saveVersion: SAVE_VERSION,
+    activeIdolId: resolveActiveIdolId(state),
     lastSavedAt: now
   };
 
@@ -88,7 +96,14 @@ function parseSave(rawSave: string, now: number): GameState | null {
       return migrateV1Save(data, now);
     }
 
-    if (saveVersion === 2 || saveVersion === 3 || saveVersion === 4 || saveVersion === SAVE_VERSION || saveVersion === null) {
+    if (
+      saveVersion === 2 ||
+      saveVersion === 3 ||
+      saveVersion === 4 ||
+      saveVersion === 5 ||
+      saveVersion === SAVE_VERSION ||
+      saveVersion === null
+    ) {
       return parseV2Save(data, now);
     }
 
@@ -101,9 +116,11 @@ function parseSave(rawSave: string, now: number): GameState | null {
 function migrateV1Save(data: RawSaveData, now: number): GameState | null {
   const { applause, lights, alleyStageLevel, lastSavedAt } = data;
 
-  return {
+  const state: GameState = {
     saveVersion: SAVE_VERSION,
     lights: normalizeAmount(lights ?? applause),
+    activeIdolId: INITIAL_ACTIVE_IDOL_ID,
+    recordTabLastSeenContentVersion: 0,
     facilities: {
       ...createInitialFacilities(),
       alleyStage: {
@@ -114,19 +131,36 @@ function migrateV1Save(data: RawSaveData, now: number): GameState | null {
     records: createInitialRecords(),
     lastSavedAt: normalizeSavedAt(lastSavedAt, now)
   };
+
+  return state;
 }
 
 function parseV2Save(data: RawSaveData, now: number): GameState | null {
-  const { applause, lights, facilities, songs, records, lastSavedAt } = data;
+  const { applause, lights, activeIdolId, recordTabLastSeenContentVersion, facilities, songs, records, lastSavedAt } = data;
 
-  return {
+  const state: GameState = {
     saveVersion: SAVE_VERSION,
     lights: normalizeAmount(lights ?? applause),
+    activeIdolId: getSavedActiveIdolId(activeIdolId),
+    recordTabLastSeenContentVersion: normalizeRecordTabLastSeenContentVersion(recordTabLastSeenContentVersion),
     facilities: normalizeFacilities(facilities),
     songs: normalizeSongs(songs),
     records: normalizeRecords(records),
     lastSavedAt: normalizeSavedAt(lastSavedAt, now)
   };
+
+  return {
+    ...state,
+    activeIdolId: isIdolUnlocked(state, state.activeIdolId) ? state.activeIdolId : INITIAL_ACTIVE_IDOL_ID
+  };
+}
+
+function normalizeRecordTabLastSeenContentVersion(value: unknown): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return 0;
+  }
+
+  return Math.max(0, Math.floor(value));
 }
 
 function normalizeFacilities(facilities: unknown): Record<FacilityId, FacilityState> {
@@ -193,6 +227,14 @@ function getSavedFacilityLevel(facilities: unknown, facilityId: FacilityId): num
   const facility = (facilities as Partial<Record<FacilityId, { level?: unknown }>>)[facilityId];
 
   return normalizeLevel(facility?.level);
+}
+
+function getSavedActiveIdolId(activeIdolId: unknown): IdolId {
+  if (typeof activeIdolId === "string" && Object.prototype.hasOwnProperty.call(IDOLS, activeIdolId)) {
+    return activeIdolId as IdolId;
+  }
+
+  return INITIAL_ACTIVE_IDOL_ID;
 }
 
 function getRawSaveVersion(data: RawSaveData): number | null {

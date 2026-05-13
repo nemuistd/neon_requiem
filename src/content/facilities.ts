@@ -5,7 +5,7 @@ export const FACILITIES: Record<FacilityId, FacilityDefinition> = {
     id: "alleyStage",
     name: "路地裏ステージ",
     description:
-      "古いスピーカー、拾い集めたネオン管、小さな聖印で組まれた仮設ステージ。強化するほど、地下の静寂に届く音が増えていく。",
+      "古いスピーカー、拾い集めたネオン管、小規模な舞台で組まれた仮設ステージ。静まり返った地下へ歌を響かせる最初の拠点。",
     baseCost: 10,
     costMultiplier: 1.15,
     productionPerLevel: 0.1
@@ -14,7 +14,7 @@ export const FACILITIES: Record<FacilityId, FacilityDefinition> = {
     id: "undergroundChapel",
     name: "地下礼拝堂",
     description:
-      "崩れかけた柱と古い聖印が残る小さな礼拝堂。響きを整えるほど、歌に導かれた灯りが静かに集まっていく。",
+      "崩れかけた柱と古い聖印が残る小さな礼拝堂。魅力的な歌は、人々の熱に導かれて、灯りが集まり始める。",
     baseCost: 100,
     costMultiplier: 1.2,
     productionPerLevel: 0.5,

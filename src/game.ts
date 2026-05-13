@@ -5,6 +5,7 @@ import {
   IdolId,
   IDOL_ORDER,
   IDOLS,
+  RECORD_CONTENT_VERSION,
   RECORD_ORDER,
   RecordId,
   RECORDS,
@@ -14,7 +15,9 @@ import {
   UnlockRequirement
 } from "./definitions";
 
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 7;
+export const INITIAL_ACTIVE_IDOL_ID: IdolId = "otowaAkari";
+export const MAX_OFFLINE_SECONDS = 12 * 60 * 60;
 
 export type FacilityState = {
   level: number;
@@ -31,6 +34,8 @@ export type RecordState = {
 export type GameState = {
   saveVersion: typeof SAVE_VERSION;
   lights: number;
+  activeIdolId: IdolId;
+  recordTabLastSeenContentVersion: number;
   facilities: Record<FacilityId, FacilityState>;
   songs: Record<SongId, SongState>;
   records: Record<RecordId, RecordState>;
@@ -54,6 +59,8 @@ export function createInitialState(now = Date.now()): GameState {
   return {
     saveVersion: SAVE_VERSION,
     lights: 0,
+    activeIdolId: INITIAL_ACTIVE_IDOL_ID,
+    recordTabLastSeenContentVersion: 0,
     facilities: createInitialFacilities(),
     songs: createInitialSongs(),
     records: createInitialRecords(),
@@ -125,6 +132,32 @@ export function isFacilityUnlocked(state: GameState, facilityId: FacilityId): bo
 
 export function isIdolUnlocked(state: GameState, idolId: IdolId): boolean {
   return isRequirementMet(state, IDOLS[idolId].unlockRequirement);
+}
+
+export function resolveActiveIdolId(state: GameState): IdolId {
+  return isIdolUnlocked(state, state.activeIdolId) ? state.activeIdolId : INITIAL_ACTIVE_IDOL_ID;
+}
+
+export function selectActiveIdol(state: GameState, idolId: IdolId): GameState {
+  if (!isIdolUnlocked(state, idolId)) {
+    return state;
+  }
+
+  return {
+    ...state,
+    activeIdolId: idolId
+  };
+}
+
+export function markRecordTabSeen(state: GameState): GameState {
+  if (state.recordTabLastSeenContentVersion >= RECORD_CONTENT_VERSION) {
+    return state;
+  }
+
+  return {
+    ...state,
+    recordTabLastSeenContentVersion: RECORD_CONTENT_VERSION
+  };
 }
 
 export function isSongUnlocked(state: GameState, songId: SongId): boolean {
@@ -206,7 +239,7 @@ export function getManualLightGain(state: GameState): number {
 }
 
 export function getOfflineLights(state: GameState, offlineSeconds: number): number {
-  return getLightsPerSecond(state) * Math.max(0, offlineSeconds);
+  return getLightsPerSecond(state) * getCappedOfflineSeconds(offlineSeconds);
 }
 
 export function gainManualLights(state: GameState): GameState {
@@ -225,6 +258,10 @@ export function applyProduction(state: GameState, elapsedSeconds: number): GameS
     ...state,
     lights: state.lights + getLightsPerSecond(state) * elapsedSeconds
   };
+}
+
+export function getCappedOfflineSeconds(offlineSeconds: number): number {
+  return Math.max(0, Math.min(offlineSeconds, MAX_OFFLINE_SECONDS));
 }
 
 export function purchaseSong(state: GameState, songId: SongId): PurchaseSongResult {

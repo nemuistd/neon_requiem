@@ -16,5 +16,5 @@ export type {
 
 export { FACILITIES, FACILITY_ORDER } from "./content/facilities.js";
 export { IDOLS, IDOL_ORDER } from "./content/idols.js";
-export { RECORDS, RECORD_ORDER } from "./content/records.js";
+export { RECORD_CONTENT_VERSION, RECORDS, RECORD_ORDER } from "./content/records.js";
 export { SONGS, SONG_ORDER } from "./content/songs.js";

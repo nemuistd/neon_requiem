@@ -16,6 +16,8 @@ export const UI_TEXT = {
   baseProductionLabel: "基礎生産",
   productionMultiplierLabel: "生産倍率",
   detailButtonLabel: "詳細を見る",
+  focusIdolButtonLabel: "注目にする",
+  focusedIdolLabel: "注目中",
   idolRosterLabel: "アイドル切替",
   lockedIdolLabel: "未解放",
   idolUnlockRequirementLabel: "解放条件",
@@ -28,6 +30,9 @@ export const UI_TEXT = {
   readRecordLabel: "既読",
   lockedRecordLabel: "未解放の記録",
   readRecordButtonLabel: "読む",
+  versionLabel: "バージョン",
+  closeButtonLabel: "閉じる",
+  resetSaveButtonLabel: "セーブデータを削除",
   idolSectionLabel: "アイドル",
   facilitySectionLabel: "施設",
   initialIdolLabel: "初期アイドル",
@@ -44,6 +49,8 @@ export const UI_TEXT = {
   notEnoughLightsLog: "灯りがまだ足りません。",
   lockedFacilityLog: "まだこの施設は解放されていません。",
   purchasedSongLabel: "取得済み",
+  unlockedSongLabel: "解放済み",
+  lockedSongLabel: "未開放",
   songEffectLabel: "効果",
   songPriceLabel: "価格",
   purchaseSongButtonLabel: "歌を取得",
@@ -57,8 +64,8 @@ export const RESOURCE_LABELS = {
   lights: "灯り"
 } as const;
 
-export function createOfflineRewardMessage(lights: string): string {
-  return `離れている間に、灯里が ${lights} 灯りを集めました。路地の灯りが少し強くなっています。`;
+export function createOfflineRewardMessage(idolName: string, lights: string): string {
+  return `${getGivenName(idolName)}が${lights}灯りを集めました。`;
 }
 
 export function createFacilityUpgradeMessage(facilityName: string, cost: string): string {
@@ -67,4 +74,10 @@ export function createFacilityUpgradeMessage(facilityName: string, cost: string)
 
 export function createSongPurchaseMessage(songName: string, cost: string): string {
   return `${songName}を取得しました。-${cost} 灯り`;
+}
+
+function getGivenName(fullName: string): string {
+  const nameParts = fullName.trim().split(/\s+/);
+
+  return nameParts[nameParts.length - 1] || fullName;
 }

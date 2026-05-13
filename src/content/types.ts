@@ -77,5 +77,6 @@ export type RecordDefinition = {
   title: string;
   category: "復旧報告" | "観測記録" | "施設ログ" | "断片記憶";
   body: string;
+  introducedAtVersion: number;
   unlockRequirements: UnlockRequirement[];
 };
