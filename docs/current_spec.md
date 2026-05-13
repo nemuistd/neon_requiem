@@ -5,6 +5,7 @@
 この文書は、現在の実装状態をドキュメント側で参照するための仕様メモである。
 
 世界観・用語体系は [worldbuilding.md](worldbuilding.md) を正史とする。README とこの文書に差分が出た場合は、実装と README を確認して同期する。
+長期方針と未実装計画は [planning/](planning/) 配下を参照する。
 
 ## 技術構成
 
