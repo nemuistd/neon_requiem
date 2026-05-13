@@ -1,0 +1,37 @@
+# AGENTS.md draft for NEON REQUIEM
+
+このファイルは、Codex等のコーディングエージェントに毎回守らせるためのリポジトリ内指示案です。必要ならリポジトリルートに `AGENTS.md` として追加してください。
+
+## Project
+
+NEON REQUIEM is a lightweight browser incremental game built with Vite and TypeScript.
+Keep the current static TypeScript architecture. Do not introduce React/Vue/Svelte or other UI frameworks unless explicitly requested.
+
+## Canon
+
+- Treat `docs/worldbuilding.md` as the canon worldbuilding document.
+- Do not invent major lore not documented there.
+- Surface UI should initially feel like an idol base management and restoration game.
+- Deep lore terms must be introduced gradually through records/logs.
+- Do not use `聖歌` as a normal system name. It is a dangerous deep-lore term.
+- `灯し手` is the public/human term for idol-suitable performers.
+- `アンカー` is the old engineering/administrative term.
+- The experience should focus on recovery, belonging, and restoration, not exploitation or despair.
+
+## Engineering rules
+
+- Preserve TypeScript strictness.
+- Avoid new dependencies unless explicitly justified.
+- Keep `npm run build` and `npm run check:content` passing.
+- Keep the debug API available: `window.__NEON_DEBUG__`.
+- Keep save reset available in settings.
+- Prefer small PRs. Do not implement multiple roadmap phases in one task.
+
+## After every task
+
+Report:
+
+1. Summary of changes.
+2. Files changed.
+3. Commands run and results.
+4. Remaining risks or follow-up tasks.

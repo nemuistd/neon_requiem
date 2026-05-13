@@ -1,27 +1,31 @@
-import { FACILITY_ORDER, FacilityId, IdolId, IDOLS, RECORD_ORDER, RecordId, SONG_ORDER, SongId } from "./definitions";
+import { FACILITY_ORDER, FacilityId, ITEM_ORDER, ItemId, IdolId, IDOLS, RECORD_ORDER, RecordId, ResourceId, SONG_ORDER, SongId } from "./definitions";
 import {
   applyProduction,
   createInitialFacilities,
+  createInitialItems,
   createInitialRecords,
+  createInitialResources,
   createInitialSongs,
   createInitialState,
   FacilityState,
   GameState,
-  getOfflineLights,
+  ItemState,
+  getOfflineTomorusa,
   INITIAL_ACTIVE_IDOL_ID,
   isIdolUnlocked,
   RecordState,
   MAX_OFFLINE_SECONDS,
   resolveActiveIdolId,
   SAVE_VERSION,
-  SongState
+  SongState,
+  TOMORUSA_RESOURCE_ID
 } from "./game";
 
 export const SAVE_KEY = "neon-requiem-save-v1";
 
 export type LoadResult = {
   state: GameState;
-  offlineLights: number;
+  offlineTomorusa: number;
   offlineSeconds: number;
 };
 
@@ -30,12 +34,14 @@ type RawSaveData = {
   version?: unknown;
   applause?: unknown;
   lights?: unknown;
+  resources?: unknown;
   activeIdolId?: unknown;
   recordTabLastSeenContentVersion?: unknown;
   alleyStageLevel?: unknown;
   facilities?: unknown;
   songs?: unknown;
   records?: unknown;
+  items?: unknown;
   lastSavedAt?: unknown;
 };
 
@@ -45,7 +51,7 @@ export function loadGame(now = Date.now()): LoadResult {
   if (!rawSave) {
     return {
       state: createInitialState(now),
-      offlineLights: 0,
+      offlineTomorusa: 0,
       offlineSeconds: 0
     };
   }
@@ -54,20 +60,20 @@ export function loadGame(now = Date.now()): LoadResult {
   if (!savedState) {
     return {
       state: createInitialState(now),
-      offlineLights: 0,
+      offlineTomorusa: 0,
       offlineSeconds: 0
     };
   }
 
   const offlineSeconds = Math.max(0, (now - savedState.lastSavedAt) / 1000);
-  const offlineLights = getOfflineLights(savedState, offlineSeconds);
+  const offlineTomorusa = getOfflineTomorusa(savedState, offlineSeconds);
   const appliedOfflineSeconds = Math.min(offlineSeconds, MAX_OFFLINE_SECONDS);
   const state = {
     ...applyProduction(savedState, appliedOfflineSeconds),
     lastSavedAt: now
   };
 
-  return { state, offlineLights, offlineSeconds };
+  return { state, offlineTomorusa, offlineSeconds };
 }
 
 export function saveGame(state: GameState, now = Date.now()): GameState {
@@ -92,19 +98,18 @@ function parseSave(rawSave: string, now: number): GameState | null {
 
     const saveVersion = getRawSaveVersion(data);
 
-    if (saveVersion === 1) {
-      return migrateV1Save(data, now);
-    }
-
     if (
+      saveVersion === 1 ||
       saveVersion === 2 ||
       saveVersion === 3 ||
       saveVersion === 4 ||
       saveVersion === 5 ||
+      saveVersion === 6 ||
+      saveVersion === 7 ||
       saveVersion === SAVE_VERSION ||
       saveVersion === null
     ) {
-      return parseV2Save(data, now);
+      return parseLatestSave(data, now);
     }
 
     return null;
@@ -113,37 +118,16 @@ function parseSave(rawSave: string, now: number): GameState | null {
   }
 }
 
-function migrateV1Save(data: RawSaveData, now: number): GameState | null {
-  const { applause, lights, alleyStageLevel, lastSavedAt } = data;
+function parseLatestSave(data: RawSaveData, now: number): GameState | null {
+  const { applause, lights, resources, activeIdolId, recordTabLastSeenContentVersion, facilities, items, songs, records, lastSavedAt } = data;
 
   const state: GameState = {
     saveVersion: SAVE_VERSION,
-    lights: normalizeAmount(lights ?? applause),
-    activeIdolId: INITIAL_ACTIVE_IDOL_ID,
-    recordTabLastSeenContentVersion: 0,
-    facilities: {
-      ...createInitialFacilities(),
-      alleyStage: {
-        level: normalizeLevel(alleyStageLevel)
-      }
-    },
-    songs: createInitialSongs(),
-    records: createInitialRecords(),
-    lastSavedAt: normalizeSavedAt(lastSavedAt, now)
-  };
-
-  return state;
-}
-
-function parseV2Save(data: RawSaveData, now: number): GameState | null {
-  const { applause, lights, activeIdolId, recordTabLastSeenContentVersion, facilities, songs, records, lastSavedAt } = data;
-
-  const state: GameState = {
-    saveVersion: SAVE_VERSION,
-    lights: normalizeAmount(lights ?? applause),
+    resources: normalizeResources(resources, lights ?? applause),
     activeIdolId: getSavedActiveIdolId(activeIdolId),
     recordTabLastSeenContentVersion: normalizeRecordTabLastSeenContentVersion(recordTabLastSeenContentVersion),
-    facilities: normalizeFacilities(facilities),
+    facilities: normalizeFacilities(facilities, data.alleyStageLevel),
+    items: normalizeItems(items),
     songs: normalizeSongs(songs),
     records: normalizeRecords(records),
     lastSavedAt: normalizeSavedAt(lastSavedAt, now)
@@ -155,6 +139,23 @@ function parseV2Save(data: RawSaveData, now: number): GameState | null {
   };
 }
 
+function normalizeResources(resources: unknown, fallbackTomorusa: unknown): Record<ResourceId, number> {
+  return {
+    ...createInitialResources(),
+    [TOMORUSA_RESOURCE_ID]: getSavedResourceAmount(resources, TOMORUSA_RESOURCE_ID, fallbackTomorusa)
+  };
+}
+
+function getSavedResourceAmount(resources: unknown, resourceId: ResourceId, fallback: unknown): number {
+  if (!isRecord(resources)) {
+    return normalizeAmount(fallback);
+  }
+
+  const rawAmount = (resources as Partial<Record<ResourceId, unknown>>)[resourceId];
+
+  return normalizeAmount(rawAmount);
+}
+
 function normalizeRecordTabLastSeenContentVersion(value: unknown): number {
   if (typeof value !== "number" || !Number.isFinite(value)) {
     return 0;
@@ -163,15 +164,27 @@ function normalizeRecordTabLastSeenContentVersion(value: unknown): number {
   return Math.max(0, Math.floor(value));
 }
 
-function normalizeFacilities(facilities: unknown): Record<FacilityId, FacilityState> {
+function normalizeFacilities(facilities: unknown, fallbackAlleyStageLevel?: unknown): Record<FacilityId, FacilityState> {
   return FACILITY_ORDER.reduce(
     (normalizedFacilities, facilityId) => ({
       ...normalizedFacilities,
       [facilityId]: {
-        level: getSavedFacilityLevel(facilities, facilityId)
+        level: getSavedFacilityLevel(facilities, facilityId, fallbackAlleyStageLevel)
       }
     }),
     createInitialFacilities()
+  );
+}
+
+function normalizeItems(items: unknown): Record<ItemId, ItemState> {
+  return ITEM_ORDER.reduce(
+    (normalizedItems, itemId) => ({
+      ...normalizedItems,
+      [itemId]: {
+        purchased: getSavedItemPurchased(items, itemId)
+      }
+    }),
+    createInitialItems()
   );
 }
 
@@ -209,6 +222,16 @@ function getSavedRecordRead(records: unknown, recordId: RecordId): boolean {
   return record?.read === true;
 }
 
+function getSavedItemPurchased(items: unknown, itemId: ItemId): boolean {
+  if (!isRecord(items)) {
+    return false;
+  }
+
+  const item = (items as Partial<Record<ItemId, { purchased?: unknown }>>)[itemId];
+
+  return item?.purchased === true;
+}
+
 function getSavedSongPurchased(songs: unknown, songId: SongId): boolean {
   if (!isRecord(songs)) {
     return false;
@@ -219,8 +242,12 @@ function getSavedSongPurchased(songs: unknown, songId: SongId): boolean {
   return song?.purchased === true;
 }
 
-function getSavedFacilityLevel(facilities: unknown, facilityId: FacilityId): number {
+function getSavedFacilityLevel(facilities: unknown, facilityId: FacilityId, fallbackAlleyStageLevel?: unknown): number {
   if (!isRecord(facilities)) {
+    if (facilityId === "alleyStage") {
+      return normalizeLevel(fallbackAlleyStageLevel);
+    }
+
     return 0;
   }
 

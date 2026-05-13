@@ -10,7 +10,7 @@ export const IDOLS: Record<IdolId, IdolDefinition> = {
       "灯里は、寂れた路地裏でもなお歌い続けていた。澄んだ声が響くたび、ひび割れた街路に小さな灯りが戻っていく。",
     imageUrl: new URL("../../assets/idol/ComfyUI_00021_.png", import.meta.url).href,
     imagePosition: "center top",
-    passiveDescription: "全灯り生産 +20%",
+    passiveDescription: "全灯るさ生産 +20%",
     passiveEffect: {
       type: "globalProductionMultiplier",
       multiplier: 1.2
@@ -20,19 +20,20 @@ export const IDOLS: Record<IdolId, IdolDefinition> = {
     id: "mizukiShino",
     name: "深月 詩乃",
     reading: "みづき しの",
-    title: "地下礼拝堂の聖歌係",
+    title: "地下礼拝堂の保管係",
     description:
-      "詩乃は、閉ざされた地下礼拝堂で失われた歌を守っていた。聞く人々の安息を守り、心を守る最後の歌手として。",
+      "詩乃は、閉ざされた地下礼拝堂で失われた響きを守っていた。静かな声で、深い区画に残された記録と歌の断片をたぐり寄せる。",
     imageUrl: new URL("../../assets/idol/ComfyUI_00022_.png", import.meta.url).href,
     imagePosition: "center top",
-    passiveDescription: "全灯り生産 +10%",
+    passiveDescription: "全灯るさ生産 +10%",
     passiveEffect: {
       type: "globalProductionMultiplier",
       multiplier: 1.1
     },
     unlockRequirement: {
-      facilityId: "alleyStage",
-      level: 10
+      type: "facility.level",
+      facilityId: "undergroundChapel",
+      level: 3
     }
   },
   asagiriYui: {
@@ -44,13 +45,14 @@ export const IDOLS: Record<IdolId, IdolDefinition> = {
       "結のよく通る歌声は、霞の濃い通路で迷う人々の道標であった。彼女の笑顔は、足元の頼りない道を踏みしめる勇気をくれるのだ。",
     imageUrl: new URL("../../assets/idol/ComfyUI_00027_.png", import.meta.url).href,
     imagePosition: "center top",
-    passiveDescription: "全灯り生産 +15%",
+    passiveDescription: "全灯るさ生産 +15%",
     passiveEffect: {
       type: "globalProductionMultiplier",
       multiplier: 1.15
     },
     unlockRequirement: {
-      facilityId: "undergroundChapel",
+      type: "facility.level",
+      facilityId: "neonBoard",
       level: 5
     }
   }

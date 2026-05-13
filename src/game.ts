@@ -2,6 +2,9 @@ import {
   FACILITIES,
   FACILITY_ORDER,
   FacilityId,
+  ITEM_ORDER,
+  ItemId,
+  ITEMS,
   IdolId,
   IDOL_ORDER,
   IDOLS,
@@ -9,15 +12,18 @@ import {
   RECORD_ORDER,
   RecordId,
   RECORDS,
+  RESOURCE_ORDER,
+  ResourceId,
   SONG_ORDER,
   SongId,
-  SONGS,
-  UnlockRequirement
+  SONGS
 } from "./definitions";
+import { areRequirementsMet, isRequirementMet } from "./engine/requirements";
 
-export const SAVE_VERSION = 7;
+export const SAVE_VERSION = 8;
 export const INITIAL_ACTIVE_IDOL_ID: IdolId = "otowaAkari";
 export const MAX_OFFLINE_SECONDS = 12 * 60 * 60;
+export const TOMORUSA_RESOURCE_ID: ResourceId = "tomorusa";
 
 export type FacilityState = {
   level: number;
@@ -27,16 +33,21 @@ export type SongState = {
   purchased: boolean;
 };
 
+export type ItemState = {
+  purchased: boolean;
+};
+
 export type RecordState = {
   read: boolean;
 };
 
 export type GameState = {
   saveVersion: typeof SAVE_VERSION;
-  lights: number;
+  resources: Record<ResourceId, number>;
   activeIdolId: IdolId;
   recordTabLastSeenContentVersion: number;
   facilities: Record<FacilityId, FacilityState>;
+  items: Record<ItemId, ItemState>;
   songs: Record<SongId, SongState>;
   records: Record<RecordId, RecordState>;
   lastSavedAt: number;
@@ -50,6 +61,10 @@ export type PurchaseSongResult =
   | { purchased: true; cost: number; songId: SongId; state: GameState }
   | { purchased: false; cost: number; songId: SongId; state: GameState; reason: "locked" | "notEnoughLights" | "alreadyPurchased" };
 
+export type PurchaseItemResult =
+  | { purchased: true; cost: number; itemId: ItemId; state: GameState }
+  | { purchased: false; cost: number; itemId: ItemId; state: GameState; reason: "locked" | "notEnoughLights" | "alreadyPurchased" };
+
 export type FacilityMultiplierEffect = {
   idolId: IdolId;
   multiplier: number;
@@ -58,14 +73,35 @@ export type FacilityMultiplierEffect = {
 export function createInitialState(now = Date.now()): GameState {
   return {
     saveVersion: SAVE_VERSION,
-    lights: 0,
+    resources: createInitialResources(),
     activeIdolId: INITIAL_ACTIVE_IDOL_ID,
     recordTabLastSeenContentVersion: 0,
     facilities: createInitialFacilities(),
+    items: createInitialItems(),
     songs: createInitialSongs(),
     records: createInitialRecords(),
     lastSavedAt: now
   };
+}
+
+export function createInitialItems(): Record<ItemId, ItemState> {
+  return ITEM_ORDER.reduce(
+    (items, itemId) => ({
+      ...items,
+      [itemId]: { purchased: false }
+    }),
+    {} as Record<ItemId, ItemState>
+  );
+}
+
+export function createInitialResources(): Record<ResourceId, number> {
+  return RESOURCE_ORDER.reduce(
+    (resources, resourceId) => ({
+      ...resources,
+      [resourceId]: 0
+    }),
+    {} as Record<ResourceId, number>
+  );
 }
 
 export function createInitialFacilities(): Record<FacilityId, FacilityState> {
@@ -102,28 +138,52 @@ export function getFacilityLevel(state: GameState, facilityId: FacilityId): numb
   return state.facilities[facilityId]?.level ?? 0;
 }
 
+export function getResourceAmount(state: GameState, resourceId: ResourceId): number {
+  return state.resources[resourceId] ?? 0;
+}
+
+export function addResource(state: GameState, resourceId: ResourceId, amount: number): GameState {
+  if (amount <= 0) {
+    return state;
+  }
+
+  return {
+    ...state,
+    resources: {
+      ...state.resources,
+      [resourceId]: getResourceAmount(state, resourceId) + amount
+    }
+  };
+}
+
+export function canSpendResource(state: GameState, resourceId: ResourceId, amount: number): boolean {
+  return amount >= 0 && getResourceAmount(state, resourceId) >= amount;
+}
+
+export function spendResource(state: GameState, resourceId: ResourceId, amount: number): GameState {
+  if (!canSpendResource(state, resourceId, amount)) {
+    return state;
+  }
+
+  return {
+    ...state,
+    resources: {
+      ...state.resources,
+      [resourceId]: getResourceAmount(state, resourceId) - amount
+    }
+  };
+}
+
 export function isSongPurchased(state: GameState, songId: SongId): boolean {
   return state.songs[songId]?.purchased ?? false;
 }
 
+export function isItemPurchased(state: GameState, itemId: ItemId): boolean {
+  return state.items[itemId]?.purchased ?? false;
+}
+
 export function isRecordRead(state: GameState, recordId: RecordId): boolean {
   return state.records[recordId]?.read ?? false;
-}
-
-export function isRequirementMet(state: GameState, requirement?: UnlockRequirement): boolean {
-  if (!requirement) {
-    return true;
-  }
-
-  if (requirement.type === "songPurchased") {
-    return isSongPurchased(state, requirement.songId);
-  }
-
-  return getFacilityLevel(state, requirement.facilityId) >= requirement.level;
-}
-
-export function areRequirementsMet(state: GameState, requirements: UnlockRequirement[]): boolean {
-  return requirements.every((requirement) => isRequirementMet(state, requirement));
 }
 
 export function isFacilityUnlocked(state: GameState, facilityId: FacilityId): boolean {
@@ -164,6 +224,10 @@ export function isSongUnlocked(state: GameState, songId: SongId): boolean {
   return isRequirementMet(state, SONGS[songId].unlockRequirement);
 }
 
+export function isItemUnlocked(state: GameState, itemId: ItemId): boolean {
+  return isRequirementMet(state, ITEMS[itemId].unlockRequirement);
+}
+
 export function isRecordUnlocked(state: GameState, recordId: RecordId): boolean {
   return areRequirementsMet(state, RECORDS[recordId].unlockRequirements);
 }
@@ -175,31 +239,48 @@ export function getFacilityUpgradeCost(state: GameState, facilityId: FacilityId)
   return Math.floor(facility.baseCost * facility.costMultiplier ** level);
 }
 
-export function getFacilityLightsPerSecond(state: GameState, facilityId: FacilityId): number {
+export function getFacilityTomorusaPerSecond(state: GameState, facilityId: FacilityId): number {
   if (!isFacilityUnlocked(state, facilityId)) {
     return 0;
   }
 
-  return getFacilityBaseLightsPerSecond(state, facilityId) * getFacilityProductionMultiplier(state);
+  return getFacilityBaseTomorusaPerSecond(state, facilityId) * getFacilityProductionMultiplier(state);
 }
 
-export function getFacilityBaseLightsPerSecond(state: GameState, facilityId: FacilityId): number {
+export function getFacilityBaseTomorusaPerSecond(state: GameState, facilityId: FacilityId): number {
   return getFacilityLevel(state, facilityId) * (FACILITIES[facilityId].productionPerLevel ?? 0);
 }
 
 export function getFacilityProductionMultiplier(state: GameState): number {
   const idolMultiplier = getGlobalMultiplierEffects(state).reduce((multiplier, effect) => multiplier * effect.multiplier, 1);
   const songMultiplier = SONG_ORDER.reduce((multiplier, songId) => {
-    const effect = SONGS[songId].effect;
-
-    if (!isSongPurchased(state, songId) || effect.type !== "facilityProductionMultiplier") {
+    if (!isSongPurchased(state, songId)) {
       return multiplier;
     }
 
-    return multiplier * effect.multiplier;
+    return SONGS[songId].effects.reduce((effectMultiplier, effect) => {
+      if (effect.type !== "facility.production.multiplier") {
+        return effectMultiplier;
+      }
+
+      return effectMultiplier * effect.multiplier;
+    }, multiplier);
+  }, 1);
+  const itemMultiplier = ITEM_ORDER.reduce((multiplier, itemId) => {
+    if (!isItemPurchased(state, itemId)) {
+      return multiplier;
+    }
+
+    return ITEMS[itemId].effects.reduce((effectMultiplier, effect) => {
+      if (effect.type !== "facility.production.multiplier") {
+        return effectMultiplier;
+      }
+
+      return effectMultiplier * effect.multiplier;
+    }, multiplier);
   }, 1);
 
-  return idolMultiplier * songMultiplier;
+  return idolMultiplier * songMultiplier * itemMultiplier;
 }
 
 export function getFacilityMultiplierEffects(state: GameState, facilityId: FacilityId): FacilityMultiplierEffect[] {
@@ -222,31 +303,46 @@ export function getGlobalMultiplierEffects(state: GameState): FacilityMultiplier
   });
 }
 
-export function getLightsPerSecond(state: GameState): number {
-  return FACILITY_ORDER.reduce((total, facilityId) => total + getFacilityLightsPerSecond(state, facilityId), 0);
+export function getTomorusaPerSecond(state: GameState): number {
+  return FACILITY_ORDER.reduce((total, facilityId) => total + getFacilityTomorusaPerSecond(state, facilityId), 0);
 }
 
-export function getManualLightGain(state: GameState): number {
-  return SONG_ORDER.reduce((gain, songId) => {
-    const effect = SONGS[songId].effect;
-
-    if (!isSongPurchased(state, songId) || effect.type !== "manualLightGainBonus") {
+export function getManualTomorusaGain(state: GameState): number {
+  const songGain = SONG_ORDER.reduce((gain, songId) => {
+    if (!isSongPurchased(state, songId)) {
       return gain;
     }
 
-    return gain + effect.amount;
+    return SONGS[songId].effects.reduce((effectGain, effect) => {
+      if (effect.type !== "manual.gain.add" || effect.resourceId !== TOMORUSA_RESOURCE_ID) {
+        return effectGain;
+      }
+
+      return effectGain + effect.amount;
+    }, gain);
   }, 1);
+
+  return ITEM_ORDER.reduce((gain, itemId) => {
+    if (!isItemPurchased(state, itemId)) {
+      return gain;
+    }
+
+    return ITEMS[itemId].effects.reduce((effectGain, effect) => {
+      if (effect.type !== "manual.gain.add" || effect.resourceId !== TOMORUSA_RESOURCE_ID) {
+        return effectGain;
+      }
+
+      return effectGain + effect.amount;
+    }, gain);
+  }, songGain);
 }
 
-export function getOfflineLights(state: GameState, offlineSeconds: number): number {
-  return getLightsPerSecond(state) * getCappedOfflineSeconds(offlineSeconds);
+export function getOfflineTomorusa(state: GameState, offlineSeconds: number): number {
+  return getTomorusaPerSecond(state) * getCappedOfflineSeconds(offlineSeconds);
 }
 
-export function gainManualLights(state: GameState): GameState {
-  return {
-    ...state,
-    lights: state.lights + getManualLightGain(state)
-  };
+export function gainManualTomorusa(state: GameState): GameState {
+  return addResource(state, TOMORUSA_RESOURCE_ID, getManualTomorusaGain(state));
 }
 
 export function applyProduction(state: GameState, elapsedSeconds: number): GameState {
@@ -254,10 +350,7 @@ export function applyProduction(state: GameState, elapsedSeconds: number): GameS
     return state;
   }
 
-  return {
-    ...state,
-    lights: state.lights + getLightsPerSecond(state) * elapsedSeconds
-  };
+  return addResource(state, TOMORUSA_RESOURCE_ID, getTomorusaPerSecond(state) * elapsedSeconds);
 }
 
 export function getCappedOfflineSeconds(offlineSeconds: number): number {
@@ -275,20 +368,54 @@ export function purchaseSong(state: GameState, songId: SongId): PurchaseSongResu
     return { purchased: false, cost: song.cost, songId, state, reason: "alreadyPurchased" };
   }
 
-  if (state.lights < song.cost) {
+  if (!canSpendResource(state, TOMORUSA_RESOURCE_ID, song.cost)) {
     return { purchased: false, cost: song.cost, songId, state, reason: "notEnoughLights" };
   }
+
+  const paidState = spendResource(state, TOMORUSA_RESOURCE_ID, song.cost);
 
   return {
     purchased: true,
     cost: song.cost,
     songId,
     state: {
-      ...state,
-      lights: state.lights - song.cost,
+      ...paidState,
       songs: {
-        ...state.songs,
+        ...paidState.songs,
         [songId]: {
+          purchased: true
+        }
+      }
+    }
+  };
+}
+
+export function purchaseItem(state: GameState, itemId: ItemId): PurchaseItemResult {
+  const item = ITEMS[itemId];
+
+  if (!isItemUnlocked(state, itemId)) {
+    return { purchased: false, cost: item.cost, itemId, state, reason: "locked" };
+  }
+
+  if (isItemPurchased(state, itemId)) {
+    return { purchased: false, cost: item.cost, itemId, state, reason: "alreadyPurchased" };
+  }
+
+  if (!canSpendResource(state, TOMORUSA_RESOURCE_ID, item.cost)) {
+    return { purchased: false, cost: item.cost, itemId, state, reason: "notEnoughLights" };
+  }
+
+  const paidState = spendResource(state, TOMORUSA_RESOURCE_ID, item.cost);
+
+  return {
+    purchased: true,
+    cost: item.cost,
+    itemId,
+    state: {
+      ...paidState,
+      items: {
+        ...paidState.items,
+        [itemId]: {
           purchased: true
         }
       }
@@ -319,19 +446,20 @@ export function upgradeFacility(state: GameState, facilityId: FacilityId): Upgra
     return { upgraded: false, cost, facilityId, state, reason: "locked" };
   }
 
-  if (state.lights < cost) {
+  if (!canSpendResource(state, TOMORUSA_RESOURCE_ID, cost)) {
     return { upgraded: false, cost, facilityId, state, reason: "notEnoughLights" };
   }
+
+  const paidState = spendResource(state, TOMORUSA_RESOURCE_ID, cost);
 
   return {
     upgraded: true,
     cost,
     facilityId,
     state: {
-      ...state,
-      lights: state.lights - cost,
+      ...paidState,
       facilities: {
-        ...state.facilities,
+        ...paidState.facilities,
         [facilityId]: {
           level: getFacilityLevel(state, facilityId) + 1
         }

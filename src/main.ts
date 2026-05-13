@@ -1,21 +1,13 @@
 import "./style.css";
-import { createFacilityUpgradeMessage, createOfflineRewardMessage, createSongPurchaseMessage, UI_TEXT } from "./data";
-import { FACILITIES, IDOLS, SONGS } from "./definitions";
-import { applyProduction, gainManualLights, GameState, markRecordTabSeen, purchaseSong, readRecord, resolveActiveIdolId, SAVE_VERSION, selectActiveIdol, upgradeFacility } from "./game";
+import { createFacilityUpgradeMessage, createItemPurchaseMessage, createOfflineRewardMessage, createSongPurchaseMessage, UI_TEXT } from "./data";
+import { FACILITIES, IDOLS, ITEMS, SONGS } from "./definitions";
+import { applyProduction, gainManualTomorusa, GameState, markRecordTabSeen, purchaseItem, purchaseSong, readRecord, resolveActiveIdolId, SAVE_VERSION, selectActiveIdol, upgradeFacility } from "./game";
 import { loadGame, saveGame, SAVE_KEY } from "./storage";
-import {
-  ActiveTabId,
-  formatAmount,
-  getFacilityIdFromEvent,
-  getIdolIdFromEvent,
-  getRecordIdFromEvent,
-  getSongIdFromEvent,
-  getTabIdFromEvent,
-  renderLiveValues,
-  renderState,
-  setMessage,
-  setupUi
-} from "./ui";
+import { getFacilityIdFromEvent, getIdolIdFromEvent, getItemIdFromEvent, getRecordIdFromEvent, getSongIdFromEvent, getTabIdFromEvent } from "./ui/events";
+import { formatAmount } from "./ui/format";
+import { renderLiveValues, renderState, setMessage } from "./ui/renderState";
+import { setupUi } from "./ui/setupUi";
+import type { ActiveTabId } from "./ui/types";
 
 const SAVE_INTERVAL_MS = 5000;
 
@@ -97,8 +89,8 @@ window.__NEON_DEBUG__ = {
 renderState(elements, state, activeTabId);
 renderSettings();
 
-if (loadResult.offlineLights > 0) {
-  setMessage(elements, createOfflineRewardMessage(IDOLS[resolveActiveIdolId(state)].name, formatAmount(loadResult.offlineLights)));
+if (loadResult.offlineTomorusa > 0) {
+  setMessage(elements, createOfflineRewardMessage(IDOLS[resolveActiveIdolId(state)].name, formatAmount(loadResult.offlineTomorusa)));
 }
 
 elements.settingsButton.addEventListener("click", () => {
@@ -120,7 +112,7 @@ elements.settingsResetButton.addEventListener("click", () => {
 
 elements.liveButton.addEventListener("click", () => {
   advanceToNow();
-  state = gainManualLights(state);
+  state = gainManualTomorusa(state);
   state = saveGame(state);
   renderState(elements, state, activeTabId);
   setMessage(elements, UI_TEXT.liveSuccessLog);
@@ -152,6 +144,30 @@ elements.root.addEventListener("click", (event) => {
     advanceToNow();
     state = saveGame(selectActiveIdol(state, idolId));
     renderState(elements, state, activeTabId);
+    return;
+  }
+
+  const itemId = getItemIdFromEvent(event);
+
+  if (itemId) {
+    advanceToNow();
+    const result = purchaseItem(state, itemId);
+
+    if (!result.purchased) {
+      if (result.reason === "locked") {
+        setMessage(elements, UI_TEXT.lockedItemLog);
+      } else if (result.reason === "alreadyPurchased") {
+        setMessage(elements, UI_TEXT.alreadyPurchasedItemLog);
+      } else {
+        setMessage(elements, UI_TEXT.notEnoughLightsLog);
+      }
+
+      return;
+    }
+
+    state = saveGame(result.state);
+    renderState(elements, state, activeTabId);
+    setMessage(elements, createItemPurchaseMessage(ITEMS[result.itemId].name, formatAmount(result.cost)));
     return;
   }
 

@@ -1,7 +1,8 @@
-import { FacilityDefinition, FacilityId } from "./types.js";
+import { ContentId, defineContent, toContentMap, toContentOrder } from "./defineContent.js";
+import { FacilityDefinition } from "./types.js";
 
-export const FACILITIES: Record<FacilityId, FacilityDefinition> = {
-  alleyStage: {
+export const FACILITY_DEFINITIONS = defineContent([
+  {
     id: "alleyStage",
     name: "路地裏ステージ",
     description:
@@ -10,19 +11,38 @@ export const FACILITIES: Record<FacilityId, FacilityDefinition> = {
     costMultiplier: 1.15,
     productionPerLevel: 0.1
   },
-  undergroundChapel: {
-    id: "undergroundChapel",
-    name: "地下礼拝堂",
+  {
+    id: "neonBoard",
+    name: "ネオン掲示板",
     description:
-      "崩れかけた柱と古い聖印が残る小さな礼拝堂。魅力的な歌は、人々の熱に導かれて、灯りが集まり始める。",
+      "ライブ告知とアイドルの名前を掲げる古い電光掲示板。通りすがりの人々が名前を目にするたび、路地に少しずつ賑わいが戻っていく。",
     baseCost: 100,
     costMultiplier: 1.2,
-    productionPerLevel: 0.5,
+    productionPerLevel: 0.3,
     unlockRequirement: {
+      type: "facility.level",
       facilityId: "alleyStage",
       level: 10
     }
+  },
+  {
+    id: "undergroundChapel",
+    name: "地下礼拝堂",
+    description:
+      "崩れかけた柱と古い紋章が残る小さな礼拝堂。地下深くに閉ざされていた響きを、後の復興段階で少しずつ調べていく場所。",
+    baseCost: 1000,
+    costMultiplier: 1.25,
+    productionPerLevel: 1,
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "neonBoard",
+      level: 10
+    }
   }
-};
+] as const satisfies readonly FacilityDefinition[]);
 
-export const FACILITY_ORDER: FacilityId[] = ["alleyStage", "undergroundChapel"];
+export type FacilityId = ContentId<typeof FACILITY_DEFINITIONS>;
+
+export const FACILITIES: Record<FacilityId, FacilityDefinition> = toContentMap(FACILITY_DEFINITIONS);
+
+export const FACILITY_ORDER: FacilityId[] = toContentOrder(FACILITY_DEFINITIONS);

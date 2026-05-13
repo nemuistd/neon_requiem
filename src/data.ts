@@ -23,6 +23,7 @@ export const UI_TEXT = {
   idolUnlockRequirementLabel: "解放条件",
   restorationTabLabel: "復興区画",
   songTabLabel: "歌",
+  itemTabLabel: "アイテム",
   idolTabLabel: "アイドル",
   recordTabLabel: "記録",
   recordCategoryLabel: "種別",
@@ -46,7 +47,7 @@ export const UI_TEXT = {
   unlockRequirementLabel: "解放条件",
   initialLog: "薄暗いネオンが点滅している。オートセーブ準備完了。",
   liveSuccessLog: "灯里の歌に、小さな灯りが返ってきました。",
-  notEnoughLightsLog: "灯りがまだ足りません。",
+  notEnoughLightsLog: "灯るさがまだ足りません。",
   lockedFacilityLog: "まだこの施設は解放されていません。",
   purchasedSongLabel: "取得済み",
   unlockedSongLabel: "解放済み",
@@ -56,24 +57,36 @@ export const UI_TEXT = {
   purchaseSongButtonLabel: "歌を取得",
   lockedSongLog: "まだこの歌は解放されていません。",
   alreadyPurchasedSongLog: "この歌は取得済みです。",
+  purchasedItemLabel: "購入済み",
+  unlockedItemLabel: "購入可能",
+  lockedItemLabel: "未解放",
+  itemEffectLabel: "効果",
+  itemPriceLabel: "価格",
+  purchaseItemButtonLabel: "購入",
+  lockedItemLog: "まだこのアイテムは解放されていません。",
+  alreadyPurchasedItemLog: "このアイテムは購入済みです。",
   recordReadLog: "記録を確認しました。",
   autoSavedLog: "オートセーブしました。"
 } as const;
 
 export const RESOURCE_LABELS = {
-  lights: "灯り"
+  tomorusa: "灯るさ"
 } as const;
 
-export function createOfflineRewardMessage(idolName: string, lights: string): string {
-  return `${getGivenName(idolName)}が${lights}灯りを集めました。`;
+export function createOfflineRewardMessage(idolName: string, tomorusa: string): string {
+  return `${getGivenName(idolName)}が${tomorusa}灯るさを集めました。`;
 }
 
 export function createFacilityUpgradeMessage(facilityName: string, cost: string): string {
-  return `${facilityName}を強化しました。-${cost} 灯り`;
+  return `${facilityName}を強化しました。-${cost} 灯るさ`;
 }
 
 export function createSongPurchaseMessage(songName: string, cost: string): string {
-  return `${songName}を取得しました。-${cost} 灯り`;
+  return `${songName}を取得しました。-${cost} 灯るさ`;
+}
+
+export function createItemPurchaseMessage(itemName: string, cost: string): string {
+  return `${itemName}を購入しました。-${cost} 灯るさ`;
 }
 
 function getGivenName(fullName: string): string {

@@ -1,8 +1,11 @@
+import { Effect } from "../engine/effects.js";
+import { Requirement } from "../engine/requirements.js";
+
 export type IdolId = "otowaAkari" | "mizukiShino" | "asagiriYui";
 
-export type FacilityId = "alleyStage" | "undergroundChapel";
-
 export type SongId = "rojiuraIntro" | "chapelHarmony" | "twilightChorus";
+
+export type ItemId = "oldNeonTube" | "handwrittenPoster" | "recordedGreeting";
 
 export type RecordId =
   | "alleyStageRestorationMemo"
@@ -11,33 +14,18 @@ export type RecordId =
   | "songAndHymnDistinction"
   | "mistAndAnchorFacilityLog";
 
-export type FacilityLevelUnlockRequirement = {
-  type?: "facilityLevel";
-  facilityId: FacilityId;
-  level: number;
-};
-
-export type SongPurchasedUnlockRequirement = {
-  type: "songPurchased";
-  songId: SongId;
-};
-
-export type UnlockRequirement = FacilityLevelUnlockRequirement | SongPurchasedUnlockRequirement;
+export type RevealLevel = "surface" | "uncanny" | "technical" | "deep";
 
 export type IdolPassiveEffect = {
   type: "globalProductionMultiplier";
   multiplier: number;
 };
 
-export type SongEffect =
-  | {
-      type: "manualLightGainBonus";
-      amount: number;
-    }
-  | {
-      type: "facilityProductionMultiplier";
-      multiplier: number;
-    };
+export type ResourceDefinition = {
+  id: string;
+  name: string;
+  description: string;
+};
 
 export type IdolDefinition = {
   id: IdolId;
@@ -49,17 +37,17 @@ export type IdolDefinition = {
   imagePosition: string;
   passiveDescription: string;
   passiveEffect: IdolPassiveEffect;
-  unlockRequirement?: UnlockRequirement;
+  unlockRequirement?: Requirement;
 };
 
 export type FacilityDefinition = {
-  id: FacilityId;
+  id: string;
   name: string;
   description: string;
   baseCost: number;
   costMultiplier: number;
   productionPerLevel?: number;
-  unlockRequirement?: UnlockRequirement;
+  unlockRequirement?: Requirement;
 };
 
 export type SongDefinition = {
@@ -68,15 +56,26 @@ export type SongDefinition = {
   description: string;
   cost: number;
   effectDescription: string;
-  effect: SongEffect;
-  unlockRequirement: UnlockRequirement;
+  effects: Effect[];
+  unlockRequirement: Requirement;
+};
+
+export type ItemDefinition = {
+  id: ItemId;
+  name: string;
+  description: string;
+  cost: number;
+  effectDescription: string;
+  effects: Effect[];
+  unlockRequirement: Requirement;
 };
 
 export type RecordDefinition = {
   id: RecordId;
   title: string;
   category: "復旧報告" | "観測記録" | "施設ログ" | "断片記憶";
+  revealLevel: RevealLevel;
   body: string;
   introducedAtVersion: number;
-  unlockRequirements: UnlockRequirement[];
+  unlockRequirements: Requirement[];
 };

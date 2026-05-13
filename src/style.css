@@ -375,7 +375,7 @@ h2 {
 
 .idol-switcher {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 10px;
   margin-top: 10px;
 }
@@ -463,12 +463,14 @@ h2 {
   background: rgba(13, 10, 22, 0.72);
 }
 
-.tab-button[data-tab-id="song"] {
+.tab-button[data-tab-id="song"],
+.tab-button[data-tab-id="item"] {
   position: relative;
   padding-right: 34px;
 }
 
-.tab-button[data-tab-id="song"]::after {
+.tab-button[data-tab-id="song"]::after,
+.tab-button[data-tab-id="item"]::after {
   position: absolute;
   top: 50%;
   right: 10px;
@@ -487,6 +489,16 @@ h2 {
 }
 
 .tab-button[data-tab-id="song"][data-song-unlock-count]::after {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-button[data-tab-id="item"]::after {
+  content: attr(data-item-unlock-count);
+}
+
+.tab-button[data-tab-id="item"][data-item-unlock-count]::after {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -888,6 +900,14 @@ h2 {
     radial-gradient(circle at 62% 28%, rgba(255, 210, 115, 0.22), transparent 28%),
     linear-gradient(135deg, rgba(127, 233, 255, 0.2), rgba(8, 11, 22, 0.88)),
     repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 22px);
+}
+
+.facility-visual-neonBoard {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent),
+    repeating-linear-gradient(0deg, rgba(127, 233, 255, 0.18) 0 2px, transparent 2px 12px),
+    radial-gradient(circle at 30% 32%, rgba(255, 94, 216, 0.3), transparent 30%),
+    linear-gradient(135deg, rgba(255, 224, 115, 0.22), rgba(8, 11, 22, 0.86));
 }
 
 .stage-card .stats-list {
