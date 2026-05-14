@@ -47,6 +47,38 @@ export const RECORD_DEFINITIONS = defineContent([
     ]
   },
   {
+    id: "idolBondAkariFirstVoice",
+    title: "灯里・最初の呼び声",
+    category: "交流メモ",
+    revealLevel: "surface",
+    body:
+      "ライブの後、灯里は客席から名前を呼ばれたことに少し遅れて気づいた。返事は小さかったが、片づけの間もその席の方を何度か見ていた。次の告知にも、自分の名前をきちんと書いてほしいと頼まれた。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "idol.bond",
+        idolId: "otowaAkari",
+        amount: 5
+      }
+    ]
+  },
+  {
+    id: "idolBondAkariRegularSeat",
+    title: "灯里・いつもの席",
+    category: "交流メモ",
+    revealLevel: "surface",
+    body:
+      "折りたたみ椅子のひとつに、誰が決めたわけでもない指定席ができた。灯里は曲の始まりにそこを一度見る。誰も座っていない日でも、そこへ向けて歌うと、路地裏ステージの空気が少し落ち着く。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "idol.bond",
+        idolId: "otowaAkari",
+        amount: 20
+      }
+    ]
+  },
+  {
     id: "posterNameMemo",
     title: "告知ポスターの貼り替え",
     category: "復旧報告",
@@ -74,6 +106,22 @@ export const RECORD_DEFINITIONS = defineContent([
         type: "facility.level",
         facilityId: "neonBoard",
         level: 1
+      }
+    ]
+  },
+  {
+    id: "idolBondYuiGuideNote",
+    title: "結・案内メモの端",
+    category: "交流メモ",
+    revealLevel: "uncanny",
+    body:
+      "結は、ネオン掲示板の横に小さな案内メモを足した。曲がり角の説明は妙に正確で、読んだ人は暗い通路でも迷いにくいという。本人は、前に誰かが教えてくれた気がするとだけ言っている。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "idol.bond",
+        idolId: "asagiriYui",
+        amount: 5
       }
     ]
   },
@@ -106,6 +154,22 @@ export const RECORD_DEFINITIONS = defineContent([
         type: "facility.level",
         facilityId: "neonBoard",
         level: 10
+      }
+    ]
+  },
+  {
+    id: "idolBondShinoStorageShelf",
+    title: "詩乃・保管棚の前",
+    category: "交流メモ",
+    revealLevel: "uncanny",
+    body:
+      "詩乃は地下礼拝堂の保管棚を開ける前に、必ず短く声をかける。返事はないが、棚札の番号が読みやすくなることがある。失われた歌の持ち主へ挨拶しているのだと、彼女は静かに説明した。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "idol.bond",
+        idolId: "mizukiShino",
+        amount: 5
       }
     ]
   },

@@ -1,7 +1,8 @@
-import { FACILITY_ORDER, FacilityId, ITEM_ORDER, ItemId, IdolId, IDOLS, RECORD_ORDER, RecordId, ResourceId, SONG_ORDER, SongId } from "./definitions";
+import { FACILITY_ORDER, FacilityId, IDOL_ORDER, ITEM_ORDER, ItemId, IdolId, IDOLS, RECORD_ORDER, RecordId, ResourceId, SONG_ORDER, SongId } from "./definitions";
 import {
   applyProduction,
   createInitialFacilities,
+  createInitialIdols,
   createInitialItems,
   createInitialRecords,
   createInitialResources,
@@ -9,6 +10,7 @@ import {
   createInitialState,
   FacilityState,
   GameState,
+  IdolState,
   ItemState,
   getOfflineTomorusa,
   INITIAL_ACTIVE_IDOL_ID,
@@ -39,6 +41,7 @@ type RawSaveData = {
   recordTabLastSeenContentVersion?: unknown;
   alleyStageLevel?: unknown;
   facilities?: unknown;
+  idols?: unknown;
   songs?: unknown;
   records?: unknown;
   items?: unknown;
@@ -106,6 +109,7 @@ function parseSave(rawSave: string, now: number): GameState | null {
       saveVersion === 5 ||
       saveVersion === 6 ||
       saveVersion === 7 ||
+      saveVersion === 8 ||
       saveVersion === SAVE_VERSION ||
       saveVersion === null
     ) {
@@ -119,7 +123,7 @@ function parseSave(rawSave: string, now: number): GameState | null {
 }
 
 function parseLatestSave(data: RawSaveData, now: number): GameState | null {
-  const { applause, lights, resources, activeIdolId, recordTabLastSeenContentVersion, facilities, items, songs, records, lastSavedAt } = data;
+  const { applause, lights, resources, activeIdolId, recordTabLastSeenContentVersion, facilities, idols, items, songs, records, lastSavedAt } = data;
 
   const state: GameState = {
     saveVersion: SAVE_VERSION,
@@ -127,6 +131,7 @@ function parseLatestSave(data: RawSaveData, now: number): GameState | null {
     activeIdolId: getSavedActiveIdolId(activeIdolId),
     recordTabLastSeenContentVersion: normalizeRecordTabLastSeenContentVersion(recordTabLastSeenContentVersion),
     facilities: normalizeFacilities(facilities, data.alleyStageLevel),
+    idols: normalizeIdols(idols),
     items: normalizeItems(items),
     songs: normalizeSongs(songs),
     records: normalizeRecords(records),
@@ -176,6 +181,16 @@ function normalizeFacilities(facilities: unknown, fallbackAlleyStageLevel?: unkn
   );
 }
 
+function normalizeIdols(idols: unknown): Record<IdolId, IdolState> {
+  return IDOL_ORDER.reduce(
+    (normalizedIdols, idolId) => ({
+      ...normalizedIdols,
+      [idolId]: getSavedIdolState(idols, idolId)
+    }),
+    createInitialIdols()
+  );
+}
+
 function normalizeItems(items: unknown): Record<ItemId, ItemState> {
   return ITEM_ORDER.reduce(
     (normalizedItems, itemId) => ({
@@ -210,6 +225,29 @@ function normalizeRecords(records: unknown): Record<RecordId, RecordState> {
     }),
     createInitialRecords()
   );
+}
+
+function getSavedIdolState(idols: unknown, idolId: IdolId): IdolState {
+  if (!isRecord(idols)) {
+    return {
+      bond: 0,
+      eventIdsRead: []
+    };
+  }
+
+  const idol = (idols as Partial<Record<IdolId, { bond?: unknown; eventIdsRead?: unknown }>>)[idolId];
+
+  if (!isRecord(idol)) {
+    return {
+      bond: 0,
+      eventIdsRead: []
+    };
+  }
+
+  return {
+    bond: normalizeBond(idol.bond),
+    eventIdsRead: normalizeEventIdsRead(idol.eventIdsRead)
+  };
 }
 
 function getSavedRecordRead(records: unknown, recordId: RecordId): boolean {
@@ -288,6 +326,22 @@ function normalizeLevel(level: unknown): number {
   }
 
   return Math.max(0, Math.floor(level));
+}
+
+function normalizeBond(bond: unknown): number {
+  if (typeof bond !== "number" || !Number.isFinite(bond) || bond < 0) {
+    return 0;
+  }
+
+  return Math.floor(bond);
+}
+
+function normalizeEventIdsRead(eventIdsRead: unknown): string[] {
+  if (!Array.isArray(eventIdsRead)) {
+    return [];
+  }
+
+  return Array.from(new Set(eventIdsRead.filter((eventId): eventId is string => typeof eventId === "string")));
 }
 
 function normalizeSavedAt(savedAt: unknown, now: number): number {

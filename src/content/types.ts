@@ -3,11 +3,6 @@ import { Requirement } from "../engine/requirements.js";
 
 export type RevealLevel = "surface" | "uncanny" | "technical" | "deep";
 
-export type IdolPassiveEffect = {
-  type: "globalProductionMultiplier";
-  multiplier: number;
-};
-
 export type ResourceDefinition = {
   id: string;
   name: string;
@@ -23,7 +18,8 @@ export type IdolDefinition = {
   imageUrl: string;
   imagePosition: string;
   passiveDescription: string;
-  passiveEffect: IdolPassiveEffect;
+  passiveEffects: Effect[];
+  focusEffects?: Effect[];
   unlockRequirement?: Requirement;
 };
 
@@ -60,7 +56,7 @@ export type ItemDefinition = {
 export type RecordDefinition = {
   id: string;
   title: string;
-  category: "復旧報告" | "観測記録" | "施設ログ" | "断片記憶";
+  category: "復旧報告" | "観測記録" | "施設ログ" | "断片記憶" | "交流メモ";
   revealLevel: RevealLevel;
   body: string;
   introducedAtVersion: number;

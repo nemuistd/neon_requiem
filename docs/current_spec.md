@@ -26,13 +26,15 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 
 ## 基本ループ
 
-1. 「ライブする」で灯るさを得る。
+1. 「ライブする」で灯るさを得て、注目アイドルの `bond` が 1 増える。
 2. 灯るさを使って施設を強化する。
 3. 施設が毎秒灯るさを生産する。
 4. 歌やアイテムを購入して恒久効果を得る。
 5. アイドル解放により全体生産倍率が増える。
 6. 記録を読み、世界観の開示を進める。
 7. localStorage に保存され、離脱時間に応じたオフライン報酬を得る。
+
+`bond` は注目アイドル枠とアイドルタブで「交流」として表示する。自動生産やオフライン報酬では増えない。
 
 ## リソース
 
@@ -61,6 +63,8 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `otowaAkari` | 音羽 灯里 | 初期 | 全灯るさ生産 x1.20 |
 | `asagiriYui` | 朝霧 結 | ネオン掲示板 Lv5 | 全灯るさ生産 x1.15 |
 | `mizukiShino` | 深月 詩乃 | 地下礼拝堂 Lv3 | 全灯るさ生産 x1.10 |
+
+アイドル効果は `passiveEffects: Effect[]` として定義する。現在の3人は、解放済みなら常時発動する `facility.production.multiplier` を1件ずつ持つ。`focusEffects` は型だけ用意し、注目アイドル限定効果の適用は後続で扱う。
 
 ## 歌
 
@@ -104,10 +108,14 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 - 路地裏ステージの復興
 - 最初の客席メモ
 - 観測記録・灯り反応
+- 灯里・最初の呼び声
+- 灯里・いつもの席
 - 告知ポスターの貼り替え
 - ネオン掲示板・点灯確認
+- 結・案内メモの端
 - 短い挨拶の反響
 - 地下礼拝堂復旧報告
+- 詩乃・保管棚の前
 - 礼拝堂保管棚の札
 - 観測者数メモ断片
 - 歌の扱いに関する断片
@@ -125,10 +133,11 @@ surface の記録に、祈念工学、アンカー、聖歌、祈念負荷を出
 ## 保存
 
 - 保存キー: `neon-requiem-save-v1`
-- セーブバージョン: `8`
-- 保存形式: `resources.tomorusa`, `facilities`, `items`, `songs`, `records`, `activeIdolId`, `recordTabLastSeenContentVersion`, `lastSavedAt`
+- セーブバージョン: `9`
+- 保存形式: `resources.tomorusa`, `facilities`, `idols`, `items`, `songs`, `records`, `activeIdolId`, `recordTabLastSeenContentVersion`, `lastSavedAt`
+- アイドル個別状態として `idols[id].bond` と `idols[id].eventIdsRead` を保存する。
 
-旧セーブは可能な範囲で正規化する。壊れたセーブでアプリがクラッシュしないようにする。
+v1〜v8 の旧セーブは可能な範囲で正規化する。`idols` がない旧セーブでは、全アイドルに `bond: 0`, `eventIdsRead: []` を補完する。壊れたセーブでアプリがクラッシュしないようにする。
 
 ## UI
 
@@ -146,3 +155,9 @@ surface の記録に、祈念工学、アンカー、聖歌、祈念負荷を出
 - セーブ削除ボタン
 
 `window.__NEON_DEBUG__` は開発用に維持する。
+
+## Requirement
+
+現在の Requirement は `facility.level`, `song.purchased`, `resource.amount`, `idol.bond`, `all`, `any`, `not` を扱う。
+`idol.bond` は `state.idols[idolId]?.bond >= amount` で判定し、表示文は「アイドル名 交流 amount」を基本にする。
+contentValidation は `idol.bond` の idolId 存在確認と正の有限 amount を検証する。

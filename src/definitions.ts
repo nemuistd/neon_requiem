@@ -2,7 +2,6 @@ export type {
   FacilityDefinition,
   ItemDefinition,
   IdolDefinition,
-  IdolPassiveEffect,
   RecordDefinition,
   ResourceDefinition,
   SongDefinition,

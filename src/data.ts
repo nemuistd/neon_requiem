@@ -11,6 +11,7 @@ export const UI_TEXT = {
   settingsButtonLabel: "設定",
   messageLabel: "最新メッセージ",
   activeIdolLabel: "注目アイドル",
+  bondLabel: "交流",
   passiveEffectLabel: "パッシブ効果",
   noActiveEffectLabel: "効果なし",
   baseProductionLabel: "基礎生産",

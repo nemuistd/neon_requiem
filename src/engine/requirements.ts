@@ -2,6 +2,7 @@ export type Requirement =
   | { type: "facility.level"; facilityId: string; level: number }
   | { type: "song.purchased"; songId: string }
   | { type: "resource.amount"; resourceId: string; amount: number }
+  | { type: "idol.bond"; idolId: string; amount: number }
   | { type: "all"; requirements: Requirement[] }
   | { type: "any"; requirements: Requirement[] }
   | { type: "not"; requirement: Requirement };
@@ -10,6 +11,7 @@ export type RequirementState = {
   facilities: Partial<Record<string, { level?: number }>>;
   resources: Partial<Record<string, number>>;
   songs: Partial<Record<string, { purchased?: boolean }>>;
+  idols?: Partial<Record<string, { bond?: number }>>;
 };
 
 export function isRequirementMet(state: RequirementState, requirement?: Requirement): boolean {
@@ -27,6 +29,10 @@ export function isRequirementMet(state: RequirementState, requirement?: Requirem
 
   if (requirement.type === "resource.amount") {
     return (state.resources[requirement.resourceId] ?? 0) >= requirement.amount;
+  }
+
+  if (requirement.type === "idol.bond") {
+    return (state.idols?.[requirement.idolId]?.bond ?? 0) >= requirement.amount;
   }
 
   if (requirement.type === "all") {

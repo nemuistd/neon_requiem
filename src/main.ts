@@ -1,7 +1,7 @@
 import "./style.css";
 import { createFacilityUpgradeMessage, createItemPurchaseMessage, createOfflineRewardMessage, createSongPurchaseMessage, UI_TEXT } from "./data";
 import { FACILITIES, IDOLS, ITEMS, SONGS } from "./definitions";
-import { applyProduction, gainManualTomorusa, GameState, markRecordTabSeen, purchaseItem, purchaseSong, readRecord, resolveActiveIdolId, SAVE_VERSION, selectActiveIdol, upgradeFacility } from "./game";
+import { applyProduction, GameState, markRecordTabSeen, performManualLive, purchaseItem, purchaseSong, readRecord, resolveActiveIdolId, SAVE_VERSION, selectActiveIdol, upgradeFacility } from "./game";
 import { loadGame, saveGame, SAVE_KEY } from "./storage";
 import { getFacilityIdFromEvent, getIdolIdFromEvent, getItemIdFromEvent, getRecordIdFromEvent, getSongIdFromEvent, getTabIdFromEvent } from "./ui/events";
 import { formatAmount } from "./ui/format";
@@ -113,7 +113,7 @@ elements.settingsResetButton.addEventListener("click", () => {
 
 elements.liveButton.addEventListener("click", () => {
   advanceToNow();
-  state = gainManualTomorusa(state);
+  state = performManualLive(state);
   state = saveGame(state);
   renderState(elements, state, activeTabId);
   setMessage(elements, UI_TEXT.liveSuccessLog);

@@ -51,11 +51,15 @@ npm.cmd run check:content
 
 ## 発見した問題
 
-- この実行環境では、Browser スキルが要求する Node REPL ブラウザ操作ツールが公開されていなかった。
-- そのため、実ブラウザ上でのクリック、リロード、localStorage操作、スクリーンショット確認は未実行。
+- 現在の Codex CLI では `codex.cmd features list` 上、`js_repl` と `js_repl_tools_only` が `removed false`、`browser_use` と `in_app_browser` が `true` である。
+- 今後は `node_repl` / `mcp__node_repl__js` を前提にせず、Node REPL MCP server 追加で解決するものとして扱わない。
+- JavaScript ロジック検証は `node -e`、`npm run build`、一時スクリプト、Vitest で行う。
+- Browser Use は UI、操作、表示、localStorage 挙動の最終確認に限定する。
+- Browser Use が Node REPL を要求して止まる場合は、現行 Codex CLI ではその経路は使えないものとして、Chrome + Chrome DevTools Protocol などの代替手段でQAする。
+- 実ブラウザ確認が重い場合は、検証項目を小さく分け、チェックリスト化して進める。
 
 ## 修正済み / 未修正
 
 - 修正済み: `docs/qa_manual_checklist.md` を追加し、QA実行状況を記録した。
 - 修正済み: Vite dev server がトップページを返すことを確認した。
-- 未修正: 実ブラウザでの手動操作QAは未実行。Browser操作ツールが利用可能な環境で再実行が必要。
+- 未修正: この記録時点の実ブラウザでの手動操作QAは未実行。今後は必要範囲を絞り、Browser Use または Chrome + CDP 代替手段で確認する。

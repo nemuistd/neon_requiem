@@ -71,12 +71,21 @@ function validateItems(): string[] {
 function validateIdols(): string[] {
   return IDOL_ORDER.flatMap((idolId) => {
     const idol = IDOLS[idolId];
+    const errors: string[] = [];
 
-    if (!idol.unlockRequirement) {
-      return [];
+    idol.passiveEffects.forEach((effect) => {
+      errors.push(...validateEffect(`idol "${idolId}" passive effect`, effect));
+    });
+
+    idol.focusEffects?.forEach((effect) => {
+      errors.push(...validateEffect(`idol "${idolId}" focus effect`, effect));
+    });
+
+    if (idol.unlockRequirement) {
+      errors.push(...validateRequirement(`idol "${idolId}"`, idol.unlockRequirement));
     }
 
-    return validateRequirement(`idol "${idolId}"`, idol.unlockRequirement);
+    return errors;
   });
 }
 
@@ -219,7 +228,7 @@ function validateNormalUiTerms(): string[] {
   });
 }
 
-function validateRequirement(label: string, requirement: Requirement): string[] {
+export function validateRequirement(label: string, requirement: Requirement): string[] {
   if (requirement.type === "song.purchased") {
     if (!Object.prototype.hasOwnProperty.call(SONGS, requirement.songId)) {
       return [`${label}: unlock requirement references missing song "${requirement.songId}".`];
@@ -237,6 +246,20 @@ function validateRequirement(label: string, requirement: Requirement): string[] 
 
     if (!isNonNegativeFiniteNumber(requirement.amount)) {
       errors.push(`${label}: requirement resource amount must be non-negative.`);
+    }
+
+    return errors;
+  }
+
+  if (requirement.type === "idol.bond") {
+    const errors: string[] = [];
+
+    if (!Object.prototype.hasOwnProperty.call(IDOLS, requirement.idolId)) {
+      errors.push(`${label}: requirement references missing idol "${requirement.idolId}".`);
+    }
+
+    if (!isPositiveFiniteNumber(requirement.amount)) {
+      errors.push(`${label}: requirement idol bond amount must be positive.`);
     }
 
     return errors;
@@ -421,6 +444,10 @@ function isRequirementPotentiallyReachable(
 
   if (requirement.type === "resource.amount") {
     return reachableResources.has(requirement.resourceId) && isNonNegativeFiniteNumber(requirement.amount);
+  }
+
+  if (requirement.type === "idol.bond") {
+    return Object.prototype.hasOwnProperty.call(IDOLS, requirement.idolId) && isPositiveFiniteNumber(requirement.amount);
   }
 
   if (requirement.type === "all") {

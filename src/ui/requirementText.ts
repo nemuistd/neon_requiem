@@ -46,6 +46,14 @@ export function getUnlockRequirementTextFromRequirement(requirement: Requirement
     return `${formatAmount(requirement.amount)} ${RESOURCE_LABELS.tomorusa}`;
   }
 
+  if (requirement.type === "idol.bond") {
+    if (!isIdolId(requirement.idolId)) {
+      return "不明なアイドル";
+    }
+
+    return `${IDOLS[requirement.idolId].name} ${UI_TEXT.bondLabel} ${requirement.amount}`;
+  }
+
   if (requirement.type === "all") {
     return requirement.requirements.map(getUnlockRequirementTextFromRequirement).join(" / ");
   }
@@ -71,4 +79,8 @@ export function isFacilityId(value: string | undefined): value is FacilityId {
 
 export function isSongId(value: string | undefined): value is SongId {
   return typeof value === "string" && Object.prototype.hasOwnProperty.call(SONGS, value);
+}
+
+export function isIdolId(value: string | undefined): value is IdolId {
+  return typeof value === "string" && Object.prototype.hasOwnProperty.call(IDOLS, value);
 }

@@ -176,10 +176,14 @@ MVP では、次の 1 つの基本ループだけを実装した。
 
 ## 実ブラウザQA運用
 
-- 将来、`browser-use:browser` skill が要求する Node REPL / in-app browser 操作用ツールがセッションに公開されている場合は、`$browser` の本来経路を優先して使う。
-- 現在の Codex CLI 環境では `$browser` の本来経路を利用できない前提とし、当面は Chrome + Chrome DevTools Protocol 経由の実ブラウザQAを正式な代替手段とする。
-- 実ブラウザQAでは、`npm run dev` でローカル起動し、初期表示、主要タブ、ライブ、施設強化、アイドル / 歌 / アイテム / 記録表示、リロード後のセーブ復元、コンソールエラー、主要 viewport を確認する。
+- 現在の Codex CLI では `codex.cmd features list` 上、`js_repl` と `js_repl_tools_only` が `removed false`、`browser_use` と `in_app_browser` が `true` である。
+- そのため、`node_repl` / `mcp__node_repl__js` を前提にしない。`node_repl` MCP server を追加すれば解決する、という前提で作業しない。
+- JavaScript ロジック検証は `node -e`、`npm run build`、一時スクリプト、必要なら Vitest のテストコードで行う。
+- Browser Use は、最終的な UI、操作、表示、localStorage 挙動の確認に限定する。
+- Browser Use が Node REPL を要求して止まる場合は、現在の Codex CLI ではその経路は利用できないものとして、代替手段でQAする。
+- 当面は Chrome + Chrome DevTools Protocol 経由の実ブラウザQAを正式な代替手段とする。
+- 実ブラウザQAが重くなる場合は、検証項目を小さく分け、チェックリスト化して進める。
+- 実ブラウザQAでは、必要な範囲に絞って `npm run dev` でローカル起動し、初期表示、主要タブ、ライブ、施設強化、アイドル / 歌 / アイテム / 記録表示、リロード後のセーブ復元、コンソールエラー、主要 viewport を確認する。
 - 一時 Chrome プロファイル、ログ、スクリーンショット、trace などはワークツリー内に作らず、OS の一時ディレクトリに作る。
 - QA 後は不要な一時ファイルを削除する。
 - どうしても残す必要がある成果物だけ、ユーザーが明示した保存先へ保存する。
-

@@ -12,10 +12,12 @@ export const IDOL_DEFINITIONS = defineContent([
     imageUrl: new URL("../../assets/idol/ComfyUI_00021_.png", import.meta.url).href,
     imagePosition: "center top",
     passiveDescription: "全灯るさ生産 +20%",
-    passiveEffect: {
-      type: "globalProductionMultiplier",
-      multiplier: 1.2
-    }
+    passiveEffects: [
+      {
+        type: "facility.production.multiplier",
+        multiplier: 1.2
+      }
+    ]
   },
   {
     id: "asagiriYui",
@@ -27,10 +29,12 @@ export const IDOL_DEFINITIONS = defineContent([
     imageUrl: new URL("../../assets/idol/ComfyUI_00027_.png", import.meta.url).href,
     imagePosition: "center top",
     passiveDescription: "全灯るさ生産 +15%",
-    passiveEffect: {
-      type: "globalProductionMultiplier",
-      multiplier: 1.15
-    },
+    passiveEffects: [
+      {
+        type: "facility.production.multiplier",
+        multiplier: 1.15
+      }
+    ],
     unlockRequirement: {
       type: "facility.level",
       facilityId: "neonBoard",
@@ -47,10 +51,12 @@ export const IDOL_DEFINITIONS = defineContent([
     imageUrl: new URL("../../assets/idol/ComfyUI_00022_.png", import.meta.url).href,
     imagePosition: "center top",
     passiveDescription: "全灯るさ生産 +10%",
-    passiveEffect: {
-      type: "globalProductionMultiplier",
-      multiplier: 1.1
-    },
+    passiveEffects: [
+      {
+        type: "facility.production.multiplier",
+        multiplier: 1.1
+      }
+    ],
     unlockRequirement: {
       type: "facility.level",
       facilityId: "undergroundChapel",

@@ -77,3 +77,4 @@ Phase 18以降では、まず会話由来の長期前提をリポジトリ内doc
 
 - 薄明通り案内所など、地下礼拝堂前に挟める施設を設計。
 - 章進行、ファン資源、転生後開示との接続を検討。
+- 詳細は `chapter_progression_design.md` と `next_facility_candidates.md` を参照する。

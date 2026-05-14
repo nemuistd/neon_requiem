@@ -6,6 +6,7 @@ import {
 import { UI_TEXT } from "../data";
 import {
   GameState,
+  getIdolBond,
   isIdolUnlocked,
   resolveActiveIdolId
 } from "../game";
@@ -31,6 +32,10 @@ export function renderIdolCards(state: GameState, activeIdolId: IdolId): string 
           </div>
 
           <dl class="idol-details">
+            <div>
+              <dt>${UI_TEXT.bondLabel}</dt>
+              <dd>${getIdolBond(state, activeIdolId)}</dd>
+            </div>
             <div>
               <dt>${UI_TEXT.passiveEffectLabel}</dt>
               <dd>${isIdolUnlocked(state, activeIdolId) ? idol.passiveDescription : UI_TEXT.lockedIdolLabel}</dd>
@@ -106,6 +111,13 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
           <p class="title-line">${idol.title}</p>
           <p>${idol.description}</p>
           <dl class="stats-list">
+            ${isUnlocked
+              ? `
+            <div>
+              <dt>${UI_TEXT.bondLabel}</dt>
+              <dd>${getIdolBond(state, idolId)}</dd>
+            </div>`
+              : ""}
             <div>
               <dt>${UI_TEXT.passiveEffectLabel}</dt>
               <dd>${isUnlocked ? idol.passiveDescription : UI_TEXT.lockedIdolLabel}</dd>

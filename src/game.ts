@@ -26,7 +26,7 @@ import {
 } from "./engine/effects";
 import { areRequirementsMet, isRequirementMet } from "./engine/requirements";
 
-export const SAVE_VERSION = 8;
+export const SAVE_VERSION = 9;
 export const INITIAL_ACTIVE_IDOL_ID: IdolId = "otowaAkari";
 export const MAX_OFFLINE_SECONDS = 12 * 60 * 60;
 export const TOMORUSA_RESOURCE_ID: ResourceId = "tomorusa";
@@ -47,12 +47,18 @@ export type RecordState = {
   read: boolean;
 };
 
+export type IdolState = {
+  bond: number;
+  eventIdsRead: string[];
+};
+
 export type GameState = {
   saveVersion: typeof SAVE_VERSION;
   resources: Record<ResourceId, number>;
   activeIdolId: IdolId;
   recordTabLastSeenContentVersion: number;
   facilities: Record<FacilityId, FacilityState>;
+  idols: Record<IdolId, IdolState>;
   items: Record<ItemId, ItemState>;
   songs: Record<SongId, SongState>;
   records: Record<RecordId, RecordState>;
@@ -83,11 +89,25 @@ export function createInitialState(now = Date.now()): GameState {
     activeIdolId: INITIAL_ACTIVE_IDOL_ID,
     recordTabLastSeenContentVersion: 0,
     facilities: createInitialFacilities(),
+    idols: createInitialIdols(),
     items: createInitialItems(),
     songs: createInitialSongs(),
     records: createInitialRecords(),
     lastSavedAt: now
   };
+}
+
+export function createInitialIdols(): Record<IdolId, IdolState> {
+  return IDOL_ORDER.reduce(
+    (idols, idolId) => ({
+      ...idols,
+      [idolId]: {
+        bond: 0,
+        eventIdsRead: []
+      }
+    }),
+    {} as Record<IdolId, IdolState>
+  );
 }
 
 export function createInitialItems(): Record<ItemId, ItemState> {
@@ -192,6 +212,10 @@ export function isRecordRead(state: GameState, recordId: RecordId): boolean {
   return state.records[recordId]?.read ?? false;
 }
 
+export function getIdolBond(state: GameState, idolId: IdolId): number {
+  return state.idols[idolId]?.bond ?? 0;
+}
+
 export function isFacilityUnlocked(state: GameState, facilityId: FacilityId): boolean {
   return isRequirementMet(state, FACILITIES[facilityId].unlockRequirement);
 }
@@ -258,7 +282,7 @@ export function getFacilityBaseTomorusaPerSecond(state: GameState, facilityId: F
 }
 
 export function getFacilityProductionMultiplier(state: GameState): number {
-  const idolMultiplier = getGlobalMultiplierEffects(state).reduce((multiplier, effect) => multiplier * effect.multiplier, 1);
+  const idolMultiplier = getFacilityProductionMultiplierFromEffects(getUnlockedIdolPassiveEffects(state));
   const contentMultiplier = getFacilityProductionMultiplierFromEffects(getPurchasedContentEffects(state));
 
   return idolMultiplier * contentMultiplier;
@@ -274,13 +298,13 @@ export function getFacilityMultiplierEffects(state: GameState, facilityId: Facil
 
 export function getGlobalMultiplierEffects(state: GameState): FacilityMultiplierEffect[] {
   return IDOL_ORDER.flatMap((idolId) => {
-    const passiveEffect = IDOLS[idolId].passiveEffect;
-
-    if (passiveEffect.type !== "globalProductionMultiplier" || !isIdolUnlocked(state, idolId)) {
+    if (!isIdolUnlocked(state, idolId)) {
       return [];
     }
 
-    return [{ idolId, multiplier: passiveEffect.multiplier }];
+    return IDOLS[idolId].passiveEffects.flatMap((effect) => (
+      effect.type === "facility.production.multiplier" ? [{ idolId, multiplier: effect.multiplier }] : []
+    ));
   });
 }
 
@@ -303,6 +327,10 @@ export function getPurchasedContentEffects(state: GameState): Effect[] {
   ];
 }
 
+export function getUnlockedIdolPassiveEffects(state: GameState): Effect[] {
+  return IDOL_ORDER.flatMap((idolId) => (isIdolUnlocked(state, idolId) ? IDOLS[idolId].passiveEffects : []));
+}
+
 function getPurchasedSongEffects(state: GameState): Effect[] {
   return SONG_ORDER.flatMap((songId) => (isSongPurchased(state, songId) ? SONGS[songId].effects : []));
 }
@@ -317,6 +345,34 @@ export function getOfflineTomorusa(state: GameState, offlineSeconds: number): nu
 
 export function gainManualTomorusa(state: GameState): GameState {
   return addResource(state, TOMORUSA_RESOURCE_ID, getManualTomorusaGain(state));
+}
+
+export function gainActiveIdolBond(state: GameState, amount = 1): GameState {
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return state;
+  }
+
+  const activeIdolId = resolveActiveIdolId(state);
+  const currentIdolState = state.idols[activeIdolId] ?? {
+    bond: 0,
+    eventIdsRead: []
+  };
+
+  return {
+    ...state,
+    activeIdolId,
+    idols: {
+      ...state.idols,
+      [activeIdolId]: {
+        ...currentIdolState,
+        bond: currentIdolState.bond + Math.floor(amount)
+      }
+    }
+  };
+}
+
+export function performManualLive(state: GameState): GameState {
+  return gainActiveIdolBond(gainManualTomorusa(state));
 }
 
 export function applyProduction(state: GameState, elapsedSeconds: number): GameState {

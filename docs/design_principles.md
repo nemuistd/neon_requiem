@@ -150,10 +150,10 @@ neon-requiem-save-v1
 現在のセーブデータバージョン:
 
 ```text
-saveVersion: 8
+saveVersion: 9
 ```
 
-現在の保存構造は `resources.tomorusa`, `facilities`, `items`, `songs`, `records`, `activeIdolId`, `recordTabLastSeenContentVersion`, `lastSavedAt` を持つ。
+現在の保存構造は `resources.tomorusa`, `facilities`, `idols`, `items`, `songs`, `records`, `activeIdolId`, `recordTabLastSeenContentVersion`, `lastSavedAt` を持つ。
 
 原則:
 
