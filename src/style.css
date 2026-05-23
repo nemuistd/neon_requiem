@@ -269,6 +269,32 @@ h2 {
   object-fit: cover;
 }
 
+.idol-portrait[data-idol-placeholder="true"],
+.idol-tab-portrait[data-idol-placeholder="true"] {
+  display: grid;
+  place-items: center;
+}
+
+.idol-placeholder-glyph {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(42%, 136px);
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid rgba(255, 224, 115, 0.46);
+  border-radius: 8px;
+  color: #fff2b8;
+  font-size: 5.4rem;
+  font-weight: 900;
+  background:
+    linear-gradient(180deg, rgba(255, 224, 115, 0.14), rgba(255, 94, 216, 0.1)),
+    rgba(8, 11, 22, 0.62);
+  box-shadow:
+    0 0 34px rgba(255, 224, 115, 0.1),
+    inset 0 0 24px rgba(255, 255, 255, 0.06);
+}
+
 .idol-portrait::before {
   position: absolute;
   inset: 0;
@@ -704,6 +730,11 @@ h2 {
   object-fit: cover;
 }
 
+.idol-tab-portrait .idol-placeholder-glyph {
+  width: min(58%, 72px);
+  font-size: 2.4rem;
+}
+
 .idol-tab-body {
   min-width: 0;
 }
@@ -908,6 +939,31 @@ h2 {
     repeating-linear-gradient(0deg, rgba(127, 233, 255, 0.18) 0 2px, transparent 2px 12px),
     radial-gradient(circle at 30% 32%, rgba(255, 94, 216, 0.3), transparent 30%),
     linear-gradient(135deg, rgba(255, 224, 115, 0.22), rgba(8, 11, 22, 0.86));
+}
+
+.facility-visual-twilightPathGuide {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent),
+    linear-gradient(90deg, rgba(127, 233, 255, 0.22) 0 2px, transparent 2px 20px),
+    radial-gradient(circle at 24% 70%, rgba(255, 224, 115, 0.26), transparent 28%),
+    linear-gradient(135deg, rgba(88, 182, 255, 0.26), rgba(8, 11, 22, 0.86));
+}
+
+.facility-visual-temporaryBroadcastBooth {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent),
+    repeating-radial-gradient(circle at 74% 28%, rgba(127, 233, 255, 0.18) 0 2px, transparent 2px 12px),
+    radial-gradient(circle at 28% 42%, rgba(255, 94, 216, 0.28), transparent 30%),
+    linear-gradient(135deg, rgba(255, 224, 115, 0.18), rgba(8, 11, 22, 0.88));
+}
+
+.facility-visual-memoryLibrary {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent),
+    repeating-linear-gradient(90deg, rgba(255, 224, 115, 0.14) 0 2px, transparent 2px 14px),
+    repeating-linear-gradient(0deg, rgba(127, 233, 255, 0.08) 0 1px, transparent 1px 18px),
+    radial-gradient(circle at 72% 28%, rgba(255, 94, 216, 0.22), transparent 30%),
+    linear-gradient(135deg, rgba(127, 233, 255, 0.18), rgba(8, 11, 22, 0.88));
 }
 
 .stage-card .stats-list {

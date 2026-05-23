@@ -1,9 +1,7 @@
 import {
   FACILITY_ORDER,
   ITEM_ORDER,
-  ITEMS,
   SONG_ORDER,
-  SONGS
 } from "../definitions";
 import {
   canSpendResource,
@@ -11,7 +9,9 @@ import {
   getFacilityLevel,
   getFacilityTomorusaPerSecond,
   getFacilityUpgradeCost,
+  getItemCost,
   getResourceAmount,
+  getSongCost,
   getTomorusaPerSecond,
   isFacilityUnlocked,
   isItemPurchased,
@@ -58,20 +58,32 @@ export function updateFacilityLiveValues(elements: UiElements, state: GameState)
 
 export function updateSongLiveValues(elements: UiElements, state: GameState): void {
   SONG_ORDER.forEach((songId) => {
+    const cost = getSongCost(state, songId);
+    const costElement = elements.contentList.querySelector<HTMLElement>(`[data-song-cost="${songId}"]`);
     const purchaseButton = elements.contentList.querySelector<HTMLButtonElement>(`[data-song-id="${songId}"]`);
 
+    if (costElement) {
+      costElement.textContent = `${formatAmount(cost)} 灯るさ`;
+    }
+
     if (purchaseButton) {
-      purchaseButton.disabled = !isSongUnlocked(state, songId) || isSongPurchased(state, songId) || !canSpendResource(state, TOMORUSA_RESOURCE_ID, SONGS[songId].cost);
+      purchaseButton.disabled = !isSongUnlocked(state, songId) || isSongPurchased(state, songId) || !canSpendResource(state, TOMORUSA_RESOURCE_ID, cost);
     }
   });
 }
 
 export function updateItemLiveValues(elements: UiElements, state: GameState): void {
   ITEM_ORDER.forEach((itemId) => {
+    const cost = getItemCost(state, itemId);
+    const costElement = elements.contentList.querySelector<HTMLElement>(`[data-item-cost="${itemId}"]`);
     const purchaseButton = elements.contentList.querySelector<HTMLButtonElement>(`[data-item-id="${itemId}"]`);
 
+    if (costElement) {
+      costElement.textContent = `${formatAmount(cost)} 灯るさ`;
+    }
+
     if (purchaseButton) {
-      purchaseButton.disabled = !isItemUnlocked(state, itemId) || isItemPurchased(state, itemId) || !canSpendResource(state, TOMORUSA_RESOURCE_ID, ITEMS[itemId].cost);
+      purchaseButton.disabled = !isItemUnlocked(state, itemId) || isItemPurchased(state, itemId) || !canSpendResource(state, TOMORUSA_RESOURCE_ID, cost);
     }
   });
 }

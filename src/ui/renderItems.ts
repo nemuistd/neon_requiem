@@ -7,6 +7,7 @@ import { UI_TEXT } from "../data";
 import {
   canSpendResource,
   GameState,
+  getItemCost,
   isItemPurchased,
   isItemUnlocked,
   TOMORUSA_RESOURCE_ID
@@ -22,7 +23,8 @@ function renderItemCard(state: GameState, itemId: ItemId): string {
   const item = ITEMS[itemId];
   const isUnlocked = isItemUnlocked(state, itemId);
   const isPurchased = isItemPurchased(state, itemId);
-  const canPurchase = isUnlocked && !isPurchased && canSpendResource(state, TOMORUSA_RESOURCE_ID, item.cost);
+  const cost = getItemCost(state, itemId);
+  const canPurchase = isUnlocked && !isPurchased && canSpendResource(state, TOMORUSA_RESOURCE_ID, cost);
   const itemStateLabel = isPurchased
     ? UI_TEXT.purchasedItemLabel
     : isUnlocked
@@ -44,7 +46,7 @@ function renderItemCard(state: GameState, itemId: ItemId): string {
         </div>
         <div>
           <dt>${UI_TEXT.itemPriceLabel}</dt>
-          <dd data-item-cost="${itemId}">${formatAmount(item.cost)} 灯るさ</dd>
+          <dd data-item-cost="${itemId}">${formatAmount(cost)} 灯るさ</dd>
         </div>
         <div>
           <dt>${UI_TEXT.unlockRequirementLabel}</dt>

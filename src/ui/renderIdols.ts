@@ -3,6 +3,7 @@ import {
   IDOLS,
   IdolId
 } from "../definitions";
+import type { IdolDefinition } from "../definitions";
 import { UI_TEXT } from "../data";
 import {
   GameState,
@@ -10,6 +11,7 @@ import {
   isIdolUnlocked,
   resolveActiveIdolId
 } from "../game";
+import { formatBond } from "./format";
 import { getIdolUnlockRequirementText } from "./requirementText";
 
 export function renderIdolCards(state: GameState, activeIdolId: IdolId): string {
@@ -18,9 +20,7 @@ export function renderIdolCards(state: GameState, activeIdolId: IdolId): string 
   return `
     <article class="idol-card">
       <div class="idol-main">
-        <div class="idol-portrait" aria-hidden="true">
-          <img src="${idol.imageUrl}" alt="" style="object-position: ${idol.imagePosition};" />
-        </div>
+        ${renderIdolVisual(idol, "idol-portrait")}
 
         <div class="idol-info-panel">
           <div class="idol-summary">
@@ -34,7 +34,7 @@ export function renderIdolCards(state: GameState, activeIdolId: IdolId): string 
           <dl class="idol-details">
             <div>
               <dt>${UI_TEXT.bondLabel}</dt>
-              <dd>${getIdolBond(state, activeIdolId)}</dd>
+              <dd>${formatBond(getIdolBond(state, activeIdolId))}</dd>
             </div>
             <div>
               <dt>${UI_TEXT.passiveEffectLabel}</dt>
@@ -103,9 +103,7 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
         <span class="idol-tab-state">${stateLabel}</span>
       </div>
       <div class="idol-tab-main">
-        <div class="idol-tab-portrait" aria-hidden="true">
-          <img src="${idol.imageUrl}" alt="" style="object-position: ${idol.imagePosition};" />
-        </div>
+        ${renderIdolVisual(idol, "idol-tab-portrait")}
         <div class="idol-tab-body">
           <p class="reading">${idol.reading}</p>
           <p class="title-line">${idol.title}</p>
@@ -115,7 +113,7 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
               ? `
             <div>
               <dt>${UI_TEXT.bondLabel}</dt>
-              <dd>${getIdolBond(state, idolId)}</dd>
+              <dd>${formatBond(getIdolBond(state, idolId))}</dd>
             </div>`
               : ""}
             <div>
@@ -139,4 +137,22 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
       </div>
     </article>
   `;
+}
+
+function renderIdolVisual(idol: IdolDefinition, className: string): string {
+  if (idol.imageUrl) {
+    return `
+        <div class="${className}" aria-hidden="true">
+          <img src="${idol.imageUrl}" alt="" style="object-position: ${idol.imagePosition ?? "center top"};" />
+        </div>
+    `;
+  }
+
+  const glyph = idol.name.replace(/\s+/g, "").slice(-1);
+
+  return `
+        <div class="${className}" data-idol-placeholder="true" aria-hidden="true">
+          <span class="idol-placeholder-glyph">${glyph}</span>
+        </div>
+    `;
 }

@@ -111,6 +111,64 @@ export const ITEM_DEFINITIONS = defineContent([
       facilityId: "neonBoard",
       level: 2
     }
+  },
+  {
+    id: "oldRadioTowerDebris",
+    name: "古い電波塔の残骸",
+    description:
+      "配信ブースの回線を延ばすために使った、電波塔の部品。元の用途がなくなっても、信号を引く仕事はまだできる。",
+    cost: 3000,
+    effectDescription: "ライブ1回の灯るさ +5",
+    effects: [
+      {
+        type: "manual.gain.add",
+        resourceId: "tomorusa",
+        amount: 5
+      }
+    ],
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "temporaryBroadcastBooth",
+      level: 1
+    }
+  },
+  {
+    id: "handwrittenListenerLog",
+    name: "手書きのリスナー名簿",
+    description:
+      "配信を聞いていると思われる人の名前を書き留めたメモ。確認できていない名前がほとんどだが、書いた分だけ届いている可能性が残る。",
+    cost: 4000,
+    effectDescription: "施設の灯るさ生産 x1.06",
+    effects: [
+      {
+        type: "facility.production.multiplier",
+        multiplier: 1.06
+      }
+    ],
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "temporaryBroadcastBooth",
+      level: 3
+    }
+  },
+  {
+    id: "fadedBookLabel",
+    name: "色あせた書名ラベル",
+    description:
+      "棚から落ちた書名ラベル。文字が薄くて読めないものも含め、巡はすべてに鉛筆で著者不明か番号を書いて貼り直している。",
+    cost: 10000,
+    effectDescription: "交流増加量 x1.10",
+    effects: [
+      {
+        type: "bond.rate.multiplier",
+        multiplier: 1.1
+      }
+    ],
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "memoryLibrary",
+      level: 2
+    }
   }
 ] as const satisfies readonly ItemDefinition[]);
 

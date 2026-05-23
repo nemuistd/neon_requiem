@@ -1,5 +1,5 @@
 export type { ActiveTabId, UiElements } from "./ui/types";
-export { formatAmount, formatRate } from "./ui/format";
+export { formatAmount, formatBond, formatRate } from "./ui/format";
 export {
   getFacilityIdFromEvent,
   getIdolIdFromEvent,

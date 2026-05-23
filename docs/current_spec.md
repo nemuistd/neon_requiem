@@ -4,8 +4,10 @@
 
 この文書は、現在の実装状態をドキュメント側で参照するための仕様メモである。
 
-世界観・用語体系は [worldbuilding.md](worldbuilding.md) を正史とする。README とこの文書に差分が出た場合は、実装と README を確認して同期する。
+世界観・用語体系は [worldbuilding.md](worldbuilding.md) を正史とする。承認済みの物語・コンテンツ正史は [fiction/](fiction/) 配下を参照する。README とこの文書に差分が出た場合は、実装と README を確認して同期する。
 長期方針と未実装計画は [planning/](planning/) 配下を参照する。
+
+`docs/fiction/world_design.md` で定義された **廻（めぐり）** は正式システム名として扱う。ただし、現在の実装にはまだ廻システム本体、記憶断片リソース、廻後アノテーションは入っていない。
 
 ## 技術構成
 
@@ -54,6 +56,9 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | --- | --- | --- | ---: | ---: | ---: |
 | `alleyStage` | 路地裏ステージ | 初期 | 10 | 1.15 | 0.1 |
 | `neonBoard` | ネオン掲示板 | 路地裏ステージ Lv10 | 80 | 1.18 | 0.35 |
+| `twilightPathGuide` | 薄明通り案内所 | ネオン掲示板 Lv5 | 3000 | 1.22 | 3 |
+| `temporaryBroadcastBooth` | 仮設配信ブース | 薄明通り案内所 Lv1 | 5000 | 1.22 | 4 |
+| `memoryLibrary` | 記憶図書館 | 仮設配信ブース Lv5 | 15000 | 1.25 | 8 |
 | `undergroundChapel` | 地下礼拝堂 | ネオン掲示板 Lv10 | 900 | 1.25 | 1 |
 
 地下礼拝堂は序盤施設ではなく、中盤以降の深層施設として扱う。
@@ -65,14 +70,35 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `otowaAkari` | 音羽 灯里 | 初期 | 全灯るさ生産 x1.20 |
 | `asagiriYui` | 朝霧 結 | ネオン掲示板 Lv5 | 全灯るさ生産 x1.15 |
 | `mizukiShino` | 深月 詩乃 | 地下礼拝堂 Lv3 | 全灯るさ生産 x1.10 |
+| `kaminoMeguri` | 紙野 巡 | 記憶図書館 Lv2 | 全アイドルの交流増加量 x1.25 |
 
-アイドル効果は `passiveEffects: Effect[]` として定義する。現在の3人は、解放済みなら常時発動する `facility.production.multiplier` を1件ずつ持つ。`focusEffects` は型だけ用意しているが、注目アイドルは「好きなアイドルを画面に置く」ための枠でもあるため、進行効率に直結する注目アイドル限定効果の適用は保留する。
+アイドル効果は `passiveEffects: Effect[]` として定義する。解放済みなら常時発動する。灯里・結・詩乃は `facility.production.multiplier`、巡は `bond.rate.multiplier` を持つ。`focusEffects` は型だけ用意しているが、注目アイドルは「好きなアイドルを画面に置く」ための枠でもあるため、進行効率に直結する注目アイドル限定効果の適用は保留する。
+
+立ち絵制作はコンテンツ実装と分ける。`imageUrl` が未設定のアイドルは、アイドルタブと注目アイドル枠で記名札風の簡易表示を出す。
+
+効果エンジンは、追加アイドル・追加施設に備えて以下の効果タイプを扱える。
+
+- `manual.gain.add`
+- `manual.gain.add.production.ratio`
+- `facility.production.multiplier`
+- `facility.production.multiplier.tag`
+- `offline.reward.multiplier`
+- `bond.rate.multiplier`
+- `item.cost.multiplier`
+- `song.cost.multiplier`
+- `record.unlock.cost.multiplier`
+- `memory.fragment.production.add`
+- `rebirth.bonus.multiplier`
+
+このうち、記録解放コスト、記憶断片、廻ボーナスは型・検証上の受け口であり、対応するUIやゲームシステムは未実装。
 
 ## 歌
 
 | id | 表示名 | 解放条件 | cost | 効果 |
 | --- | --- | --- | ---: | --- |
 | `rojiuraIntro` | 路地裏のイントロ | 路地裏ステージ Lv5 | 80 | ライブ1回の灯るさ +1 |
+| `prebroadcastAcapella` | 配信前夜のアカペラ | 仮設配信ブース Lv2 | 6000 | ライブ1回の灯るさ +8 |
+| `songOfRecords` | 記録の歌 | 記憶図書館 Lv3 | 20000 | 施設の灯るさ生産 x1.15 |
 | `chapelHarmony` | 礼拝堂のハーモニー | 地下礼拝堂 Lv1 | 450 | 施設の灯るさ生産 x1.10 |
 | `twilightChorus` | 薄明のコーラス | 地下礼拝堂 Lv5 | 1800 | 施設の灯るさ生産 x1.25 |
 
@@ -88,6 +114,9 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `portableSpotlight` | 携帯スポットライト | 路地裏ステージ Lv6 | 260 | 施設の灯るさ生産 x1.04 |
 | `recordedGreeting` | 録音済みの短い挨拶 | ネオン掲示板 Lv3 | 600 | 施設の灯るさ生産 x1.03 |
 | `shiftNoticeBoard` | 交代用連絡ボード | ネオン掲示板 Lv2 | 500 | オフライン灯るさ報酬 x1.10 |
+| `oldRadioTowerDebris` | 古い電波塔の残骸 | 仮設配信ブース Lv1 | 3000 | ライブ1回の灯るさ +5 |
+| `handwrittenListenerLog` | 手書きのリスナー名簿 | 仮設配信ブース Lv3 | 4000 | 施設の灯るさ生産 x1.06 |
+| `fadedBookLabel` | 色あせた書名ラベル | 記憶図書館 Lv2 | 10000 | 交流増加量 x1.10 |
 
 アイテムタブは実装済みで、購入済み状態は保存される。
 `交代用連絡ボード` 購入後の実効オフライン効率は `0.5 * 1.10 = 0.55` で、同じ時間のオンライン自然生産の55%になる。
@@ -117,6 +146,11 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 - ネオン掲示板・点灯確認
 - 結・案内メモの端
 - 短い挨拶の反響
+- 薄明通り案内所・開設報告
+- 路線図・読めない区画
+- 霞の濃淡・定点観測
+- 記憶図書館・開架報告
+- 出所不明の記録
 - 地下礼拝堂復旧報告
 - 詩乃・保管棚の前
 - 礼拝堂保管棚の札

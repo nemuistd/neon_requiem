@@ -331,7 +331,7 @@ function normalizeBond(bond: unknown): number {
     return 0;
   }
 
-  return Math.floor(bond);
+  return bond;
 }
 
 function normalizeEventIdsRead(eventIdsRead: unknown): string[] {

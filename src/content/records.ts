@@ -1,7 +1,7 @@
 import { ContentId, defineContent, toContentMap, toContentOrder } from "./defineContent.js";
 import { RecordDefinition } from "./types.js";
 
-export const RECORD_CONTENT_VERSION = 1;
+export const RECORD_CONTENT_VERSION = 3;
 
 export const RECORD_DEFINITIONS = defineContent([
   {
@@ -137,6 +137,86 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "neonBoard",
+        level: 3
+      }
+    ]
+  },
+  {
+    id: "twilightPathGuideOpeningReport",
+    title: "薄明通り案内所・開設報告",
+    category: "復旧報告",
+    revealLevel: "surface",
+    body:
+      "薄明通り案内所を開設した。ネオン掲示板から南西、分岐点の手前に小さな窓口を置く。確認のために一時間立っていると、そこで足を止めて周囲を見回す人が確かに多かった。案内所設置後、通過人数を計測できるようになる予定。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "facility.level",
+        facilityId: "twilightPathGuide",
+        level: 1
+      }
+    ]
+  },
+  {
+    id: "unreadableRouteMap",
+    title: "路線図・読めない区画",
+    category: "観測記録",
+    revealLevel: "uncanny",
+    body:
+      "古い路線図を確認した。現在の通路と照合すると、三か所の区画が記載されているが現状では確認できない。複数の住民への聞き込みでも、あそこには行けない、霞が濃くて近づけない、という回答が多い。路線図が正確だった時期はあったはずだ。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "facility.level",
+        facilityId: "twilightPathGuide",
+        level: 3
+      }
+    ]
+  },
+  {
+    id: "mistDensityFixedPoint",
+    title: "霞の濃淡・定点観測",
+    category: "観測記録",
+    revealLevel: "uncanny",
+    body:
+      "薄明通り案内所から三か所の定点で霞の濃度を観察している。ライブ開催日には、路地裏ステージ周辺の霞が薄くなる。公演後一時間程度で元の濃度に戻るが、客が多かった日は回復が遅い。相関が偶然かどうかは判断しない。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "facility.level",
+        facilityId: "twilightPathGuide",
+        level: 5
+      }
+    ]
+  },
+  {
+    id: "memoryLibraryOpeningReport",
+    title: "記憶図書館・開架報告",
+    category: "復旧報告",
+    revealLevel: "surface",
+    body:
+      "記憶図書館の第一区画を開架した。保管文書は各種記録、施設ログ、地図、名前の登録台帳。管理担当の紙野 巡が初日に、著者不明の文書が全体の約三分の一を占めると報告した。名前がないと、どこにも置けない。でも捨てない。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "facility.level",
+        facilityId: "memoryLibrary",
+        level: 1
+      }
+    ]
+  },
+  {
+    id: "unidentifiedRecordBundle",
+    title: "出所不明の記録",
+    category: "観測記録",
+    revealLevel: "uncanny",
+    body:
+      "巡が整理中に出所不明の文書を一束まとめた。紙の劣化から相当古いが、字体は統一されていない。複数の人間が別々の時期に書いたもの、または一人の人間が長期間にわたって書いたものと思われる。巡は、どこにも置けないものを、どこかに置くための棚を作った、とだけ言った。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "facility.level",
+        facilityId: "memoryLibrary",
         level: 3
       }
     ]

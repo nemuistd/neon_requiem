@@ -22,6 +22,45 @@ export const SONG_DEFINITIONS = defineContent([
     }
   },
   {
+    id: "prebroadcastAcapella",
+    name: "配信前夜のアカペラ",
+    description:
+      "配信を始める前の声のテスト。マイクを通さない生声は思いのほか遠くまで届く。届いたことを、誰も教えてくれないけれど。",
+    cost: 6000,
+    effectDescription: "ライブ1回の灯るさ +8",
+    effects: [
+      {
+        type: "manual.gain.add",
+        resourceId: "tomorusa",
+        amount: 8
+      }
+    ],
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "temporaryBroadcastBooth",
+      level: 2
+    }
+  },
+  {
+    id: "songOfRecords",
+    name: "記録の歌",
+    description:
+      "書かれたものを声に出すと、文字が少しだけ鮮明になるという噂が図書館の利用者のあいだにある。巡は、そういうものかもしれないと言い、試す人をとめない。",
+    cost: 20000,
+    effectDescription: "施設の灯るさ生産 x1.15",
+    effects: [
+      {
+        type: "facility.production.multiplier",
+        multiplier: 1.15
+      }
+    ],
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "memoryLibrary",
+      level: 3
+    }
+  },
+  {
     id: "chapelHarmony",
     name: "礼拝堂のハーモニー",
     description: "地下礼拝堂に残されていた、遊び心満載の楽曲。古い区画の響きを、アイドルのステージに合う明るいハーモニーへ編み直している。",

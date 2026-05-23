@@ -15,8 +15,8 @@ export type IdolDefinition = {
   reading: string;
   title: string;
   description: string;
-  imageUrl: string;
-  imagePosition: string;
+  imageUrl?: string;
+  imagePosition?: string;
   passiveDescription: string;
   passiveEffects: Effect[];
   focusEffects?: Effect[];
@@ -27,6 +27,7 @@ export type FacilityDefinition = {
   id: string;
   name: string;
   description: string;
+  tags?: string[];
   baseCost: number;
   costMultiplier: number;
   productionPerLevel?: number;

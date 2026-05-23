@@ -7,16 +7,20 @@ import {
   createInitialIdols,
   createInitialState,
   gainManualTomorusa,
+  getBondGainAmount,
   getIdolBond,
   getFacilityTomorusaPerSecond,
   getFacilityLevel,
+  getItemCost,
   getManualTomorusaGain,
   getOfflineRewardMultiplier,
   getOfflineTomorusa,
   getResourceAmount,
+  getSongCost,
   getTomorusaPerSecond,
   getUnlockedIdolPassiveEffects,
   isFacilityUnlocked,
+  isIdolUnlocked,
   isRecordRead,
   isRecordUnlocked,
   performManualLive,
@@ -29,6 +33,13 @@ import {
   TOMORUSA_RESOURCE_ID,
   upgradeFacility
 } from "./game";
+import {
+  getBondRateMultiplierFromEffects,
+  getFacilityProductionMultiplierFromEffects,
+  getItemCostMultiplierFromEffects,
+  getManualGainProductionRatio,
+  getSongCostMultiplierFromEffects
+} from "./engine/effects";
 import { areRequirementsMet, isRequirementMet } from "./engine/requirements";
 import { IDOL_ORDER } from "./definitions";
 import { validateRequirement } from "./contentValidation";
@@ -124,12 +135,20 @@ describe("game state and effects", () => {
     expect(getResourceAmount(state, TOMORUSA_RESOURCE_ID)).toBe(0);
     expect(state.facilities.alleyStage.level).toBe(0);
     expect(state.facilities.neonBoard.level).toBe(0);
+    expect(state.facilities.twilightPathGuide.level).toBe(0);
+    expect(state.facilities.temporaryBroadcastBooth.level).toBe(0);
+    expect(state.facilities.memoryLibrary.level).toBe(0);
     expect(state.facilities.undergroundChapel.level).toBe(0);
     expect(state.items.oldNeonTube.purchased).toBe(false);
     expect(state.items.ticketStubBundle.purchased).toBe(false);
+    expect(state.items.oldRadioTowerDebris.purchased).toBe(false);
+    expect(state.items.fadedBookLabel.purchased).toBe(false);
     expect(state.idols.otowaAkari.bond).toBe(0);
+    expect(state.idols.kaminoMeguri.bond).toBe(0);
     expect(state.idols.otowaAkari.eventIdsRead).toEqual([]);
     expect(state.songs.rojiuraIntro.purchased).toBe(false);
+    expect(state.songs.prebroadcastAcapella.purchased).toBe(false);
+    expect(state.songs.songOfRecords.purchased).toBe(false);
     expect(state.records.alleyStageRestorationMemo.read).toBe(false);
     expect(getTomorusaPerSecond(state)).toBe(0);
   });
@@ -185,6 +204,23 @@ describe("game state and effects", () => {
     expect(getResourceAmount(gainedState, TOMORUSA_RESOURCE_ID)).toBe(getResourceAmount(itemResult.state, TOMORUSA_RESOURCE_ID) + 4);
   });
 
+  it("applies expanded effect helpers for future fiction content", () => {
+    const effects = [
+      { type: "manual.gain.add.production.ratio", ratio: 0.05 },
+      { type: "facility.production.multiplier.tag", tag: "deep", multiplier: 1.25 },
+      { type: "bond.rate.multiplier", multiplier: 1.1 },
+      { type: "item.cost.multiplier", multiplier: 0.9 },
+      { type: "song.cost.multiplier", multiplier: 0.85 }
+    ] as const;
+
+    expect(getManualGainProductionRatio([...effects])).toBeCloseTo(0.05);
+    expect(getFacilityProductionMultiplierFromEffects([...effects], ["deep"])).toBeCloseTo(1.25);
+    expect(getFacilityProductionMultiplierFromEffects([...effects], ["infra"])).toBeCloseTo(1);
+    expect(getBondRateMultiplierFromEffects([...effects])).toBeCloseTo(1.1);
+    expect(getItemCostMultiplierFromEffects([...effects])).toBeCloseTo(0.9);
+    expect(getSongCostMultiplierFromEffects([...effects])).toBeCloseTo(0.85);
+  });
+
   it("adds bond to Otowa Akari when performing a manual live from the initial state", () => {
     const baseState = createInitialState();
     const liveState = performManualLive(baseState);
@@ -212,6 +248,12 @@ describe("game state and effects", () => {
     expect(getIdolBond(liveState, "otowaAkari")).toBe(0);
     expect(getIdolBond(liveState, "asagiriYui")).toBe(1);
     expect(getResourceAmount(liveState, TOMORUSA_RESOURCE_ID)).toBe(getResourceAmount(selectedState, TOMORUSA_RESOURCE_ID) + getManualTomorusaGain(selectedState));
+  });
+
+  it("reports the default bond gain before bond multipliers are purchased or unlocked", () => {
+    const baseState = createInitialState();
+
+    expect(getBondGainAmount(baseState)).toBe(1);
   });
 
   it("resolves locked active idol before adding live bond", () => {
@@ -295,6 +337,82 @@ describe("game state and effects", () => {
     expect(getManualTomorusaGain(noticeBoardResult.state)).toBe(2);
     expect(getFacilityTomorusaPerSecond(noticeBoardResult.state, "alleyStage")).toBeCloseTo(0.6 * 1.2 * 1.04);
     expect(getOfflineRewardMultiplier(noticeBoardResult.state)).toBeCloseTo(1.1);
+  });
+
+  it("unlocks Ch.3 facilities and applies their first song and items", () => {
+    const baseState = createInitialState();
+    const neonProgressState = {
+      ...addResource(baseState, TOMORUSA_RESOURCE_ID, 25000),
+      facilities: {
+        ...baseState.facilities,
+        alleyStage: { level: 10 },
+        neonBoard: { level: 5 }
+      }
+    };
+    const guideProgressState = {
+      ...neonProgressState,
+      facilities: {
+        ...neonProgressState.facilities,
+        twilightPathGuide: { level: 1 },
+        temporaryBroadcastBooth: { level: 3 }
+      }
+    };
+
+    expect(isFacilityUnlocked(neonProgressState, "twilightPathGuide")).toBe(true);
+    expect(isFacilityUnlocked(neonProgressState, "temporaryBroadcastBooth")).toBe(false);
+    expect(isFacilityUnlocked(guideProgressState, "temporaryBroadcastBooth")).toBe(true);
+    expect(getSongCost(guideProgressState, "prebroadcastAcapella")).toBe(6000);
+    expect(getItemCost(guideProgressState, "oldRadioTowerDebris")).toBe(3000);
+
+    const radioResult = purchaseItem(guideProgressState, "oldRadioTowerDebris");
+    const listenerResult = purchaseItem(radioResult.state, "handwrittenListenerLog");
+    const songResult = purchaseSong(listenerResult.state, "prebroadcastAcapella");
+
+    expect(radioResult.purchased).toBe(true);
+    expect(listenerResult.purchased).toBe(true);
+    expect(songResult.purchased).toBe(true);
+    expect(getManualTomorusaGain(songResult.state)).toBe(14);
+    expect(getFacilityTomorusaPerSecond(listenerResult.state, "temporaryBroadcastBooth")).toBeCloseTo(12 * 1.2 * 1.15 * 1.06);
+  });
+
+  it("unlocks the memory library, Meguri, and the first Ch.4 bond and song effects", () => {
+    const baseState = createInitialState();
+    const boothProgressState = {
+      ...addResource(baseState, TOMORUSA_RESOURCE_ID, 60000),
+      facilities: {
+        ...baseState.facilities,
+        alleyStage: { level: 10 },
+        neonBoard: { level: 5 },
+        twilightPathGuide: { level: 1 },
+        temporaryBroadcastBooth: { level: 5 }
+      }
+    };
+    const libraryProgressState = {
+      ...boothProgressState,
+      facilities: {
+        ...boothProgressState.facilities,
+        memoryLibrary: { level: 3 }
+      }
+    };
+
+    expect(isFacilityUnlocked(boothProgressState, "memoryLibrary")).toBe(true);
+    expect(isIdolUnlocked(libraryProgressState, "kaminoMeguri")).toBe(true);
+    expect(isRecordUnlocked(libraryProgressState, "memoryLibraryOpeningReport")).toBe(true);
+    expect(isRecordUnlocked(libraryProgressState, "unidentifiedRecordBundle")).toBe(true);
+    expect(getBondGainAmount(libraryProgressState)).toBeCloseTo(1.25);
+    expect(getItemCost(libraryProgressState, "fadedBookLabel")).toBe(10000);
+    expect(getSongCost(libraryProgressState, "songOfRecords")).toBe(20000);
+
+    const selectedState = selectActiveIdol(libraryProgressState, "kaminoMeguri");
+    const labelResult = purchaseItem(selectedState, "fadedBookLabel");
+    const songResult = purchaseSong(labelResult.state, "songOfRecords");
+    const liveState = performManualLive(songResult.state);
+
+    expect(labelResult.purchased).toBe(true);
+    expect(songResult.purchased).toBe(true);
+    expect(getBondGainAmount(labelResult.state)).toBeCloseTo(1.25 * 1.1);
+    expect(getIdolBond(liveState, "kaminoMeguri")).toBeCloseTo(1.25 * 1.1);
+    expect(getFacilityTomorusaPerSecond(songResult.state, "memoryLibrary")).toBeCloseTo(24 * 1.2 * 1.15 * 1.15);
   });
 
   it("applies production and caps offline reward at 12 hours", () => {
@@ -381,6 +499,23 @@ describe("game state and effects", () => {
 
     expect(isFacilityUnlocked(baseState, "neonBoard")).toBe(false);
     expect(isFacilityUnlocked(alleyProgressState, "neonBoard")).toBe(true);
+    expect(isFacilityUnlocked(alleyProgressState, "twilightPathGuide")).toBe(false);
+    expect(isFacilityUnlocked({
+      ...alleyProgressState,
+      facilities: {
+        ...alleyProgressState.facilities,
+        neonBoard: { level: 5 }
+      }
+    }, "twilightPathGuide")).toBe(true);
+    expect(isFacilityUnlocked({
+      ...alleyProgressState,
+      facilities: {
+        ...alleyProgressState.facilities,
+        neonBoard: { level: 5 },
+        twilightPathGuide: { level: 1 },
+        temporaryBroadcastBooth: { level: 5 }
+      }
+    }, "memoryLibrary")).toBe(true);
     expect(isFacilityUnlocked(alleyProgressState, "undergroundChapel")).toBe(false);
     expect(isFacilityUnlocked(neonProgressState, "undergroundChapel")).toBe(true);
     expect(isRecordUnlocked(alleyProgressState, "firstAudienceNote")).toBe(true);
@@ -471,10 +606,14 @@ describe("save normalization", () => {
       eventIdsRead: []
     });
     expect(result.state.idols.asagiriYui).toEqual({
-      bond: 2,
+      bond: 2.8,
       eventIdsRead: ["intro", "notice"]
     });
     expect(result.state.idols.mizukiShino).toEqual({
+      bond: 0,
+      eventIdsRead: []
+    });
+    expect(result.state.idols.kaminoMeguri).toEqual({
       bond: 0,
       eventIdsRead: []
     });

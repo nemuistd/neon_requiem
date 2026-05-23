@@ -9,3 +9,7 @@ export function formatAmount(value: number): string {
 export function formatRate(value: number): string {
   return value.toFixed(2);
 }
+
+export function formatBond(value: number): string {
+  return Number.isInteger(value) ? String(value) : value.toFixed(1);
+}

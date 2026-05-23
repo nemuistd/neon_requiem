@@ -7,6 +7,7 @@ import { UI_TEXT } from "../data";
 import {
   canSpendResource,
   GameState,
+  getSongCost,
   isSongPurchased,
   isSongUnlocked,
   TOMORUSA_RESOURCE_ID
@@ -22,7 +23,8 @@ function renderSongCard(state: GameState, songId: SongId): string {
   const song = SONGS[songId];
   const isUnlocked = isSongUnlocked(state, songId);
   const isPurchased = isSongPurchased(state, songId);
-  const canPurchase = isUnlocked && !isPurchased && canSpendResource(state, TOMORUSA_RESOURCE_ID, song.cost);
+  const cost = getSongCost(state, songId);
+  const canPurchase = isUnlocked && !isPurchased && canSpendResource(state, TOMORUSA_RESOURCE_ID, cost);
   const songStateLabel = isPurchased
     ? UI_TEXT.purchasedSongLabel
     : isUnlocked
@@ -44,7 +46,7 @@ function renderSongCard(state: GameState, songId: SongId): string {
         </div>
         <div>
           <dt>${UI_TEXT.songPriceLabel}</dt>
-          <dd data-song-cost="${songId}">${formatAmount(song.cost)} 灯るさ</dd>
+          <dd data-song-cost="${songId}">${formatAmount(cost)} 灯るさ</dd>
         </div>
         <div>
           <dt>${UI_TEXT.unlockRequirementLabel}</dt>

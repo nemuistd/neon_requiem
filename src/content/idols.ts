@@ -63,6 +63,26 @@ export const IDOL_DEFINITIONS = defineContent([
       level: 3
     }
   },
+  {
+    id: "kaminoMeguri",
+    name: "紙野 巡",
+    reading: "かみの めぐり",
+    title: "記憶図書館の整理係",
+    description:
+      "名前がないと、どこにも置けない。巡はそう言いながら、著者不明の文書をひとつずつ棚に戻す。名前を与えることが彼女の仕事で、その手が止まる記録は一つだけある。",
+    passiveDescription: "全アイドルの交流増加量 x1.25",
+    passiveEffects: [
+      {
+        type: "bond.rate.multiplier",
+        multiplier: 1.25
+      }
+    ],
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "memoryLibrary",
+      level: 2
+    }
+  },
 
 ] as const satisfies readonly IdolDefinition[]);
 

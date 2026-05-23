@@ -138,6 +138,20 @@ function validateFacilities(): string[] {
       errors.push(`facility "${facilityId}": productionPerLevel must be non-negative.`);
     }
 
+    if (facility.tags) {
+      const uniqueTags = new Set(facility.tags);
+
+      if (uniqueTags.size !== facility.tags.length) {
+        errors.push(`facility "${facilityId}": tags must not contain duplicates.`);
+      }
+
+      facility.tags.forEach((tag) => {
+        if (!tag.trim()) {
+          errors.push(`facility "${facilityId}": tags must not be empty.`);
+        }
+      });
+    }
+
     if (facility.unlockRequirement) {
       errors.push(...validateRequirement(`facility "${facilityId}"`, facility.unlockRequirement));
     }
@@ -314,15 +328,65 @@ function validateEffect(label: string, effect: Effect): string[] {
     return errors;
   }
 
+  if (effect.type === "manual.gain.add.production.ratio" && !isPositiveFiniteNumber(effect.ratio)) {
+    return [`${label}: manual.gain.add.production.ratio ratio must be positive.`];
+  }
+
   if (effect.type === "facility.production.multiplier" && !isPositiveFiniteNumber(effect.multiplier)) {
     return [`${label}: facility.production.multiplier multiplier must be positive.`];
+  }
+
+  if (effect.type === "facility.production.multiplier.tag") {
+    const errors: string[] = [];
+
+    if (!effect.tag.trim()) {
+      errors.push(`${label}: facility.production.multiplier.tag tag must not be empty.`);
+    }
+
+    if (!getFacilityTags().has(effect.tag)) {
+      errors.push(`${label}: facility.production.multiplier.tag references missing facility tag "${effect.tag}".`);
+    }
+
+    if (!isPositiveFiniteNumber(effect.multiplier)) {
+      errors.push(`${label}: facility.production.multiplier.tag multiplier must be positive.`);
+    }
+
+    return errors;
   }
 
   if (effect.type === "offline.reward.multiplier" && !isPositiveFiniteNumber(effect.multiplier)) {
     return [`${label}: offline.reward.multiplier multiplier must be positive.`];
   }
 
+  if (effect.type === "bond.rate.multiplier" && !isPositiveFiniteNumber(effect.multiplier)) {
+    return [`${label}: bond.rate.multiplier multiplier must be positive.`];
+  }
+
+  if (effect.type === "record.unlock.cost.multiplier" && !isPositiveFiniteNumber(effect.multiplier)) {
+    return [`${label}: record.unlock.cost.multiplier multiplier must be positive.`];
+  }
+
+  if (effect.type === "item.cost.multiplier" && !isPositiveFiniteNumber(effect.multiplier)) {
+    return [`${label}: item.cost.multiplier multiplier must be positive.`];
+  }
+
+  if (effect.type === "song.cost.multiplier" && !isPositiveFiniteNumber(effect.multiplier)) {
+    return [`${label}: song.cost.multiplier multiplier must be positive.`];
+  }
+
+  if (effect.type === "memory.fragment.production.add" && !isPositiveFiniteNumber(effect.ratio)) {
+    return [`${label}: memory.fragment.production.add ratio must be positive.`];
+  }
+
+  if (effect.type === "rebirth.bonus.multiplier" && !isPositiveFiniteNumber(effect.multiplier)) {
+    return [`${label}: rebirth.bonus.multiplier multiplier must be positive.`];
+  }
+
   return [];
+}
+
+function getFacilityTags(): Set<string> {
+  return new Set(Object.values(FACILITIES).flatMap((facility) => facility.tags ?? []));
 }
 
 function isPositiveFiniteNumber(value: number): boolean {

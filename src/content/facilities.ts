@@ -26,6 +26,49 @@ export const FACILITY_DEFINITIONS = defineContent([
     }
   },
   {
+    id: "twilightPathGuide",
+    name: "薄明通り案内所",
+    description:
+      "霞の濃い通路の入口に設けられた小さな案内所。貼り替えられる告知と手書きの地図が、薄明通りへ踏み出す人の足元を支える。",
+    tags: ["infra"],
+    baseCost: 3000,
+    costMultiplier: 1.22,
+    productionPerLevel: 3,
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "neonBoard",
+      level: 5
+    }
+  },
+  {
+    id: "temporaryBroadcastBooth",
+    name: "仮設配信ブース",
+    description:
+      "電波塔の残骸から引いた細い回線と、防音とは言えない仮囲い。どこまで届いているかは分からないが、今日の公演を外へ向けて送り出す。",
+    baseCost: 5000,
+    costMultiplier: 1.22,
+    productionPerLevel: 4,
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "twilightPathGuide",
+      level: 1
+    }
+  },
+  {
+    id: "memoryLibrary",
+    name: "記憶図書館",
+    description:
+      "地下区画の一角に残されていた文書保管施設。棚の多くは空だが、整理されたものと放置されたものが混在している。著者不明の背表紙が、どの棚にも何冊かある。",
+    baseCost: 15000,
+    costMultiplier: 1.25,
+    productionPerLevel: 8,
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "temporaryBroadcastBooth",
+      level: 5
+    }
+  },
+  {
     id: "undergroundChapel",
     name: "地下礼拝堂",
     description:
