@@ -1,7 +1,7 @@
 import { ContentId, defineContent, toContentMap, toContentOrder } from "./defineContent.js";
 import { RecordDefinition } from "./types.js";
 
-export const RECORD_CONTENT_VERSION = 5;
+export const RECORD_CONTENT_VERSION = 8;
 
 export const RECORD_DEFINITIONS = defineContent([
   {
@@ -302,6 +302,38 @@ export const RECORD_DEFINITIONS = defineContent([
     ]
   },
   {
+    id: "nameRecordWallOpeningLog",
+    title: "名前の記録壁・設置報告",
+    category: "復旧報告",
+    revealLevel: "surface",
+    body:
+      "地下広場の奥に、来場者や公演名を書いた紙片を貼る壁を設けた。小春は名前を聞くたびに、本人に見える高さへ紙片を貼っている。自分の名前を見つけた人は、少し照れた後で次の公演予定も確認していく。広場を通り過ぎるだけだった人が、壁の前で立ち止まるようになった。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "facility.level",
+        facilityId: "nameRecordWall",
+        level: 1
+      }
+    ]
+  },
+  {
+    id: "wallNameStabilityLog",
+    title: "壁面の名前と輪郭",
+    category: "観測記録",
+    revealLevel: "uncanny",
+    body:
+      "名前の記録壁を貼り替えた日の観測。古い紙片を捨てず、書き写してから新しい場所へ移したところ、地下広場の奥の通路が少し見つけやすくなったという報告が複数あった。光量や案内の改善だけで説明できるかは分からない。現時点では、名前が見える状態を保つことに意味がある、という作業仮説に留める。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "facility.level",
+        facilityId: "nameRecordWall",
+        level: 3
+      }
+    ]
+  },
+  {
     id: "nameFixationObservation",
     title: "観測記録・名称固定の効果",
     category: "施設ログ",
@@ -323,13 +355,13 @@ export const RECORD_DEFINITIONS = defineContent([
     category: "復旧報告",
     revealLevel: "uncanny",
     body:
-      "ネオン掲示板に名前と告知を残し続けたことで、人通りの少ない奥の区画まで道筋が戻った。閉ざされていた地下礼拝堂には、『祈る場所としてではなく、失われた響きを保管する区画として残されていた』という置手紙がある。",
+      "名前の記録壁を整理している時、古い紙片の裏に地下礼拝堂への通路名が残っていた。広場の奥で同じ名前を何度か呼ぶと、霞の向こうに扉の輪郭が戻った。閉ざされていた地下礼拝堂には、『祈る場所としてではなく、失われた響きを保管する区画として残されていた』という置手紙がある。",
     introducedAtVersion: RECORD_CONTENT_VERSION,
     unlockRequirements: [
       {
         type: "facility.level",
-        facilityId: "neonBoard",
-        level: 10
+        facilityId: "undergroundChapel",
+        level: 1
       }
     ]
   },
@@ -382,6 +414,38 @@ export const RECORD_DEFINITIONS = defineContent([
     ]
   },
   {
+    id: "chapelSecondShelfInvestigation",
+    title: "礼拝堂・第二保管棚の調査",
+    category: "観測記録",
+    revealLevel: "uncanny",
+    body:
+      "詩乃が第二保管棚の内容を整理した。分類結果は、公演記録、復旧報告、名前の登録台帳。どれも通常の施設記録として扱える。例外として、表紙に何も書かれていない文書が一冊あった。内容は観測手順と思われるが、何を観測するものかは書かれていない。詩乃は、出所不明として保管すると記録した。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "facility.level",
+        facilityId: "undergroundChapel",
+        level: 2
+      }
+    ]
+  },
+  {
+    id: "shinoDeletedRecordTrace",
+    title: "詩乃・消えた記録の痕跡",
+    category: "施設ログ",
+    revealLevel: "technical",
+    body:
+      "保管棚の一部の文書に、削除の痕跡がある。詩乃は、朽ちたのではなく、削除された跡だけが残っている、と観察した。削除された内容の種類も、削除した者の意図も不明。詩乃は、消えた記録を復元することはできない。でも、消えたことは記録できる、とだけ言った。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "facility.level",
+        facilityId: "undergroundChapel",
+        level: 4
+      }
+    ]
+  },
+  {
     id: "songAndHymnDistinction",
     title: "歌の扱いに関する断片",
     category: "断片記憶",
@@ -391,8 +455,18 @@ export const RECORD_DEFINITIONS = defineContent([
     introducedAtVersion: RECORD_CONTENT_VERSION,
     unlockRequirements: [
       {
-        type: "song.purchased",
-        songId: "chapelHarmony"
+        type: "all",
+        requirements: [
+          {
+            type: "facility.level",
+            facilityId: "undergroundChapel",
+            level: 5
+          },
+          {
+            type: "song.purchased",
+            songId: "chapelHarmony"
+          }
+        ]
       }
     ]
   },

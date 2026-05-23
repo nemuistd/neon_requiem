@@ -993,6 +993,16 @@ h2 {
     linear-gradient(135deg, rgba(255, 224, 115, 0.18), rgba(8, 11, 22, 0.88));
 }
 
+.facility-visual-nameRecordWall {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent),
+    repeating-linear-gradient(90deg, rgba(255, 224, 115, 0.14) 0 3px, transparent 3px 18px),
+    repeating-linear-gradient(0deg, rgba(127, 233, 255, 0.1) 0 2px, transparent 2px 16px),
+    radial-gradient(circle at 30% 34%, rgba(255, 94, 216, 0.24), transparent 30%),
+    radial-gradient(circle at 70% 64%, rgba(127, 233, 255, 0.24), transparent 28%),
+    linear-gradient(135deg, rgba(255, 224, 115, 0.16), rgba(8, 11, 22, 0.9));
+}
+
 .stage-card .stats-list {
   margin-top: 0;
   gap: 6px;

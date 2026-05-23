@@ -111,6 +111,21 @@ export const FACILITY_DEFINITIONS = defineContent([
     }
   },
   {
+    id: "nameRecordWall",
+    name: "名前の記録壁",
+    description:
+      "地下広場の奥に設けた、来場者や公演名を書いた紙片を残すための壁。呼ばれた名前、戻ってきた名前、まだ確認できない名前が、消えないように一枚ずつ貼られている。",
+    tags: ["memory"],
+    baseCost: 45000,
+    costMultiplier: 1.26,
+    productionPerLevel: 14,
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "undergroundPlaza",
+      level: 4
+    }
+  },
+  {
     id: "undergroundChapel",
     name: "地下礼拝堂",
     description:
@@ -120,8 +135,8 @@ export const FACILITY_DEFINITIONS = defineContent([
     productionPerLevel: 1,
     unlockRequirement: {
       type: "facility.level",
-      facilityId: "neonBoard",
-      level: 10
+      facilityId: "nameRecordWall",
+      level: 3
     }
   }
 ] as const satisfies readonly FacilityDefinition[]);

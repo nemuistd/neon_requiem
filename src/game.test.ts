@@ -141,6 +141,7 @@ describe("game state and effects", () => {
     expect(state.facilities.recordingStorage.level).toBe(0);
     expect(state.facilities.oldBroadcastRoom.level).toBe(0);
     expect(state.facilities.undergroundPlaza.level).toBe(0);
+    expect(state.facilities.nameRecordWall.level).toBe(0);
     expect(state.facilities.undergroundChapel.level).toBe(0);
     expect(state.items.oldNeonTube.purchased).toBe(false);
     expect(state.items.ticketStubBundle.purchased).toBe(false);
@@ -481,6 +482,67 @@ describe("game state and effects", () => {
     expect(getManualTomorusaGain(songResult.state)).toBeCloseTo(1 + getTomorusaPerSecond(songResult.state) * 0.13);
   });
 
+  it("unlocks the name record wall after the plaza and reveals name records", () => {
+    const baseState = createInitialState();
+    const wallState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        alleyStage: { level: 10 },
+        neonBoard: { level: 5 },
+        twilightPathGuide: { level: 1 },
+        temporaryBroadcastBooth: { level: 5 },
+        memoryLibrary: { level: 3 },
+        undergroundPlaza: { level: 4 },
+        nameRecordWall: { level: 3 }
+      }
+    };
+
+    expect(isFacilityUnlocked(wallState, "nameRecordWall")).toBe(true);
+    expect(isRecordUnlocked(wallState, "nameRecordWallOpeningLog")).toBe(true);
+    expect(isRecordUnlocked(wallState, "wallNameStabilityLog")).toBe(true);
+    expect(getFacilityTomorusaPerSecond(wallState, "nameRecordWall")).toBeCloseTo(42 * 1.2 * 1.15 * 1.08);
+  });
+
+  it("unlocks chapel records without entering the meguri system", () => {
+    const baseState = createInitialState();
+    const chapelLevelTwoState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        undergroundChapel: { level: 2 }
+      }
+    };
+    const chapelLevelFourState = {
+      ...chapelLevelTwoState,
+      facilities: {
+        ...chapelLevelTwoState.facilities,
+        undergroundChapel: { level: 4 }
+      }
+    };
+    const chapelLevelFiveState = {
+      ...chapelLevelFourState,
+      facilities: {
+        ...chapelLevelFourState.facilities,
+        undergroundChapel: { level: 5 }
+      }
+    };
+    const chapelSongState = {
+      ...chapelLevelFiveState,
+      songs: {
+        ...chapelLevelFiveState.songs,
+        chapelHarmony: { purchased: true }
+      }
+    };
+
+    expect(isRecordUnlocked(chapelLevelTwoState, "observerCountFragment")).toBe(true);
+    expect(isRecordUnlocked(chapelLevelTwoState, "chapelSecondShelfInvestigation")).toBe(true);
+    expect(isRecordUnlocked(chapelLevelTwoState, "shinoDeletedRecordTrace")).toBe(false);
+    expect(isRecordUnlocked(chapelLevelFourState, "shinoDeletedRecordTrace")).toBe(true);
+    expect(isRecordUnlocked(chapelLevelFiveState, "songAndHymnDistinction")).toBe(false);
+    expect(isRecordUnlocked(chapelSongState, "songAndHymnDistinction")).toBe(true);
+  });
+
   it("applies production and caps offline reward at 12 hours", () => {
     const baseState = createInitialState();
     const state = {
@@ -613,10 +675,43 @@ describe("game state and effects", () => {
         memoryLibrary: { level: 3 }
       }
     }, "undergroundPlaza")).toBe(true);
+    expect(isFacilityUnlocked({
+      ...alleyProgressState,
+      facilities: {
+        ...alleyProgressState.facilities,
+        neonBoard: { level: 5 },
+        twilightPathGuide: { level: 1 },
+        temporaryBroadcastBooth: { level: 5 },
+        memoryLibrary: { level: 3 },
+        undergroundPlaza: { level: 4 }
+      }
+    }, "nameRecordWall")).toBe(true);
+    const chapelPathState = {
+      ...alleyProgressState,
+      facilities: {
+        ...alleyProgressState.facilities,
+        neonBoard: { level: 5 },
+        twilightPathGuide: { level: 1 },
+        temporaryBroadcastBooth: { level: 5 },
+        memoryLibrary: { level: 3 },
+        undergroundPlaza: { level: 4 },
+        nameRecordWall: { level: 3 }
+      }
+    };
+    const chapelOpenedState = {
+      ...chapelPathState,
+      facilities: {
+        ...chapelPathState.facilities,
+        undergroundChapel: { level: 1 }
+      }
+    };
+
     expect(isFacilityUnlocked(alleyProgressState, "undergroundChapel")).toBe(false);
-    expect(isFacilityUnlocked(neonProgressState, "undergroundChapel")).toBe(true);
+    expect(isFacilityUnlocked(neonProgressState, "undergroundChapel")).toBe(false);
+    expect(isFacilityUnlocked(chapelPathState, "undergroundChapel")).toBe(true);
     expect(isRecordUnlocked(alleyProgressState, "firstAudienceNote")).toBe(true);
-    expect(isRecordUnlocked(neonProgressState, "undergroundChapelRestorationReport")).toBe(true);
+    expect(isRecordUnlocked(chapelPathState, "undergroundChapelRestorationReport")).toBe(false);
+    expect(isRecordUnlocked(chapelOpenedState, "undergroundChapelRestorationReport")).toBe(true);
     expect(getFacilityLevel(neonProgressState, "neonBoard")).toBe(10);
   });
 
