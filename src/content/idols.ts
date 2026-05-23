@@ -103,6 +103,30 @@ export const IDOL_DEFINITIONS = defineContent([
       level: 2
     }
   },
+  {
+    id: "hinataKoharu",
+    name: "陽向 小春",
+    reading: "ひなた こはる",
+    title: "地下広場の呼び込み",
+    description:
+      "大声でよく笑い、会ったばかりの人の名前を必ず覚える。次に会った時には必ず呼ぶ。名前を呼ぶのは礼儀だから、と彼女は言う。それ以上の理由があるかどうか、本人は話さない。",
+    passiveDescription: "全灯るさ生産 x1.08 / アイテム購入コスト x0.90",
+    passiveEffects: [
+      {
+        type: "facility.production.multiplier",
+        multiplier: 1.08
+      },
+      {
+        type: "item.cost.multiplier",
+        multiplier: 0.9
+      }
+    ],
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "undergroundPlaza",
+      level: 1
+    }
+  },
 
 ] as const satisfies readonly IdolDefinition[]);
 

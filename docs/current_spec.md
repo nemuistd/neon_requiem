@@ -61,6 +61,7 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `memoryLibrary` | 記憶図書館 | 仮設配信ブース Lv5 | 15000 | 1.25 | 8 |
 | `recordingStorage` | 録音保管庫 | 記憶図書館 Lv1 | 12000 | 1.23 | 6 |
 | `oldBroadcastRoom` | 古い放送室 | 録音保管庫 Lv2 | 26000 | 1.24 | 11 |
+| `undergroundPlaza` | 地下広場 | 記憶図書館 Lv3 | 20000 | 1.25 | 10 |
 | `undergroundChapel` | 地下礼拝堂 | ネオン掲示板 Lv10 | 900 | 1.25 | 1 |
 
 地下礼拝堂は序盤施設ではなく、中盤以降の深層施設として扱う。
@@ -74,8 +75,9 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `hibikiTooko` | 響木 遠子 | 仮設配信ブース Lv3 | ライブ1回の灯るさ獲得に全施設合計の秒間灯るさ x0.05 を加算 |
 | `mizukiShino` | 深月 詩乃 | 地下礼拝堂 Lv3 | 全灯るさ生産 x1.10 |
 | `kaminoMeguri` | 紙野 巡 | 記憶図書館 Lv2 | 全アイドルの交流増加量 x1.25 |
+| `hinataKoharu` | 陽向 小春 | 地下広場 Lv1 | 全灯るさ生産 x1.08 / アイテム購入コスト x0.90 |
 
-アイドル効果は `passiveEffects: Effect[]` として定義する。解放済みなら常時発動する。灯里・結・詩乃は `facility.production.multiplier`、遠子は `manual.gain.add.production.ratio`、巡は `bond.rate.multiplier` を持つ。`focusEffects` は型だけ用意しているが、注目アイドルは「好きなアイドルを画面に置く」ための枠でもあるため、進行効率に直結する注目アイドル限定効果の適用は保留する。
+アイドル効果は `passiveEffects: Effect[]` として定義する。解放済みなら常時発動する。灯里・結・詩乃は `facility.production.multiplier`、遠子は `manual.gain.add.production.ratio`、巡は `bond.rate.multiplier`、小春は `facility.production.multiplier` と `item.cost.multiplier` を持つ。`focusEffects` は型だけ用意しているが、注目アイドルは「好きなアイドルを画面に置く」ための枠でもあるため、進行効率に直結する注目アイドル限定効果の適用は保留する。
 
 立ち絵制作はコンテンツ実装と分ける。`imageUrl` が未設定のアイドルは、アイドルタブと注目アイドル枠で記名札風の簡易表示を出す。
 
@@ -102,6 +104,7 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `rojiuraIntro` | 路地裏のイントロ | 路地裏ステージ Lv5 | 80 | ライブ1回の灯るさ +1 |
 | `prebroadcastAcapella` | 配信前夜のアカペラ | 仮設配信ブース Lv2 | 6000 | ライブ1回の灯るさ +8 |
 | `songOfRecords` | 記録の歌 | 記憶図書館 Lv3 | 20000 | 施設の灯るさ生産 x1.15 |
+| `plazaAnthem` | 広場のアンセム | 地下広場 Lv3 | 30000 | ライブ1回の灯るさ獲得に全施設合計の灯るさ/秒 x0.08 を加算 |
 | `chapelHarmony` | 礼拝堂のハーモニー | 地下礼拝堂 Lv1 | 450 | 施設の灯るさ生産 x1.10 |
 | `twilightChorus` | 薄明のコーラス | 地下礼拝堂 Lv5 | 1800 | 施設の灯るさ生産 x1.25 |
 
@@ -158,6 +161,8 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 - 記憶図書館・開架報告
 - 出所不明の記録
 - 古い放送室・機材確認
+- 地下広場・初日
+- 小春・名前の効果
 - 観測記録・名称固定の効果
 - 地下礼拝堂復旧報告
 - 詩乃・保管棚の前

@@ -61,6 +61,25 @@ export const SONG_DEFINITIONS = defineContent([
     }
   },
   {
+    id: "plazaAnthem",
+    name: "広場のアンセム",
+    description:
+      "広場に人が集まる時間に流れる、テンポの速い曲。小春が一番前で手拍子をとるので、初めて来た人もすぐ合わせられる。",
+    cost: 30000,
+    effectDescription: "ライブ1回の灯るさ獲得に、全施設合計の灯るさ/秒 x0.08 を加算",
+    effects: [
+      {
+        type: "manual.gain.add.production.ratio",
+        ratio: 0.08
+      }
+    ],
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "undergroundPlaza",
+      level: 3
+    }
+  },
+  {
     id: "chapelHarmony",
     name: "礼拝堂のハーモニー",
     description: "地下礼拝堂に残されていた、遊び心満載の楽曲。古い区画の響きを、アイドルのステージに合う明るいハーモニーへ編み直している。",

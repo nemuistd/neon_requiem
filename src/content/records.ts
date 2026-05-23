@@ -1,7 +1,7 @@
 import { ContentId, defineContent, toContentMap, toContentOrder } from "./defineContent.js";
 import { RecordDefinition } from "./types.js";
 
-export const RECORD_CONTENT_VERSION = 4;
+export const RECORD_CONTENT_VERSION = 5;
 
 export const RECORD_DEFINITIONS = defineContent([
   {
@@ -266,6 +266,38 @@ export const RECORD_DEFINITIONS = defineContent([
         type: "facility.level",
         facilityId: "oldBroadcastRoom",
         level: 1
+      }
+    ]
+  },
+  {
+    id: "undergroundPlazaFirstDay",
+    title: "地下広場・初日",
+    category: "復旧報告",
+    revealLevel: "surface",
+    body:
+      "地下広場が稼働した。初日の記録では、陽向 小春が来た人間全員に声をかけ、三十分で二十七人の名前を覚えた。翌日、同じ人間が戻ってきた時に全員の名前を呼んだ。驚いた後、広場に留まる時間が長くなった。小春は、名前を呼ぶと帰る速度が遅くなる、と笑って言った。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "facility.level",
+        facilityId: "undergroundPlaza",
+        level: 1
+      }
+    ]
+  },
+  {
+    id: "koharuNameEffect",
+    title: "小春・名前の効果",
+    category: "観測記録",
+    revealLevel: "uncanny",
+    body:
+      "陽向 小春が名前を呼んだ時の観察記録。名前を呼んだ直後、その人物の輪郭が一瞬鮮明になる気がする。光の問題か、注目が集まるためか、別の何かか。小春に確認すると、そうかな、そんなことより今日は何人来た、と話題を変えた。以後、この件について小春には確認していない。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "facility.level",
+        facilityId: "undergroundPlaza",
+        level: 4
       }
     ]
   },

@@ -97,6 +97,20 @@ export const FACILITY_DEFINITIONS = defineContent([
     }
   },
   {
+    id: "undergroundPlaza",
+    name: "地下広場",
+    description:
+      "かつて市場として使われていたと思われる広い空間。人が多く集まる場所だが、何もない時間は奇妙に静かだ。小春が告知を貼り始めてから、立ち止まる時間が少しずつ長くなった。",
+    baseCost: 20000,
+    costMultiplier: 1.25,
+    productionPerLevel: 10,
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "memoryLibrary",
+      level: 3
+    }
+  },
+  {
     id: "undergroundChapel",
     name: "地下礼拝堂",
     description:

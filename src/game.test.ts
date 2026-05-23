@@ -140,6 +140,7 @@ describe("game state and effects", () => {
     expect(state.facilities.memoryLibrary.level).toBe(0);
     expect(state.facilities.recordingStorage.level).toBe(0);
     expect(state.facilities.oldBroadcastRoom.level).toBe(0);
+    expect(state.facilities.undergroundPlaza.level).toBe(0);
     expect(state.facilities.undergroundChapel.level).toBe(0);
     expect(state.items.oldNeonTube.purchased).toBe(false);
     expect(state.items.ticketStubBundle.purchased).toBe(false);
@@ -149,10 +150,12 @@ describe("game state and effects", () => {
     expect(state.idols.otowaAkari.bond).toBe(0);
     expect(state.idols.hibikiTooko.bond).toBe(0);
     expect(state.idols.kaminoMeguri.bond).toBe(0);
+    expect(state.idols.hinataKoharu.bond).toBe(0);
     expect(state.idols.otowaAkari.eventIdsRead).toEqual([]);
     expect(state.songs.rojiuraIntro.purchased).toBe(false);
     expect(state.songs.prebroadcastAcapella.purchased).toBe(false);
     expect(state.songs.songOfRecords.purchased).toBe(false);
+    expect(state.songs.plazaAnthem.purchased).toBe(false);
     expect(state.records.alleyStageRestorationMemo.read).toBe(false);
     expect(getTomorusaPerSecond(state)).toBe(0);
   });
@@ -449,6 +452,35 @@ describe("game state and effects", () => {
     expect(getOfflineRewardMultiplier(manualResult.state)).toBeCloseTo(1.1);
   });
 
+  it("unlocks the underground plaza, Koharu, and applies plaza anthem scaling", () => {
+    const baseState = createInitialState();
+    const plazaState = {
+      ...addResource(baseState, TOMORUSA_RESOURCE_ID, 120000),
+      facilities: {
+        ...baseState.facilities,
+        alleyStage: { level: 10 },
+        neonBoard: { level: 5 },
+        twilightPathGuide: { level: 1 },
+        temporaryBroadcastBooth: { level: 5 },
+        memoryLibrary: { level: 3 },
+        undergroundPlaza: { level: 4 }
+      }
+    };
+
+    expect(isFacilityUnlocked(plazaState, "undergroundPlaza")).toBe(true);
+    expect(isIdolUnlocked(plazaState, "hinataKoharu")).toBe(true);
+    expect(getItemCost(plazaState, "oldNeonTube")).toBe(90);
+    expect(getSongCost(plazaState, "plazaAnthem")).toBe(30000);
+    expect(isRecordUnlocked(plazaState, "undergroundPlazaFirstDay")).toBe(true);
+    expect(isRecordUnlocked(plazaState, "koharuNameEffect")).toBe(true);
+    expect(getFacilityTomorusaPerSecond(plazaState, "undergroundPlaza")).toBeCloseTo(40 * 1.2 * 1.15 * 1.08);
+
+    const songResult = purchaseSong(plazaState, "plazaAnthem");
+
+    expect(songResult.purchased).toBe(true);
+    expect(getManualTomorusaGain(songResult.state)).toBeCloseTo(1 + getTomorusaPerSecond(songResult.state) * 0.13);
+  });
+
   it("applies production and caps offline reward at 12 hours", () => {
     const baseState = createInitialState();
     const state = {
@@ -571,6 +603,16 @@ describe("game state and effects", () => {
         recordingStorage: { level: 2 }
       }
     }, "oldBroadcastRoom")).toBe(true);
+    expect(isFacilityUnlocked({
+      ...alleyProgressState,
+      facilities: {
+        ...alleyProgressState.facilities,
+        neonBoard: { level: 5 },
+        twilightPathGuide: { level: 1 },
+        temporaryBroadcastBooth: { level: 5 },
+        memoryLibrary: { level: 3 }
+      }
+    }, "undergroundPlaza")).toBe(true);
     expect(isFacilityUnlocked(alleyProgressState, "undergroundChapel")).toBe(false);
     expect(isFacilityUnlocked(neonProgressState, "undergroundChapel")).toBe(true);
     expect(isRecordUnlocked(alleyProgressState, "firstAudienceNote")).toBe(true);
