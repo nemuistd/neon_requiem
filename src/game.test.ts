@@ -143,20 +143,24 @@ describe("game state and effects", () => {
     expect(state.facilities.undergroundPlaza.level).toBe(0);
     expect(state.facilities.nameRecordWall.level).toBe(0);
     expect(state.facilities.undergroundChapel.level).toBe(0);
+    expect(state.facilities.undergroundPassageRepair.level).toBe(0);
     expect(state.items.oldNeonTube.purchased).toBe(false);
     expect(state.items.ticketStubBundle.purchased).toBe(false);
     expect(state.items.oldRadioTowerDebris.purchased).toBe(false);
     expect(state.items.fadedBookLabel.purchased).toBe(false);
     expect(state.items.broadcastEquipmentManual.purchased).toBe(false);
+    expect(state.items.repairToolSet.purchased).toBe(false);
     expect(state.idols.otowaAkari.bond).toBe(0);
     expect(state.idols.hibikiTooko.bond).toBe(0);
     expect(state.idols.kaminoMeguri.bond).toBe(0);
     expect(state.idols.hinataKoharu.bond).toBe(0);
+    expect(state.idols.tsuginohataSakurako.bond).toBe(0);
     expect(state.idols.otowaAkari.eventIdsRead).toEqual([]);
     expect(state.songs.rojiuraIntro.purchased).toBe(false);
     expect(state.songs.prebroadcastAcapella.purchased).toBe(false);
     expect(state.songs.songOfRecords.purchased).toBe(false);
     expect(state.songs.plazaAnthem.purchased).toBe(false);
+    expect(state.songs.restorationHumming.purchased).toBe(false);
     expect(state.records.alleyStageRestorationMemo.read).toBe(false);
     expect(getTomorusaPerSecond(state)).toBe(0);
   });
@@ -543,6 +547,33 @@ describe("game state and effects", () => {
     expect(isRecordUnlocked(chapelSongState, "songAndHymnDistinction")).toBe(true);
   });
 
+  it("unlocks the passage repair area and Sakurako before entering the meguri system", () => {
+    const baseState = createInitialState();
+    const repairState = {
+      ...addResource(baseState, TOMORUSA_RESOURCE_ID, 200000),
+      facilities: {
+        ...baseState.facilities,
+        undergroundChapel: { level: 5 },
+        undergroundPassageRepair: { level: 3 }
+      }
+    };
+
+    expect(isFacilityUnlocked(repairState, "undergroundPassageRepair")).toBe(true);
+    expect(isIdolUnlocked(repairState, "tsuginohataSakurako")).toBe(true);
+    expect(isRecordUnlocked(repairState, "sakurakoRemovedPartsReport")).toBe(true);
+    expect(getOfflineRewardMultiplier(repairState)).toBeCloseTo(1.15);
+    expect(getItemCost(repairState, "repairToolSet")).toBe(50000);
+    expect(getSongCost(repairState, "restorationHumming")).toBe(80000);
+
+    const itemResult = purchaseItem(repairState, "repairToolSet");
+    const songResult = purchaseSong(itemResult.state, "restorationHumming");
+
+    expect(itemResult.purchased).toBe(true);
+    expect(songResult.purchased).toBe(true);
+    expect(getFacilityTomorusaPerSecond(itemResult.state, "undergroundPassageRepair")).toBeCloseTo(60 * 1.2 * 1.1 * 1.08);
+    expect(getOfflineRewardMultiplier(songResult.state)).toBeCloseTo(1.15 * 1.1);
+  });
+
   it("applies production and caps offline reward at 12 hours", () => {
     const baseState = createInitialState();
     const state = {
@@ -705,13 +736,29 @@ describe("game state and effects", () => {
         undergroundChapel: { level: 1 }
       }
     };
+    const chapelExpandedState = {
+      ...chapelPathState,
+      facilities: {
+        ...chapelPathState.facilities,
+        undergroundChapel: { level: 5 }
+      }
+    };
+    const repairOpenedState = {
+      ...chapelExpandedState,
+      facilities: {
+        ...chapelExpandedState.facilities,
+        undergroundPassageRepair: { level: 1 }
+      }
+    };
 
     expect(isFacilityUnlocked(alleyProgressState, "undergroundChapel")).toBe(false);
     expect(isFacilityUnlocked(neonProgressState, "undergroundChapel")).toBe(false);
     expect(isFacilityUnlocked(chapelPathState, "undergroundChapel")).toBe(true);
+    expect(isFacilityUnlocked(chapelExpandedState, "undergroundPassageRepair")).toBe(true);
     expect(isRecordUnlocked(alleyProgressState, "firstAudienceNote")).toBe(true);
     expect(isRecordUnlocked(chapelPathState, "undergroundChapelRestorationReport")).toBe(false);
     expect(isRecordUnlocked(chapelOpenedState, "undergroundChapelRestorationReport")).toBe(true);
+    expect(isRecordUnlocked(repairOpenedState, "sakurakoRemovedPartsReport")).toBe(true);
     expect(getFacilityLevel(neonProgressState, "neonBoard")).toBe(10);
   });
 

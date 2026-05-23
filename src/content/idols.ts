@@ -127,7 +127,26 @@ export const IDOL_DEFINITIONS = defineContent([
       level: 1
     }
   },
-
+  {
+    id: "tsuginohataSakurako",
+    name: "継ノ端 桜子",
+    reading: "つぎのはた さくらこ",
+    title: "地下通路の修復士",
+    description:
+      "壊れたのではなく、外されていたものがある。桜子はそう言って修理という言葉を使うのをやめた。何を復元しているのかを正確に知っているような手つきで、通路を一本ずつつなぎ直す。",
+    passiveDescription: "オフライン灯るさ報酬 x1.15",
+    passiveEffects: [
+      {
+        type: "offline.reward.multiplier",
+        multiplier: 1.15
+      }
+    ],
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "undergroundPassageRepair",
+      level: 2
+    }
+  }
 ] as const satisfies readonly IdolDefinition[]);
 
 export type IdolId = ContentId<typeof IDOL_DEFINITIONS>;

@@ -188,6 +188,25 @@ export const ITEM_DEFINITIONS = defineContent([
       facilityId: "recordingStorage",
       level: 2
     }
+  },
+  {
+    id: "repairToolSet",
+    name: "修復用の工具一式",
+    description:
+      "桜子がまとめた修復用具のセット。使い込まれた道具が多いが、どれも手入れが行き届いている。道具には名前をつけた方がいい、と桜子は言う。",
+    cost: 50000,
+    effectDescription: "施設の灯るさ生産 x1.08",
+    effects: [
+      {
+        type: "facility.production.multiplier",
+        multiplier: 1.08
+      }
+    ],
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "undergroundPassageRepair",
+      level: 1
+    }
   }
 ] as const satisfies readonly ItemDefinition[]);
 

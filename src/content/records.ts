@@ -1,7 +1,7 @@
 import { ContentId, defineContent, toContentMap, toContentOrder } from "./defineContent.js";
 import { RecordDefinition } from "./types.js";
 
-export const RECORD_CONTENT_VERSION = 8;
+export const RECORD_CONTENT_VERSION = 9;
 
 export const RECORD_DEFINITIONS = defineContent([
   {
@@ -483,6 +483,22 @@ export const RECORD_DEFINITIONS = defineContent([
         type: "facility.level",
         facilityId: "undergroundChapel",
         level: 3
+      }
+    ]
+  },
+  {
+    id: "sakurakoRemovedPartsReport",
+    title: "桜子・外されていた記録",
+    category: "観測記録",
+    revealLevel: "uncanny",
+    body:
+      "継ノ端 桜子からの報告。地下通路の修復中に、接続部品が壊れたのではなく外されたと思われる箇所を発見した。意図的に取り外した形跡がある。壊れた通路と違う、と桜子は言った。理由は分からない。誰が、いつ外したかも分からない。現状は部品欠損として修復し、桜子は修理ではなく復元と記録した。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "facility.level",
+        facilityId: "undergroundPassageRepair",
+        level: 1
       }
     ]
   }

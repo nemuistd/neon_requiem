@@ -64,8 +64,10 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `undergroundPlaza` | 地下広場 | 記憶図書館 Lv3 | 20000 | 1.25 | 10 |
 | `nameRecordWall` | 名前の記録壁 | 地下広場 Lv4 | 45000 | 1.26 | 14 |
 | `undergroundChapel` | 地下礼拝堂 | 名前の記録壁 Lv3 | 900 | 1.25 | 1 |
+| `undergroundPassageRepair` | 地下通路修復区画 | 地下礼拝堂 Lv5 | 60000 | 1.28 | 20 |
 
 地下礼拝堂は序盤施設ではなく、中盤以降の深層施設として扱う。
+地下通路修復区画は Chapter 5 末尾の深層接続施設として扱う。次の `再固定中枢` は廻本体の起点になるため、廻仕様を決めるまで未実装とする。
 
 ## アイドル
 
@@ -77,8 +79,9 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `mizukiShino` | 深月 詩乃 | 地下礼拝堂 Lv3 | 全灯るさ生産 x1.10 |
 | `kaminoMeguri` | 紙野 巡 | 記憶図書館 Lv2 | 全アイドルの交流増加量 x1.25 |
 | `hinataKoharu` | 陽向 小春 | 地下広場 Lv1 | 全灯るさ生産 x1.08 / アイテム購入コスト x0.90 |
+| `tsuginohataSakurako` | 継ノ端 桜子 | 地下通路修復区画 Lv2 | オフライン灯るさ報酬 x1.15 |
 
-アイドル効果は `passiveEffects: Effect[]` として定義する。解放済みなら常時発動する。灯里・結・詩乃は `facility.production.multiplier`、遠子は `manual.gain.add.production.ratio`、巡は `bond.rate.multiplier`、小春は `facility.production.multiplier` と `item.cost.multiplier` を持つ。`focusEffects` は型だけ用意しているが、注目アイドルは「好きなアイドルを画面に置く」ための枠でもあるため、進行効率に直結する注目アイドル限定効果の適用は保留する。
+アイドル効果は `passiveEffects: Effect[]` として定義する。解放済みなら常時発動する。灯里・結・詩乃は `facility.production.multiplier`、遠子は `manual.gain.add.production.ratio`、巡は `bond.rate.multiplier`、小春は `facility.production.multiplier` と `item.cost.multiplier`、桜子は `offline.reward.multiplier` を持つ。`focusEffects` は型だけ用意しているが、注目アイドルは「好きなアイドルを画面に置く」ための枠でもあるため、進行効率に直結する注目アイドル限定効果の適用は保留する。
 
 立ち絵制作はコンテンツ実装と分ける。`imageUrl` が未設定のアイドルは、アイドルタブと注目アイドル枠で記名札風の簡易表示を出す。
 
@@ -108,6 +111,7 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `plazaAnthem` | 広場のアンセム | 地下広場 Lv3 | 30000 | ライブ1回の灯るさ獲得に全施設合計の灯るさ/秒 x0.08 を加算 |
 | `chapelHarmony` | 礼拝堂のハーモニー | 地下礼拝堂 Lv1 | 450 | 施設の灯るさ生産 x1.10 |
 | `twilightChorus` | 薄明のコーラス | 地下礼拝堂 Lv5 | 1800 | 施設の灯るさ生産 x1.25 |
+| `restorationHumming` | 修復の仮歌 | 地下通路修復区画 Lv3 | 80000 | オフライン灯るさ報酬 x1.10 |
 
 「聖歌」は通常システム名にしない。
 
@@ -125,6 +129,7 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `handwrittenListenerLog` | 手書きのリスナー名簿 | 仮設配信ブース Lv3 | 4000 | 施設の灯るさ生産 x1.06 |
 | `fadedBookLabel` | 色あせた書名ラベル | 記憶図書館 Lv2 | 10000 | 交流増加量 x1.10 |
 | `broadcastEquipmentManual` | 放送室の機材マニュアル | 録音保管庫 Lv2 | 15000 | オフライン灯るさ報酬 x1.10 |
+| `repairToolSet` | 修復用の工具一式 | 地下通路修復区画 Lv1 | 50000 | 施設の灯るさ生産 x1.08 |
 
 アイテムタブは実装済みで、購入済み状態は保存される。
 `交代用連絡ボード` 購入後の実効オフライン効率は `0.5 * 1.10 = 0.55` で、同じ時間のオンライン自然生産の55%になる。
@@ -175,6 +180,7 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 - 詩乃・消えた記録の痕跡
 - 歌の扱いに関する断片
 - 施設ログ・霞とアンカー
+- 桜子・外されていた記録
 
 revealLevel:
 

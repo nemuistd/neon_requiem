@@ -114,6 +114,25 @@ export const SONG_DEFINITIONS = defineContent([
       facilityId: "undergroundChapel",
       level: 5
     }
+  },
+  {
+    id: "restorationHumming",
+    name: "修復の仮歌",
+    description:
+      "桜子が作業しながら口ずさんでいるのを誰かが録音した。本人は歌っているつもりはなかったと言ったが、次の日も同じ旋律を繰り返していた。",
+    cost: 80000,
+    effectDescription: "オフライン灯るさ報酬 x1.10",
+    effects: [
+      {
+        type: "offline.reward.multiplier",
+        multiplier: 1.1
+      }
+    ],
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "undergroundPassageRepair",
+      level: 3
+    }
   }
 ] as const satisfies readonly SongDefinition[]);
 

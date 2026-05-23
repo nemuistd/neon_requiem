@@ -138,6 +138,21 @@ export const FACILITY_DEFINITIONS = defineContent([
       facilityId: "nameRecordWall",
       level: 3
     }
+  },
+  {
+    id: "undergroundPassageRepair",
+    name: "地下通路修復区画",
+    description:
+      "倒壊した柱と塞がれた通路を復元する作業場。桜子が修理ではなく復元と呼ぶようになった区画でもある。意図的に取り外されたと思われる部品の痕跡が、一部の壁から見つかっている。",
+    tags: ["infra"],
+    baseCost: 60000,
+    costMultiplier: 1.28,
+    productionPerLevel: 20,
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "undergroundChapel",
+      level: 5
+    }
   }
 ] as const satisfies readonly FacilityDefinition[]);
 
