@@ -468,10 +468,20 @@ describe("game state and effects", () => {
         twilightPathGuide: { level: 1 },
         temporaryBroadcastBooth: { level: 5 },
         memoryLibrary: { level: 3 },
+        recordingStorage: { level: 2 },
+        oldBroadcastRoom: { level: 1 },
         undergroundPlaza: { level: 4 }
       }
     };
+    const plazaBlockedState = {
+      ...plazaState,
+      facilities: {
+        ...plazaState.facilities,
+        oldBroadcastRoom: { level: 0 }
+      }
+    };
 
+    expect(isFacilityUnlocked(plazaBlockedState, "undergroundPlaza")).toBe(false);
     expect(isFacilityUnlocked(plazaState, "undergroundPlaza")).toBe(true);
     expect(isIdolUnlocked(plazaState, "hinataKoharu")).toBe(true);
     expect(getItemCost(plazaState, "oldNeonTube")).toBe(90);
@@ -497,6 +507,8 @@ describe("game state and effects", () => {
         twilightPathGuide: { level: 1 },
         temporaryBroadcastBooth: { level: 5 },
         memoryLibrary: { level: 3 },
+        recordingStorage: { level: 2 },
+        oldBroadcastRoom: { level: 1 },
         undergroundPlaza: { level: 4 },
         nameRecordWall: { level: 3 }
       }
@@ -505,6 +517,7 @@ describe("game state and effects", () => {
     expect(isFacilityUnlocked(wallState, "nameRecordWall")).toBe(true);
     expect(isRecordUnlocked(wallState, "nameRecordWallOpeningLog")).toBe(true);
     expect(isRecordUnlocked(wallState, "wallNameStabilityLog")).toBe(true);
+    expect(isRecordUnlocked(wallState, "nameFixationObservation")).toBe(true);
     expect(getFacilityTomorusaPerSecond(wallState, "nameRecordWall")).toBeCloseTo(42 * 1.2 * 1.15 * 1.08);
   });
 
@@ -531,10 +544,17 @@ describe("game state and effects", () => {
         undergroundChapel: { level: 5 }
       }
     };
-    const chapelSongState = {
+    const chapelLevelEightState = {
       ...chapelLevelFiveState,
+      facilities: {
+        ...chapelLevelFiveState.facilities,
+        undergroundChapel: { level: 8 }
+      }
+    };
+    const chapelSongState = {
+      ...chapelLevelEightState,
       songs: {
-        ...chapelLevelFiveState.songs,
+        ...chapelLevelEightState.songs,
         chapelHarmony: { purchased: true }
       }
     };
@@ -545,6 +565,8 @@ describe("game state and effects", () => {
     expect(isRecordUnlocked(chapelLevelFourState, "shinoDeletedRecordTrace")).toBe(true);
     expect(isRecordUnlocked(chapelLevelFiveState, "songAndHymnDistinction")).toBe(false);
     expect(isRecordUnlocked(chapelSongState, "songAndHymnDistinction")).toBe(true);
+    expect(isRecordUnlocked(chapelLevelEightState, "binderSealedLetterOpening")).toBe(false);
+    expect(isRecordUnlocked(chapelSongState, "binderSealedLetterOpening")).toBe(true);
   });
 
   it("unlocks the passage repair area and Sakurako before entering the meguri system", () => {
@@ -553,8 +575,12 @@ describe("game state and effects", () => {
       ...addResource(baseState, TOMORUSA_RESOURCE_ID, 200000),
       facilities: {
         ...baseState.facilities,
-        undergroundChapel: { level: 5 },
+        undergroundChapel: { level: 8 },
         undergroundPassageRepair: { level: 3 }
+      },
+      songs: {
+        ...baseState.songs,
+        chapelHarmony: { purchased: true }
       }
     };
 
@@ -570,7 +596,7 @@ describe("game state and effects", () => {
 
     expect(itemResult.purchased).toBe(true);
     expect(songResult.purchased).toBe(true);
-    expect(getFacilityTomorusaPerSecond(itemResult.state, "undergroundPassageRepair")).toBeCloseTo(60 * 1.2 * 1.1 * 1.08);
+    expect(getFacilityTomorusaPerSecond(itemResult.state, "undergroundPassageRepair")).toBeCloseTo(60 * 1.2 * 1.1 * 1.1 * 1.08);
     expect(getOfflineRewardMultiplier(songResult.state)).toBeCloseTo(1.15 * 1.1);
   });
 
@@ -705,6 +731,18 @@ describe("game state and effects", () => {
         temporaryBroadcastBooth: { level: 5 },
         memoryLibrary: { level: 3 }
       }
+    }, "undergroundPlaza")).toBe(false);
+    expect(isFacilityUnlocked({
+      ...alleyProgressState,
+      facilities: {
+        ...alleyProgressState.facilities,
+        neonBoard: { level: 5 },
+        twilightPathGuide: { level: 1 },
+        temporaryBroadcastBooth: { level: 5 },
+        memoryLibrary: { level: 3 },
+        recordingStorage: { level: 2 },
+        oldBroadcastRoom: { level: 1 }
+      }
     }, "undergroundPlaza")).toBe(true);
     expect(isFacilityUnlocked({
       ...alleyProgressState,
@@ -714,6 +752,8 @@ describe("game state and effects", () => {
         twilightPathGuide: { level: 1 },
         temporaryBroadcastBooth: { level: 5 },
         memoryLibrary: { level: 3 },
+        recordingStorage: { level: 2 },
+        oldBroadcastRoom: { level: 1 },
         undergroundPlaza: { level: 4 }
       }
     }, "nameRecordWall")).toBe(true);
@@ -725,6 +765,8 @@ describe("game state and effects", () => {
         twilightPathGuide: { level: 1 },
         temporaryBroadcastBooth: { level: 5 },
         memoryLibrary: { level: 3 },
+        recordingStorage: { level: 2 },
+        oldBroadcastRoom: { level: 1 },
         undergroundPlaza: { level: 4 },
         nameRecordWall: { level: 3 }
       }
@@ -740,7 +782,11 @@ describe("game state and effects", () => {
       ...chapelPathState,
       facilities: {
         ...chapelPathState.facilities,
-        undergroundChapel: { level: 5 }
+        undergroundChapel: { level: 8 }
+      },
+      songs: {
+        ...chapelPathState.songs,
+        chapelHarmony: { purchased: true }
       }
     };
     const repairOpenedState = {

@@ -12,11 +12,15 @@ import {
   isItemUnlocked,
   TOMORUSA_RESOURCE_ID
 } from "../game";
+import { isRelatedProgressVisible } from "./contentVisibility";
 import { formatAmount } from "./format";
 import { getUnlockRequirementTextFromRequirement } from "./requirementText";
 
 export function renderItemCards(state: GameState): string {
-  return ITEM_ORDER.map((itemId) => renderItemCard(state, itemId)).join("");
+  return ITEM_ORDER
+    .filter((itemId) => isRelatedProgressVisible(state, ITEMS[itemId].unlockRequirement))
+    .map((itemId) => renderItemCard(state, itemId))
+    .join("");
 }
 
 function renderItemCard(state: GameState, itemId: ItemId): string {
@@ -30,6 +34,33 @@ function renderItemCard(state: GameState, itemId: ItemId): string {
     : isUnlocked
       ? UI_TEXT.unlockedItemLabel
       : UI_TEXT.lockedItemLabel;
+
+  if (!isUnlocked) {
+    return `
+      <article class="card song-card locked-card">
+        <div class="song-card-heading">
+          <span class="card-kicker">${itemStateLabel}</span>
+          <span class="song-state locked">${itemStateLabel}</span>
+        </div>
+        <h2>${UI_TEXT.unknownItemLabel}</h2>
+        <p>${UI_TEXT.unknownContentDescription}</p>
+        <dl class="stats-list">
+          <div>
+            <dt>${UI_TEXT.unlockRequirementLabel}</dt>
+            <dd>${getUnlockRequirementTextFromRequirement(item.unlockRequirement)}</dd>
+          </div>
+        </dl>
+        <button
+          class="secondary-action song-action locked"
+          type="button"
+          data-item-id="${itemId}"
+          disabled
+        >
+          ${UI_TEXT.lockedItemLabel}
+        </button>
+      </article>
+    `;
+  }
 
   return `
     <article class="card song-card ${isUnlocked ? "unlocked-card" : "locked-card"} ${isPurchased ? "purchased-card" : ""}">

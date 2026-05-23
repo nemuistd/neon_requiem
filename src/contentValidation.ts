@@ -452,6 +452,17 @@ function getReachableFacilities(): Set<string> {
   while (changed) {
     changed = false;
 
+    SONG_ORDER.forEach((songId) => {
+      if (reachableSongs.has(songId)) {
+        return;
+      }
+
+      if (isRequirementPotentiallyReachable(SONGS[songId].unlockRequirement, reachableFacilities, reachableSongs, reachableResources)) {
+        reachableSongs.add(songId);
+        changed = true;
+      }
+    });
+
     FACILITY_ORDER.forEach((facilityId) => {
       if (reachableFacilities.has(facilityId)) {
         return;

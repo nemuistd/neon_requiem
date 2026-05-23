@@ -1,7 +1,7 @@
 import { ContentId, defineContent, toContentMap, toContentOrder } from "./defineContent.js";
 import { RecordDefinition } from "./types.js";
 
-export const RECORD_CONTENT_VERSION = 9;
+export const RECORD_CONTENT_VERSION = 10;
 
 export const RECORD_DEFINITIONS = defineContent([
   {
@@ -259,7 +259,7 @@ export const RECORD_DEFINITIONS = defineContent([
     category: "観測記録",
     revealLevel: "uncanny",
     body:
-      "旧い放送室の機材を確認した。一部は動く。録音テープが数本残っていたため再生したところ、音声は入っているが内容を聞き取れない。劣化したのではなく、録音時から音質が低いように見える。削除ではなく、意図的に聞き取れないようにされた録音である可能性がある。",
+      "旧い放送室の機材を確認した。一部は動く。録音テープが数本残っていた。再生したところ、音声は入っているが内容が聞き取れない。劣化したのではなく、録音時から音質が低いように見える。別の可能性として、意図的に聞き取れないようにされた録音かもしれない。削除ではなく、劣化させる処理が施された可能性がある。機材は動くが、この録音の意図については分からないまま保管する。",
     introducedAtVersion: RECORD_CONTENT_VERSION,
     unlockRequirements: [
       {
@@ -344,8 +344,8 @@ export const RECORD_DEFINITIONS = defineContent([
     unlockRequirements: [
       {
         type: "facility.level",
-        facilityId: "memoryLibrary",
-        level: 5
+        facilityId: "nameRecordWall",
+        level: 2
       }
     ]
   },
@@ -451,7 +451,7 @@ export const RECORD_DEFINITIONS = defineContent([
     category: "断片記憶",
     revealLevel: "deep",
     body:
-      "歌を媒介にすることで、安全に人々の注意を集め、灯し手と区画を安定させることが出来るのではないか。アイドルの歌唱は聖歌隊のそれとは異なる。公演は儀式とはならず、歌は聖歌にはならないだろう。",
+      "施設ログ断片。公演は、儀式ではない。歌は、聖歌ではない。そう扱い続けることが、安全な運用の条件である。理由はここには書かない。知っている者は知っている。知らない者は、知らないままで構わない。知らないことが、安全を保つ。以上。前後の文脈は欠落している。",
     introducedAtVersion: RECORD_CONTENT_VERSION,
     unlockRequirements: [
       {
@@ -461,6 +461,31 @@ export const RECORD_DEFINITIONS = defineContent([
             type: "facility.level",
             facilityId: "undergroundChapel",
             level: 5
+          },
+          {
+            type: "song.purchased",
+            songId: "chapelHarmony"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "binderSealedLetterOpening",
+    title: "バインダー封書・開封",
+    category: "断片記憶",
+    revealLevel: "uncanny",
+    body:
+      "バインダーの一番後ろに、封をされたままの書類が一枚あった。表書きには「地下礼拝堂の復旧が終わるまで開封しないこと」とある。礼拝堂がここまで戻った。封を切ってみた。文字のほとんどが、霞で白く潰れている。読めるのは書き出しの数文字だけだった。「これを、廻——」そこから先は読めない。封書を閉じた。読めない部分を、無理に読もうとはしなかった。霞がそれを覆っているのは、まだその時ではないからだという気がした。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "all",
+        requirements: [
+          {
+            type: "facility.level",
+            facilityId: "undergroundChapel",
+            level: 8
           },
           {
             type: "song.purchased",
@@ -492,7 +517,7 @@ export const RECORD_DEFINITIONS = defineContent([
     category: "観測記録",
     revealLevel: "uncanny",
     body:
-      "継ノ端 桜子からの報告。地下通路の修復中に、接続部品が壊れたのではなく外されたと思われる箇所を発見した。意図的に取り外した形跡がある。壊れた通路と違う、と桜子は言った。理由は分からない。誰が、いつ外したかも分からない。現状は部品欠損として修復し、桜子は修理ではなく復元と記録した。",
+      "継ノ端 桜子からの報告。地下通路の修復中に、接続部品が「壊れたのではなく外された」と思われる箇所を発見した。桜子の言葉は短かった。意図的に取り外した形跡がある。壊れた通路と違う。理由は分からない。誰が、いつ外したかも分からない。現状は部品欠損として修復した。桜子は、修理ではなく復元と記録する、と残した。",
     introducedAtVersion: RECORD_CONTENT_VERSION,
     unlockRequirements: [
       {

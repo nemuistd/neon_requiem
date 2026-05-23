@@ -11,6 +11,7 @@ import {
   isIdolUnlocked,
   resolveActiveIdolId
 } from "../game";
+import { isRelatedProgressVisible } from "./contentVisibility";
 import { formatBond } from "./format";
 import { getIdolUnlockRequirementText } from "./requirementText";
 
@@ -57,11 +58,14 @@ export function renderIdolCards(state: GameState, activeIdolId: IdolId): string 
 }
 
 export function renderIdolTabCards(state: GameState): string {
-  return IDOL_ORDER.map((idolId) => renderIdolTabCard(state, idolId)).join("");
+  return IDOL_ORDER
+    .filter((idolId) => isRelatedProgressVisible(state, IDOLS[idolId].unlockRequirement))
+    .map((idolId) => renderIdolTabCard(state, idolId))
+    .join("");
 }
 
 function renderIdolSwitcher(state: GameState, activeIdolId: IdolId): string {
-  return IDOL_ORDER.map((idolId) => {
+  return IDOL_ORDER.filter((idolId) => isRelatedProgressVisible(state, IDOLS[idolId].unlockRequirement)).map((idolId) => {
     const idol = IDOLS[idolId];
     const isUnlocked = isIdolUnlocked(state, idolId);
     const isActive = activeIdolId === idolId;
@@ -75,7 +79,7 @@ function renderIdolSwitcher(state: GameState, activeIdolId: IdolId): string {
         ${isActive ? 'aria-current="true"' : ""}
         aria-pressed="${isActive ? "true" : "false"}"
       >
-        <span>${idol.name}</span>
+        <span>${isUnlocked ? idol.name : UI_TEXT.unknownIdolLabel}</span>
         <small>${isUnlocked ? idol.reading : getIdolUnlockRequirementText(idolId)}</small>
       </button>
     `;
@@ -92,6 +96,44 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
     : isUnlocked
       ? (idolId === "otowaAkari" ? UI_TEXT.initialIdolLabel : UI_TEXT.unlockedIdolLabel)
       : UI_TEXT.lockedIdolLabel;
+
+  if (!isUnlocked) {
+    return `
+    <article class="card idol-tab-card locked-card">
+      <div class="idol-tab-header">
+        <div>
+          <span class="card-kicker">${stateLabel}</span>
+          <h2>${UI_TEXT.unknownIdolLabel}</h2>
+        </div>
+        <span class="idol-tab-state">${stateLabel}</span>
+      </div>
+      <div class="idol-tab-main">
+        ${renderUnknownIdolVisual("idol-tab-portrait")}
+        <div class="idol-tab-body">
+          <p>${UI_TEXT.unknownContentDescription}</p>
+          <dl class="stats-list">
+            <div>
+              <dt>${UI_TEXT.passiveEffectLabel}</dt>
+              <dd>${UI_TEXT.lockedIdolLabel}</dd>
+            </div>
+            <div>
+              <dt>${UI_TEXT.unlockRequirementLabel}</dt>
+              <dd>${getIdolUnlockRequirementText(idolId)}</dd>
+            </div>
+          </dl>
+          <button
+            class="secondary-action idol-tab-action locked"
+            type="button"
+            data-idol-id="${idolId}"
+            disabled
+          >
+            ${UI_TEXT.lockedIdolLabel}
+          </button>
+        </div>
+      </div>
+    </article>
+  `;
+  }
 
   return `
     <article class="card idol-tab-card ${isUnlocked ? "unlocked-card" : "locked-card"} ${isActive ? "active-card" : ""}">
@@ -137,6 +179,14 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
       </div>
     </article>
   `;
+}
+
+function renderUnknownIdolVisual(className: string): string {
+  return `
+        <div class="${className}" data-idol-placeholder="true" aria-hidden="true">
+          <span class="idol-placeholder-glyph">?</span>
+        </div>
+    `;
 }
 
 function renderIdolVisual(idol: IdolDefinition, className: string): string {

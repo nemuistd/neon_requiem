@@ -14,10 +14,14 @@ import {
   TOMORUSA_RESOURCE_ID
 } from "../game";
 import { formatAmount, formatRate } from "./format";
+import { shouldRenderFacilityCard } from "./contentVisibility";
 import { getUnlockRequirementText } from "./requirementText";
 
 export function renderFacilityCards(state: GameState): string {
-  return FACILITY_ORDER.map((facilityId) => renderFacilityCard(state, facilityId)).join("");
+  return FACILITY_ORDER
+    .filter((facilityId) => shouldRenderFacilityCard(state, facilityId))
+    .map((facilityId) => renderFacilityCard(state, facilityId))
+    .join("");
 }
 
 function renderFacilityCard(state: GameState, facilityId: FacilityId): string {
@@ -27,10 +31,11 @@ function renderFacilityCard(state: GameState, facilityId: FacilityId): string {
   if (!isUnlocked) {
     return `
       <article class="card stage-card locked-card">
-        <h2 class="facility-title">${facility.name}</h2>
+        <h2 class="facility-title">${UI_TEXT.unknownFacilityLabel}</h2>
         <div class="facility-card-main">
-          <div class="facility-visual facility-visual-${facilityId}" aria-hidden="true"></div>
+          <div class="facility-visual" aria-hidden="true"></div>
           <div class="facility-card-body">
+            <p>${UI_TEXT.unknownFacilityDescription}</p>
             <dl class="stats-list">
               <div>
                 <dt>${UI_TEXT.unlockRequirementLabel}</dt>

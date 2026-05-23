@@ -144,7 +144,7 @@ export const IDOL_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "undergroundPassageRepair",
-      level: 2
+      level: 1
     }
   }
 ] as const satisfies readonly IdolDefinition[]);

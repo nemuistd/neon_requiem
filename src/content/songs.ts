@@ -83,7 +83,7 @@ export const SONG_DEFINITIONS = defineContent([
     id: "chapelHarmony",
     name: "礼拝堂のハーモニー",
     description: "地下礼拝堂に残されていた、遊び心満載の楽曲。古い区画の響きを、アイドルのステージに合う明るいハーモニーへ編み直している。",
-    cost: 450,
+    cost: 25000,
     effectDescription: "施設の灯るさ生産 x1.10",
     effects: [
       {
@@ -94,14 +94,14 @@ export const SONG_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "undergroundChapel",
-      level: 1
+      level: 2
     }
   },
   {
     id: "twilightChorus",
     name: "薄明のコーラス",
     description: "霞の濃い通路にもよく響く合唱。複数の区画にまたがって灯りの流れを整える作用がある。",
-    cost: 1800,
+    cost: 90000,
     effectDescription: "施設の灯るさ生産 x1.25",
     effects: [
       {
@@ -112,7 +112,7 @@ export const SONG_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "undergroundChapel",
-      level: 5
+      level: 8
     }
   },
   {

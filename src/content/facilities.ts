@@ -105,9 +105,19 @@ export const FACILITY_DEFINITIONS = defineContent([
     costMultiplier: 1.25,
     productionPerLevel: 10,
     unlockRequirement: {
-      type: "facility.level",
-      facilityId: "memoryLibrary",
-      level: 3
+      type: "all",
+      requirements: [
+        {
+          type: "facility.level",
+          facilityId: "memoryLibrary",
+          level: 3
+        },
+        {
+          type: "facility.level",
+          facilityId: "oldBroadcastRoom",
+          level: 1
+        }
+      ]
     }
   },
   {
@@ -130,9 +140,9 @@ export const FACILITY_DEFINITIONS = defineContent([
     name: "地下礼拝堂",
     description:
       "崩れかけた柱と古い紋章が残る小さな礼拝堂。地下深くに閉ざされていた響きを、後の復興段階で少しずつ調べていく場所。",
-    baseCost: 900,
-    costMultiplier: 1.25,
-    productionPerLevel: 1,
+    baseCost: 18000,
+    costMultiplier: 1.2,
+    productionPerLevel: 5,
     unlockRequirement: {
       type: "facility.level",
       facilityId: "nameRecordWall",
@@ -149,9 +159,18 @@ export const FACILITY_DEFINITIONS = defineContent([
     costMultiplier: 1.28,
     productionPerLevel: 20,
     unlockRequirement: {
-      type: "facility.level",
-      facilityId: "undergroundChapel",
-      level: 5
+      type: "all",
+      requirements: [
+        {
+          type: "facility.level",
+          facilityId: "undergroundChapel",
+          level: 8
+        },
+        {
+          type: "song.purchased",
+          songId: "chapelHarmony"
+        }
+      ]
     }
   }
 ] as const satisfies readonly FacilityDefinition[]);
