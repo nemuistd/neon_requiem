@@ -29,6 +29,7 @@ import { areRequirementsMet, isRequirementMet } from "./engine/requirements";
 export const SAVE_VERSION = 9;
 export const INITIAL_ACTIVE_IDOL_ID: IdolId = "otowaAkari";
 export const MAX_OFFLINE_SECONDS = 12 * 60 * 60;
+export const BASE_OFFLINE_REWARD_RATE = 0.5;
 export const TOMORUSA_RESOURCE_ID: ResourceId = "tomorusa";
 
 export type FacilityState = {
@@ -340,7 +341,11 @@ function getPurchasedItemEffects(state: GameState): Effect[] {
 }
 
 export function getOfflineTomorusa(state: GameState, offlineSeconds: number): number {
-  return getTomorusaPerSecond(state) * getCappedOfflineSeconds(offlineSeconds) * getOfflineRewardMultiplier(state);
+  return getTomorusaPerSecond(state) * getCappedOfflineSeconds(offlineSeconds) * getEffectiveOfflineRewardRate(state);
+}
+
+export function getEffectiveOfflineRewardRate(state: GameState): number {
+  return BASE_OFFLINE_REWARD_RATE * getOfflineRewardMultiplier(state);
 }
 
 export function gainManualTomorusa(state: GameState): GameState {

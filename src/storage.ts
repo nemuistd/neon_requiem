@@ -1,6 +1,6 @@
 import { FACILITY_ORDER, FacilityId, IDOL_ORDER, ITEM_ORDER, ItemId, IdolId, IDOLS, RECORD_ORDER, RecordId, ResourceId, SONG_ORDER, SongId } from "./definitions";
 import {
-  applyProduction,
+  addResource,
   createInitialFacilities,
   createInitialIdols,
   createInitialItems,
@@ -16,7 +16,6 @@ import {
   INITIAL_ACTIVE_IDOL_ID,
   isIdolUnlocked,
   RecordState,
-  MAX_OFFLINE_SECONDS,
   resolveActiveIdolId,
   SAVE_VERSION,
   SongState,
@@ -70,9 +69,8 @@ export function loadGame(now = Date.now()): LoadResult {
 
   const offlineSeconds = Math.max(0, (now - savedState.lastSavedAt) / 1000);
   const offlineTomorusa = getOfflineTomorusa(savedState, offlineSeconds);
-  const appliedOfflineSeconds = Math.min(offlineSeconds, MAX_OFFLINE_SECONDS);
   const state = {
-    ...applyProduction(savedState, appliedOfflineSeconds),
+    ...addResource(savedState, TOMORUSA_RESOURCE_ID, offlineTomorusa),
     lastSavedAt: now
   };
 

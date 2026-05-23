@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   addResource,
   applyProduction,
+  BASE_OFFLINE_REWARD_RATE,
   canSpendResource,
   createInitialIdols,
   createInitialState,
@@ -312,8 +313,9 @@ describe("game state and effects", () => {
 
     expect(getTomorusaPerSecond(state)).toBeCloseTo(1.2);
     expect(getOfflineRewardMultiplier(state)).toBeCloseTo(1.1);
-    expect(getOfflineTomorusa(state, 10)).toBeCloseTo(12 * 1.1);
-    expect(getOfflineTomorusa(state, 13 * 60 * 60)).toBeCloseTo(1.2 * 12 * 60 * 60 * 1.1);
+    expect(BASE_OFFLINE_REWARD_RATE).toBe(0.5);
+    expect(getOfflineTomorusa(state, 10)).toBeCloseTo(12 * 0.5 * 1.1);
+    expect(getOfflineTomorusa(state, 13 * 60 * 60)).toBeCloseTo(1.2 * 12 * 60 * 60 * 0.5 * 1.1);
 
     const producedState = applyProduction(state, 5);
     expect(getResourceAmount(producedState, TOMORUSA_RESOURCE_ID)).toBeCloseTo(6);
@@ -476,6 +478,35 @@ describe("save normalization", () => {
       bond: 0,
       eventIdsRead: []
     });
+  });
+
+  it("adds offline reward with the base rate and purchased offline multiplier", () => {
+    setupLocalStorage({
+      [SAVE_KEY]: JSON.stringify({
+        saveVersion: SAVE_VERSION,
+        resources: { tomorusa: 50 },
+        activeIdolId: "otowaAkari",
+        facilities: {
+          alleyStage: { level: 10 }
+        },
+        idols: {
+          otowaAkari: { bond: 0, eventIdsRead: [] },
+          asagiriYui: { bond: 0, eventIdsRead: [] },
+          mizukiShino: { bond: 0, eventIdsRead: [] }
+        },
+        songs: {},
+        records: {},
+        items: {
+          shiftNoticeBoard: { purchased: true }
+        },
+        lastSavedAt: 1000
+      })
+    });
+
+    const result = loadGame(11000);
+
+    expect(result.offlineTomorusa).toBeCloseTo(1.2 * 10 * 0.5 * 1.1);
+    expect(getResourceAmount(result.state, TOMORUSA_RESOURCE_ID)).toBeCloseTo(50 + 1.2 * 10 * 0.5 * 1.1);
   });
 
   it("falls back to a new state for broken saves", () => {
