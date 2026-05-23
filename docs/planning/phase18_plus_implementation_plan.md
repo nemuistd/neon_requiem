@@ -32,7 +32,7 @@ Phase 18以降では、まず会話由来の長期前提をリポジトリ内doc
 ## Phase 21: アイドル効果モデル設計
 
 - `passiveEffect` 単数から `passiveEffects` 複数へ移行する計画。
-- 将来的な `focusEffects` を検討。
+- `focusEffects` は型や検証上の余地として扱い、進行効率差を作る注目効果は保留する。
 - この段階では実装せず、設計を固める。
 
 ## Phase 22: GameState.idols 基盤
@@ -69,7 +69,7 @@ Phase 18以降では、まず会話由来の長期前提をリポジトリ内doc
 ## Phase 27: アイドル効果モデルrefactor
 
 - `passiveEffect` → `passiveEffects`
-- 必要なら `focusEffects`
+- `focusEffects` は型だけに留め、注目アイドル限定の数値効果は実装しない
 - 既存効果は維持。
 - 10人以上追加前の基盤にする。
 

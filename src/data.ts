@@ -2,7 +2,7 @@ export const GAME_TITLE = "NEON REQUIEM";
 
 export const UI_TEXT = {
   heroEyebrow: "地下第七層・仮設礼拝ステージ",
-  subtitle: "灯里の歌で静寂を押し返し、忘れられた路地に灯りを戻す。",
+  subtitle: "灯里の歌で静寂を押し返し、忘れられた路地に灯るさを戻す。",
   compactSubtitle: "地下都市復興ライブ",
   resourcePanelLabel: "現在の資源",
   perSecondLabel: "毎秒",
@@ -46,10 +46,10 @@ export const UI_TEXT = {
   upgradeCostLabel: "強化コスト",
   productionLabel: "総生産",
   unlockRequirementLabel: "解放条件",
-  initialLog: "薄暗いネオンが点滅している。オートセーブ準備完了。",
-  liveSuccessLog: "灯里の歌に、小さな灯りが返ってきました。",
-  notEnoughLightsLog: "灯るさがまだ足りません。",
-  lockedFacilityLog: "まだこの施設は解放されていません。",
+  initialLog: "薄暗い路地裏ステージが、もう一度人を迎える準備を始めた。オートセーブ準備完了。",
+  liveSuccessLog: "灯里の歌に応えて、路地に小さな灯るさが戻りました。",
+  notEnoughLightsLog: "灯るさがまだ足りません。ライブで街の安定を少しずつ戻しましょう。",
+  lockedFacilityLog: "この区画はまだ復興に着手できません。",
   purchasedSongLabel: "取得済み",
   unlockedSongLabel: "解放済み",
   lockedSongLabel: "未開放",
@@ -75,19 +75,19 @@ export const RESOURCE_LABELS = {
 } as const;
 
 export function createOfflineRewardMessage(idolName: string, tomorusa: string): string {
-  return `${getGivenName(idolName)}が${tomorusa}灯るさを集めました。`;
+  return `${getGivenName(idolName)}が不在の間も歌をつなぎ、${tomorusa}灯るさ分の明かりを守りました。`;
 }
 
 export function createFacilityUpgradeMessage(facilityName: string, cost: string): string {
-  return `${facilityName}を強化しました。-${cost} 灯るさ`;
+  return `${facilityName}を少し復旧しました。街の輪郭が強まります。-${cost} 灯るさ`;
 }
 
 export function createSongPurchaseMessage(songName: string, cost: string): string {
-  return `${songName}を取得しました。-${cost} 灯るさ`;
+  return `${songName}をステージの演目に加えました。-${cost} 灯るさ`;
 }
 
 export function createItemPurchaseMessage(itemName: string, cost: string): string {
-  return `${itemName}を購入しました。-${cost} 灯るさ`;
+  return `${itemName}を復興用の備品に加えました。-${cost} 灯るさ`;
 }
 
 function getGivenName(fullName: string): string {

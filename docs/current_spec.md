@@ -66,7 +66,7 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `asagiriYui` | 朝霧 結 | ネオン掲示板 Lv5 | 全灯るさ生産 x1.15 |
 | `mizukiShino` | 深月 詩乃 | 地下礼拝堂 Lv3 | 全灯るさ生産 x1.10 |
 
-アイドル効果は `passiveEffects: Effect[]` として定義する。現在の3人は、解放済みなら常時発動する `facility.production.multiplier` を1件ずつ持つ。`focusEffects` は型だけ用意し、注目アイドル限定効果の適用は後続で扱う。
+アイドル効果は `passiveEffects: Effect[]` として定義する。現在の3人は、解放済みなら常時発動する `facility.production.multiplier` を1件ずつ持つ。`focusEffects` は型だけ用意しているが、注目アイドルは「好きなアイドルを画面に置く」ための枠でもあるため、進行効率に直結する注目アイドル限定効果の適用は保留する。
 
 ## 歌
 
