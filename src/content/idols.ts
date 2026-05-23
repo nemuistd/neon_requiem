@@ -42,6 +42,26 @@ export const IDOL_DEFINITIONS = defineContent([
     }
   },
   {
+    id: "hibikiTooko",
+    name: "響木 遠子",
+    reading: "ひびき とおこ",
+    title: "仮設配信ブースの届け手",
+    description:
+      "どこまで届いているかを確認する方法はない。それでも遠子は今日も配信を続ける。声が届くかどうかより、続けることの方が仕事だからと言う。",
+    passiveDescription: "ライブ1回の灯るさ獲得に、全施設合計の秒間灯るさ x0.05 を加算",
+    passiveEffects: [
+      {
+        type: "manual.gain.add.production.ratio",
+        ratio: 0.05
+      }
+    ],
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "temporaryBroadcastBooth",
+      level: 3
+    }
+  },
+  {
     id: "mizukiShino",
     name: "深月 詩乃",
     reading: "みづき しの",

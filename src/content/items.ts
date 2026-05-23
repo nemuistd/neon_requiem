@@ -169,6 +169,25 @@ export const ITEM_DEFINITIONS = defineContent([
       facilityId: "memoryLibrary",
       level: 2
     }
+  },
+  {
+    id: "broadcastEquipmentManual",
+    name: "放送室の機材マニュアル",
+    description:
+      "かつての放送室で使われていた機材の説明書。機材そのものはほとんど残っていないが、音響の基礎から始まっており、今でも参考になる部分がある。",
+    cost: 15000,
+    effectDescription: "オフライン灯るさ報酬 x1.10",
+    effects: [
+      {
+        type: "offline.reward.multiplier",
+        multiplier: 1.1
+      }
+    ],
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "recordingStorage",
+      level: 2
+    }
   }
 ] as const satisfies readonly ItemDefinition[]);
 

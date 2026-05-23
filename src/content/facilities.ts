@@ -69,6 +69,20 @@ export const FACILITY_DEFINITIONS = defineContent([
     }
   },
   {
+    id: "recordingStorage",
+    name: "録音保管庫",
+    description:
+      "磁気テープと録音媒体をまとめた保管庫。劣化した媒体が多いが、再生可能なものは今でも誰かの声を返す。何度も再生されたと分かる媒体が、棚の前の方に並んでいる。",
+    baseCost: 12000,
+    costMultiplier: 1.23,
+    productionPerLevel: 6,
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "memoryLibrary",
+      level: 1
+    }
+  },
+  {
     id: "undergroundChapel",
     name: "地下礼拝堂",
     description:

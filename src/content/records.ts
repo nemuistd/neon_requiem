@@ -1,7 +1,7 @@
 import { ContentId, defineContent, toContentMap, toContentOrder } from "./defineContent.js";
 import { RecordDefinition } from "./types.js";
 
-export const RECORD_CONTENT_VERSION = 3;
+export const RECORD_CONTENT_VERSION = 4;
 
 export const RECORD_DEFINITIONS = defineContent([
   {
@@ -190,6 +190,38 @@ export const RECORD_DEFINITIONS = defineContent([
     ]
   },
   {
+    id: "tookoFirstBroadcast",
+    title: "遠子・最初の放送",
+    category: "交流メモ",
+    revealLevel: "surface",
+    body:
+      "響木 遠子が最初の放送を行った。内容は路地裏ステージの公演告知、施設案内、遠子の挨拶で、約十五分。放送後に遠子は機材を点検していた。受信確認について訊くと、雑音が少し返ってきた、とだけ答えた。誰かが聞いていたかは分からない。でも続ける。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "facility.level",
+        facilityId: "temporaryBroadcastBooth",
+        level: 3
+      }
+    ]
+  },
+  {
+    id: "broadcastBoothNoiseLog",
+    title: "配信ブース・雑音の記録",
+    category: "観測記録",
+    revealLevel: "uncanny",
+    body:
+      "遠子が放送した後に返ってくる雑音について、継続観測を行っている。放送内容によって返ってくる雑音の量が異なる可能性がある。公演告知の後の雑音が多く、一般的な告知文の後は少ない。差異の原因は不明。遠子は、届く場所が内容によって変わるのかもしれない、と仮説を残した。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "facility.level",
+        facilityId: "temporaryBroadcastBooth",
+        level: 3
+      }
+    ]
+  },
+  {
     id: "memoryLibraryOpeningReport",
     title: "記憶図書館・開架報告",
     category: "復旧報告",
@@ -218,6 +250,38 @@ export const RECORD_DEFINITIONS = defineContent([
         type: "facility.level",
         facilityId: "memoryLibrary",
         level: 3
+      }
+    ]
+  },
+  {
+    id: "oldBroadcastRoomEquipmentCheck",
+    title: "古い放送室・機材確認",
+    category: "観測記録",
+    revealLevel: "uncanny",
+    body:
+      "旧い放送室の機材を確認した。一部は動く。録音テープが数本残っていたため再生したところ、音声は入っているが内容を聞き取れない。劣化したのではなく、録音時から音質が低いように見える。削除ではなく、意図的に聞き取れないようにされた録音である可能性がある。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "facility.level",
+        facilityId: "recordingStorage",
+        level: 2
+      }
+    ]
+  },
+  {
+    id: "nameFixationObservation",
+    title: "観測記録・名称固定の効果",
+    category: "施設ログ",
+    revealLevel: "technical",
+    body:
+      "出所不明の文書より抜粋。観測者数が一定水準を超えると、対象区画の輪郭が安定する傾向がある。名称の付与がない場合、同等の観測者数では効果が低下する。仮説として、名称は認知固定の補助として機能すると記されている。この文書が誰によっていつ書かれたものかは不明。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "facility.level",
+        facilityId: "memoryLibrary",
+        level: 5
       }
     ]
   },

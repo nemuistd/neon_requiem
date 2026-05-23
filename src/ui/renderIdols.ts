@@ -148,7 +148,9 @@ function renderIdolVisual(idol: IdolDefinition, className: string): string {
     `;
   }
 
-  const glyph = idol.name.replace(/\s+/g, "").slice(-1);
+  const nameParts = idol.name.trim().split(/\s+/);
+  const displayName = nameParts[nameParts.length - 1] ?? idol.name;
+  const glyph = Array.from(displayName)[0] ?? "♪";
 
   return `
         <div class="${className}" data-idol-placeholder="true" aria-hidden="true">
