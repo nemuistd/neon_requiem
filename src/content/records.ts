@@ -264,8 +264,8 @@ export const RECORD_DEFINITIONS = defineContent([
     unlockRequirements: [
       {
         type: "facility.level",
-        facilityId: "recordingStorage",
-        level: 2
+        facilityId: "oldBroadcastRoom",
+        level: 1
       }
     ]
   },

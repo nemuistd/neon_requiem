@@ -139,6 +139,7 @@ describe("game state and effects", () => {
     expect(state.facilities.temporaryBroadcastBooth.level).toBe(0);
     expect(state.facilities.memoryLibrary.level).toBe(0);
     expect(state.facilities.recordingStorage.level).toBe(0);
+    expect(state.facilities.oldBroadcastRoom.level).toBe(0);
     expect(state.facilities.undergroundChapel.level).toBe(0);
     expect(state.items.oldNeonTube.purchased).toBe(false);
     expect(state.items.ticketStubBundle.purchased).toBe(false);
@@ -419,7 +420,7 @@ describe("game state and effects", () => {
     expect(getFacilityTomorusaPerSecond(songResult.state, "memoryLibrary")).toBeCloseTo(24 * 1.2 * 1.15 * 1.15);
   });
 
-  it("unlocks recording storage and applies the broadcast equipment manual", () => {
+  it("unlocks recording storage, the old broadcast room, and applies the broadcast equipment manual", () => {
     const baseState = createInitialState();
     const libraryState = {
       ...addResource(baseState, TOMORUSA_RESOURCE_ID, 80000),
@@ -430,12 +431,15 @@ describe("game state and effects", () => {
         twilightPathGuide: { level: 1 },
         temporaryBroadcastBooth: { level: 5 },
         memoryLibrary: { level: 2 },
-        recordingStorage: { level: 2 }
+        recordingStorage: { level: 2 },
+        oldBroadcastRoom: { level: 1 }
       }
     };
 
     expect(isFacilityUnlocked(libraryState, "recordingStorage")).toBe(true);
+    expect(isFacilityUnlocked(libraryState, "oldBroadcastRoom")).toBe(true);
     expect(getFacilityTomorusaPerSecond(libraryState, "recordingStorage")).toBeCloseTo(12 * 1.2 * 1.15);
+    expect(getFacilityTomorusaPerSecond(libraryState, "oldBroadcastRoom")).toBeCloseTo(11 * 1.2 * 1.15);
     expect(getItemCost(libraryState, "broadcastEquipmentManual")).toBe(15000);
     expect(isRecordUnlocked(libraryState, "oldBroadcastRoomEquipmentCheck")).toBe(true);
 
@@ -556,6 +560,17 @@ describe("game state and effects", () => {
         memoryLibrary: { level: 1 }
       }
     }, "recordingStorage")).toBe(true);
+    expect(isFacilityUnlocked({
+      ...alleyProgressState,
+      facilities: {
+        ...alleyProgressState.facilities,
+        neonBoard: { level: 5 },
+        twilightPathGuide: { level: 1 },
+        temporaryBroadcastBooth: { level: 5 },
+        memoryLibrary: { level: 1 },
+        recordingStorage: { level: 2 }
+      }
+    }, "oldBroadcastRoom")).toBe(true);
     expect(isFacilityUnlocked(alleyProgressState, "undergroundChapel")).toBe(false);
     expect(isFacilityUnlocked(neonProgressState, "undergroundChapel")).toBe(true);
     expect(isRecordUnlocked(alleyProgressState, "firstAudienceNote")).toBe(true);

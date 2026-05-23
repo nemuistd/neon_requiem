@@ -83,6 +83,20 @@ export const FACILITY_DEFINITIONS = defineContent([
     }
   },
   {
+    id: "oldBroadcastRoom",
+    name: "古い放送室",
+    description:
+      "録音保管庫の奥で見つかった旧式の放送設備。古いマイクとスピーカーの一部はまだ動き、公演情報や短い挨拶を区画の奥へ送り直せる。",
+    baseCost: 26000,
+    costMultiplier: 1.24,
+    productionPerLevel: 11,
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "recordingStorage",
+      level: 2
+    }
+  },
+  {
     id: "undergroundChapel",
     name: "地下礼拝堂",
     description:

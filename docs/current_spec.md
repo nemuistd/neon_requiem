@@ -60,6 +60,7 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `temporaryBroadcastBooth` | 仮設配信ブース | 薄明通り案内所 Lv1 | 5000 | 1.22 | 4 |
 | `memoryLibrary` | 記憶図書館 | 仮設配信ブース Lv5 | 15000 | 1.25 | 8 |
 | `recordingStorage` | 録音保管庫 | 記憶図書館 Lv1 | 12000 | 1.23 | 6 |
+| `oldBroadcastRoom` | 古い放送室 | 録音保管庫 Lv2 | 26000 | 1.24 | 11 |
 | `undergroundChapel` | 地下礼拝堂 | ネオン掲示板 Lv10 | 900 | 1.25 | 1 |
 
 地下礼拝堂は序盤施設ではなく、中盤以降の深層施設として扱う。

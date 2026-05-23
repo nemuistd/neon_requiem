@@ -975,6 +975,15 @@ h2 {
     linear-gradient(135deg, rgba(255, 94, 216, 0.16), rgba(8, 11, 22, 0.9));
 }
 
+.facility-visual-oldBroadcastRoom {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent),
+    repeating-radial-gradient(circle at 70% 30%, rgba(127, 233, 255, 0.16) 0 2px, transparent 2px 14px),
+    repeating-linear-gradient(0deg, rgba(255, 224, 115, 0.1) 0 2px, transparent 2px 16px),
+    radial-gradient(circle at 28% 58%, rgba(255, 94, 216, 0.24), transparent 30%),
+    linear-gradient(135deg, rgba(127, 233, 255, 0.2), rgba(8, 11, 22, 0.9));
+}
+
 .stage-card .stats-list {
   margin-top: 0;
   gap: 6px;
