@@ -48,6 +48,23 @@ export function getIdolIdFromEvent(event: Event): IdolId | null {
   return null;
 }
 
+export function getIdolJoinIdFromEvent(event: Event): IdolId | null {
+  const target = event.target;
+
+  if (!(target instanceof HTMLElement)) {
+    return null;
+  }
+
+  const button = target.closest<HTMLButtonElement>("[data-idol-join-id]");
+  const idolId = button?.dataset.idolJoinId;
+
+  if (isIdolId(idolId)) {
+    return idolId;
+  }
+
+  return null;
+}
+
 export function getSongIdFromEvent(event: Event): SongId | null {
   const target = event.target;
 
@@ -99,7 +116,7 @@ export function getRecordIdFromEvent(event: Event): RecordId | null {
   return null;
 }
 
-export function getMeguriActionFromEvent(event: Event): "perform" | null {
+export function getMeguriActionFromEvent(event: Event): "perform" | "closeSettlement" | "openRecords" | null {
   const target = event.target;
 
   if (!(target instanceof HTMLElement)) {
@@ -109,7 +126,7 @@ export function getMeguriActionFromEvent(event: Event): "perform" | null {
   const button = target.closest<HTMLButtonElement>("[data-meguri-action]");
   const action = button?.dataset.meguriAction;
 
-  return action === "perform" ? action : null;
+  return action === "perform" || action === "closeSettlement" || action === "openRecords" ? action : null;
 }
 
 export function getMeguriBuffIdFromEvent(event: Event): MeguriBuffId | null {

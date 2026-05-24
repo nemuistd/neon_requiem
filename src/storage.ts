@@ -34,6 +34,7 @@ import {
   ItemState,
   getOfflineTomorusa,
   INITIAL_ACTIVE_IDOL_ID,
+  isIdolJoined,
   isIdolUnlocked,
   MEMORY_FRAGMENT_RESOURCE_ID,
   MeguriState,
@@ -134,6 +135,7 @@ function parseSave(rawSave: string, now: number): GameState | null {
       saveVersion === 7 ||
       saveVersion === 8 ||
       saveVersion === 9 ||
+      saveVersion === 10 ||
       saveVersion === SAVE_VERSION ||
       saveVersion === null
     ) {
@@ -167,8 +169,10 @@ function parseLatestSave(data: RawSaveData, now: number): GameState | null {
   const normalizedItems = normalizeItems(items);
   const normalizedSongs = normalizeSongs(songs);
   const normalizedMeguri = normalizeMeguri(meguri);
+  const normalizedIdols = normalizeIdols(idols);
+  const rawSaveVersion = getRawSaveVersion(data);
 
-  const state: GameState = {
+  const stateWithoutJoinedCompatibility: GameState = {
     saveVersion: SAVE_VERSION,
     resources: normalizedResources,
     totalTomorusaEarned: normalizeTotalTomorusaEarned(
@@ -181,17 +185,21 @@ function parseLatestSave(data: RawSaveData, now: number): GameState | null {
     activeIdolId: getSavedActiveIdolId(activeIdolId),
     recordTabLastSeenContentVersion: normalizeRecordTabLastSeenContentVersion(recordTabLastSeenContentVersion),
     facilities: normalizedFacilities,
-    idols: normalizeIdols(idols),
+    idols: normalizedIdols,
     items: normalizedItems,
     songs: normalizedSongs,
     records: normalizeRecords(records),
     meguri: normalizedMeguri,
     lastSavedAt: normalizeSavedAt(lastSavedAt, now)
   };
+  const state: GameState = {
+    ...stateWithoutJoinedCompatibility,
+    idols: normalizeIdolJoinedCompatibility(idols, normalizedIdols, stateWithoutJoinedCompatibility, rawSaveVersion)
+  };
 
   return {
     ...state,
-    activeIdolId: isIdolUnlocked(state, state.activeIdolId) ? state.activeIdolId : INITIAL_ACTIVE_IDOL_ID
+    activeIdolId: isIdolJoined(state, state.activeIdolId) ? state.activeIdolId : INITIAL_ACTIVE_IDOL_ID
   };
 }
 
@@ -328,23 +336,65 @@ function getSavedIdolState(idols: unknown, idolId: IdolId): IdolState {
   if (!isRecord(idols)) {
     return {
       bond: 0,
-      eventIdsRead: []
+      eventIdsRead: [],
+      joined: idolId === INITIAL_ACTIVE_IDOL_ID
     };
   }
 
-  const idol = (idols as Partial<Record<IdolId, { bond?: unknown; eventIdsRead?: unknown }>>)[idolId];
+  const idol = (idols as Partial<Record<IdolId, { bond?: unknown; eventIdsRead?: unknown; joined?: unknown }>>)[idolId];
 
   if (!isRecord(idol)) {
     return {
       bond: 0,
-      eventIdsRead: []
+      eventIdsRead: [],
+      joined: idolId === INITIAL_ACTIVE_IDOL_ID
     };
   }
 
   return {
     bond: normalizeBond(idol.bond),
-    eventIdsRead: normalizeEventIdsRead(idol.eventIdsRead)
+    eventIdsRead: normalizeEventIdsRead(idol.eventIdsRead),
+    joined: idolId === INITIAL_ACTIVE_IDOL_ID || idol.joined === true
   };
+}
+
+function normalizeIdolJoinedCompatibility(
+  rawIdols: unknown,
+  normalizedIdols: Record<IdolId, IdolState>,
+  state: GameState,
+  saveVersion: number | null
+): Record<IdolId, IdolState> {
+  const isOlderSave = saveVersion === null || saveVersion < SAVE_VERSION;
+
+  return IDOL_ORDER.reduce((idols, idolId) => {
+    const idolState = normalizedIdols[idolId] ?? {
+      bond: 0,
+      eventIdsRead: [],
+      joined: idolId === INITIAL_ACTIVE_IDOL_ID
+    };
+    const hasJoinedField = hasSavedIdolJoinedField(rawIdols, idolId);
+
+    return {
+      ...idols,
+      [idolId]: {
+        ...idolState,
+        joined:
+          idolId === INITIAL_ACTIVE_IDOL_ID ||
+          idolState.joined ||
+          (isOlderSave && !hasJoinedField && isIdolUnlocked(state, idolId))
+      }
+    };
+  }, createInitialIdols());
+}
+
+function hasSavedIdolJoinedField(idols: unknown, idolId: IdolId): boolean {
+  if (!isRecord(idols)) {
+    return false;
+  }
+
+  const idol = (idols as Partial<Record<IdolId, { joined?: unknown }>>)[idolId];
+
+  return isRecord(idol) && Object.prototype.hasOwnProperty.call(idol, "joined");
 }
 
 function getSavedRecordRead(records: unknown, recordId: RecordId): boolean {

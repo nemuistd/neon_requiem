@@ -10,6 +10,9 @@ import {
   isItemPurchased,
   isItemUnlocked,
   isMeguriTabUnlocked,
+  isRecordAnnotationRead,
+  isRecordAnnotationUnlocked,
+  isRecordRead,
   isRecordUnlocked,
   isSongPurchased,
   isSongUnlocked
@@ -19,8 +22,10 @@ import type { ActiveTabId, UiElements } from "./types";
 export function renderTabs(elements: UiElements, state: GameState, activeTabId: ActiveTabId): void {
   elements.root.querySelectorAll<HTMLButtonElement>("[data-tab-id]").forEach((button) => {
     const isActive = button.dataset.tabId === activeTabId;
+    const isSettlementBlocked = state.meguri.pendingSettlement && button.dataset.tabId !== "meguri";
 
     button.classList.toggle("active", isActive);
+    button.disabled = isSettlementBlocked;
 
     if (isActive) {
       button.setAttribute("aria-current", "page");
@@ -86,16 +91,19 @@ function getUnlockableSongCount(state: GameState, activeTabId: ActiveTabId): num
   }, 0);
 }
 
-function getUnreadRecordNotificationCount(state: GameState, activeTabId: ActiveTabId): number {
+export function getUnreadRecordNotificationCount(state: GameState, activeTabId: ActiveTabId): number {
   if (activeTabId === "record") {
     return 0;
   }
 
   return RECORD_ORDER.reduce((count, recordId) => {
     const record = RECORDS[recordId];
-    const isUnread = isRecordUnlocked(state, recordId) && hasUnreadRecordContent(state, recordId);
-    const isNewSinceLastView = record.introducedAtVersion > state.recordTabLastSeenContentVersion;
+    const hasUnreadBody =
+      isRecordUnlocked(state, recordId) &&
+      !isRecordRead(state, recordId) &&
+      record.introducedAtVersion > state.recordTabLastSeenContentVersion;
+    const hasUnreadAnnotation = isRecordAnnotationUnlocked(state, recordId) && !isRecordAnnotationRead(state, recordId);
 
-    return count + (isUnread && isNewSinceLastView ? 1 : 0);
+    return count + ((hasUnreadBody || hasUnreadAnnotation) && hasUnreadRecordContent(state, recordId) ? 1 : 0);
   }, 0);
 }

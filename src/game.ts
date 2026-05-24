@@ -35,7 +35,7 @@ import {
 } from "./engine/effects";
 import { areRequirementsMet, isRequirementMet } from "./engine/requirements";
 
-export const SAVE_VERSION = 10;
+export const SAVE_VERSION = 11;
 export const INITIAL_ACTIVE_IDOL_ID: IdolId = "otowaAkari";
 export const MAX_OFFLINE_SECONDS = 12 * 60 * 60;
 export const BASE_OFFLINE_REWARD_RATE = 0.5;
@@ -65,6 +65,7 @@ export type RecordState = {
 export type IdolState = {
   bond: number;
   eventIdsRead: string[];
+  joined: boolean;
 };
 
 export type MeguriBuffState = {
@@ -116,10 +117,17 @@ export type PurchaseMeguriBuffResult =
       reason: "notInSettlement" | "notEnoughFragments" | "alreadyPurchased";
     };
 
+export type JoinIdolResult =
+  | { joined: true; idolId: IdolId; state: GameState }
+  | { joined: false; idolId: IdolId; state: GameState; reason: "locked" | "alreadyJoined" };
+
 export type MeguriSettlementPreview = {
   totalEligibleMemoryFragments: number;
   memoryFragmentsAwarded: number;
   memoryFragmentMultiplier: number;
+  nextMemoryFragmentTotalTomorusa: number;
+  tomorusaUntilNextMemoryFragment: number;
+  memoryFragmentProgressRatio: number;
 };
 
 export type PerformMeguriResult =
@@ -154,7 +162,8 @@ export function createInitialIdols(): Record<IdolId, IdolState> {
       ...idols,
       [idolId]: {
         bond: 0,
-        eventIdsRead: []
+        eventIdsRead: [],
+        joined: idolId === INITIAL_ACTIVE_IDOL_ID
       }
     }),
     {} as Record<IdolId, IdolState>
@@ -333,18 +342,58 @@ export function isIdolUnlocked(state: GameState, idolId: IdolId): boolean {
   return isRequirementMet(state, IDOLS[idolId].unlockRequirement);
 }
 
+export function isIdolJoined(state: GameState, idolId: IdolId): boolean {
+  return state.idols[idolId]?.joined === true;
+}
+
+export function isIdolJoinable(state: GameState, idolId: IdolId): boolean {
+  return isIdolUnlocked(state, idolId) && !isIdolJoined(state, idolId);
+}
+
 export function resolveActiveIdolId(state: GameState): IdolId {
-  return isIdolUnlocked(state, state.activeIdolId) ? state.activeIdolId : INITIAL_ACTIVE_IDOL_ID;
+  return isIdolJoined(state, state.activeIdolId) ? state.activeIdolId : INITIAL_ACTIVE_IDOL_ID;
 }
 
 export function selectActiveIdol(state: GameState, idolId: IdolId): GameState {
-  if (!isIdolUnlocked(state, idolId)) {
+  if (!isIdolJoined(state, idolId)) {
     return state;
   }
 
   return {
     ...state,
     activeIdolId: idolId
+  };
+}
+
+export function joinIdol(state: GameState, idolId: IdolId): JoinIdolResult {
+  if (!isIdolUnlocked(state, idolId)) {
+    return { joined: false, idolId, state, reason: "locked" };
+  }
+
+  if (isIdolJoined(state, idolId)) {
+    return { joined: false, idolId, state, reason: "alreadyJoined" };
+  }
+
+  const currentIdolState = state.idols[idolId] ?? {
+    bond: 0,
+    eventIdsRead: [],
+    joined: false
+  };
+
+  return {
+    joined: true,
+    idolId,
+    state: {
+      ...state,
+      activeIdolId: idolId,
+      idols: {
+        ...state.idols,
+        [idolId]: {
+          ...currentIdolState,
+          joined: true
+        }
+      }
+    }
   };
 }
 
@@ -406,7 +455,7 @@ export function getFacilityMultiplierEffects(state: GameState, facilityId: Facil
 
 export function getGlobalMultiplierEffects(state: GameState): FacilityMultiplierEffect[] {
   return IDOL_ORDER.flatMap((idolId) => {
-    if (!isIdolUnlocked(state, idolId)) {
+    if (!isIdolJoined(state, idolId)) {
       return [];
     }
 
@@ -452,12 +501,16 @@ export function getPurchasedContentEffects(state: GameState): Effect[] {
 }
 
 export function getUnlockedIdolPassiveEffects(state: GameState): Effect[] {
-  return IDOL_ORDER.flatMap((idolId) => (isIdolUnlocked(state, idolId) ? IDOLS[idolId].passiveEffects : []));
+  return getJoinedIdolPassiveEffects(state);
+}
+
+export function getJoinedIdolPassiveEffects(state: GameState): Effect[] {
+  return IDOL_ORDER.flatMap((idolId) => (isIdolJoined(state, idolId) ? IDOLS[idolId].passiveEffects : []));
 }
 
 export function getGameplayEffects(state: GameState): Effect[] {
   return [
-    ...getUnlockedIdolPassiveEffects(state),
+    ...getJoinedIdolPassiveEffects(state),
     ...getPurchasedContentEffects(state),
     ...getPurchasedMeguriBuffEffects(state)
   ];
@@ -512,7 +565,8 @@ export function gainActiveIdolBond(state: GameState, amount = 1): GameState {
   const activeIdolId = resolveActiveIdolId(state);
   const currentIdolState = state.idols[activeIdolId] ?? {
     bond: 0,
-    eventIdsRead: []
+    eventIdsRead: [],
+    joined: activeIdolId === INITIAL_ACTIVE_IDOL_ID
   };
 
   return {
@@ -679,12 +733,33 @@ export function calculateMeguriMemoryFragmentSettlement(
     0,
     Math.floor(Math.sqrt(safeTotalTomorusaEarned / MEGURI_MEMORY_FRAGMENT_TOMORUSA_SCALE) * safeMultiplier)
   );
+  const currentMemoryFragmentThreshold = getRequiredTomorusaForEligibleMemoryFragments(totalEligibleMemoryFragments, safeMultiplier);
+  const nextMemoryFragmentTotalTomorusa = getRequiredTomorusaForEligibleMemoryFragments(totalEligibleMemoryFragments + 1, safeMultiplier);
+  const progressRange = Math.max(1, nextMemoryFragmentTotalTomorusa - currentMemoryFragmentThreshold);
+  const memoryFragmentProgressRatio = Math.max(
+    0,
+    Math.min(1, (safeTotalTomorusaEarned - currentMemoryFragmentThreshold) / progressRange)
+  );
 
   return {
     totalEligibleMemoryFragments,
     memoryFragmentsAwarded: Math.max(0, totalEligibleMemoryFragments - safeTotalMemoryFragmentsEarned),
-    memoryFragmentMultiplier: safeMultiplier
+    memoryFragmentMultiplier: safeMultiplier,
+    nextMemoryFragmentTotalTomorusa,
+    tomorusaUntilNextMemoryFragment: Math.max(0, nextMemoryFragmentTotalTomorusa - safeTotalTomorusaEarned),
+    memoryFragmentProgressRatio
   };
+}
+
+export function getRequiredTomorusaForEligibleMemoryFragments(eligibleMemoryFragments: number, memoryFragmentMultiplier: number): number {
+  const safeEligibleMemoryFragments = Math.max(0, Math.floor(eligibleMemoryFragments));
+  const safeMultiplier = Number.isFinite(memoryFragmentMultiplier) && memoryFragmentMultiplier > 0 ? memoryFragmentMultiplier : 1;
+
+  if (safeEligibleMemoryFragments <= 0) {
+    return 0;
+  }
+
+  return Math.ceil((safeEligibleMemoryFragments / safeMultiplier) ** 2 * MEGURI_MEMORY_FRAGMENT_TOMORUSA_SCALE);
 }
 
 export function getMeguriSettlementPreview(state: GameState): MeguriSettlementPreview {
@@ -719,7 +794,7 @@ export function performMeguri(state: GameState): PerformMeguriResult {
         [MEMORY_FRAGMENT_RESOURCE_ID]: nextMemoryFragments
       },
       activeIdolId: INITIAL_ACTIVE_IDOL_ID,
-      recordTabLastSeenContentVersion: 0,
+      recordTabLastSeenContentVersion: state.recordTabLastSeenContentVersion,
       facilities: createInitialFacilities(),
       idols: createInitialIdols(),
       items: createInitialItems(),

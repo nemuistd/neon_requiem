@@ -5,6 +5,7 @@ import {
   MEGURI_BUFFS,
   SONG_ORDER,
 } from "../definitions";
+import { createMeguriNextFragmentMessage, UI_TEXT } from "../data";
 import {
   canSpendResource,
   GameState,
@@ -34,6 +35,8 @@ export function renderLiveValues(elements: UiElements, state: GameState): void {
   elements.memoryFragmentsAmount.textContent = formatWholeAmount(getResourceAmount(state, MEMORY_FRAGMENT_RESOURCE_ID));
   elements.memoryFragmentResource.hidden = state.meguri.count <= 0;
   elements.lightsPerSecond.textContent = `${formatRate(getTomorusaPerSecond(state))} / 秒`;
+  elements.liveButton.disabled = state.meguri.pendingSettlement;
+  elements.liveButton.textContent = state.meguri.pendingSettlement ? UI_TEXT.meguriSettlementOpenLabel : UI_TEXT.liveButton;
   updateFacilityLiveValues(elements, state);
   updateSongLiveValues(elements, state);
   updateItemLiveValues(elements, state);
@@ -101,9 +104,12 @@ export function updateMeguriLiveValues(elements: UiElements, state: GameState): 
   const performButton = elements.contentList.querySelector<HTMLButtonElement>("[data-meguri-action='perform']");
   const memoryFragmentsElement = elements.contentList.querySelector<HTMLElement>("[data-meguri-memory-fragments]");
   const previewElement = elements.contentList.querySelector<HTMLElement>("[data-meguri-preview]");
+  const nextFragmentElement = elements.contentList.querySelector<HTMLElement>("[data-meguri-next-fragment]");
+  const nextFragmentCopyElement = elements.contentList.querySelector<HTMLElement>("[data-meguri-next-fragment-copy]");
+  const progressBarElement = elements.contentList.querySelector<HTMLElement>(".meguri-progress-track span");
 
   if (performButton) {
-    performButton.disabled = !isMeguriAvailable(state);
+    performButton.disabled = state.meguri.pendingSettlement || !isMeguriAvailable(state);
   }
 
   if (memoryFragmentsElement) {
@@ -113,6 +119,23 @@ export function updateMeguriLiveValues(elements: UiElements, state: GameState): 
   if (previewElement) {
     const preview = getMeguriSettlementPreview(state);
     previewElement.textContent = `${formatWholeAmount(preview.memoryFragmentsAwarded)} / 累計 ${formatWholeAmount(preview.totalEligibleMemoryFragments)}`;
+  }
+
+  if (nextFragmentElement || nextFragmentCopyElement || progressBarElement) {
+    const preview = getMeguriSettlementPreview(state);
+    const progressPercent = Math.round(Math.max(0, Math.min(1, preview.memoryFragmentProgressRatio)) * 100);
+
+    if (nextFragmentElement) {
+      nextFragmentElement.textContent = `${formatWholeAmount(preview.nextMemoryFragmentTotalTomorusa)} 灯るさ`;
+    }
+
+    if (nextFragmentCopyElement) {
+      nextFragmentCopyElement.textContent = createMeguriNextFragmentMessage(formatWholeAmount(preview.tomorusaUntilNextMemoryFragment));
+    }
+
+    if (progressBarElement) {
+      progressBarElement.style.width = `${progressPercent}%`;
+    }
   }
 
   MEGURI_BUFF_ORDER.forEach((buffId) => {

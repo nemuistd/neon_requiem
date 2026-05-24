@@ -5,6 +5,7 @@ import {
   closeMeguriSettlement,
   createInitialState,
   getMeguriSettlementPreview,
+  getRequiredTomorusaForEligibleMemoryFragments,
   getResourceAmount,
   isMeguriTabUnlocked,
   MEMORY_FRAGMENT_RESOURCE_ID,
@@ -19,12 +20,14 @@ import {
 import { getMemoryFragmentMultiplierFromEffects, getRebirthBonusMultiplierFromEffects } from "./engine/effects";
 import { isRequirementMet } from "./engine/requirements";
 import { validateRequirement } from "./contentValidation";
+import { UI_TEXT } from "./data";
 import { renderMeguriPanel } from "./ui/renderMeguri";
 import { renderRecordCards } from "./ui/renderRecords";
+import { getUnreadRecordNotificationCount } from "./ui/renderTabs";
 import { loadGame, SAVE_KEY } from "./storage";
 
 describe("meguri state and requirements", () => {
-  it("creates v10 state with memory fragments and empty meguri progress", () => {
+  it("creates v11 state with memory fragments and empty meguri progress", () => {
     const state = createInitialState(1234);
 
     expect(state.saveVersion).toBe(SAVE_VERSION);
@@ -122,13 +125,16 @@ describe("meguri economy", () => {
   it("uses the same memory fragment settlement preview for display and execution without double claiming", () => {
     const readyState = createMeguriReadyState({
       ...createInitialState(),
-      totalTomorusaEarned: 180000
+      totalTomorusaEarned: 200000
     });
     const preview = getMeguriSettlementPreview(readyState);
     const result = performMeguri(readyState);
 
-    expect(preview).toEqual(calculateMeguriMemoryFragmentSettlement(180000, 0, 1));
+    expect(preview).toEqual(calculateMeguriMemoryFragmentSettlement(200000, 0, 1));
     expect(preview.memoryFragmentsAwarded).toBe(3);
+    expect(preview.nextMemoryFragmentTotalTomorusa).toBe(getRequiredTomorusaForEligibleMemoryFragments(4, 1));
+    expect(preview.tomorusaUntilNextMemoryFragment).toBe(120000);
+    expect(preview.memoryFragmentProgressRatio).toBeGreaterThan(0);
     expect(result.performed).toBe(true);
 
     if (!result.performed) {
@@ -142,9 +148,21 @@ describe("meguri economy", () => {
     expect(getMeguriSettlementPreview(secondReadyState).memoryFragmentsAwarded).toBe(0);
   });
 
+  it("renders the next memory fragment gauge from the settlement preview", () => {
+    const readyState = createMeguriReadyState({
+      ...createInitialState(),
+      totalTomorusaEarned: 200000
+    });
+    const html = renderMeguriPanel(readyState);
+
+    expect(html).toContain("次の記憶断片");
+    expect(html).toContain("あと 120,000 灯るさで +1 記憶断片");
+    expect(html).toContain("meguri-progress-track");
+  });
+
   it("applies meguri buff effect helpers", () => {
-    expect(getMemoryFragmentMultiplierFromEffects([{ type: "memory.fragment.production.add", ratio: 0.15 }])).toBeCloseTo(1.15);
-    expect(getRebirthBonusMultiplierFromEffects([{ type: "rebirth.bonus.multiplier", multiplier: 1.05 }])).toBeCloseTo(1.05);
+    expect(getMemoryFragmentMultiplierFromEffects([{ type: "memory.fragment.production.add", ratio: 0.2 }])).toBeCloseTo(1.2);
+    expect(getRebirthBonusMultiplierFromEffects([{ type: "rebirth.bonus.multiplier", multiplier: 1.08 }])).toBeCloseTo(1.08);
   });
 
   it("allows buff purchases only during pending settlement", () => {
@@ -175,9 +193,55 @@ describe("meguri economy", () => {
       return;
     }
 
-    expect(getResourceAmount(purchaseResult.state, MEMORY_FRAGMENT_RESOURCE_ID)).toBe(5);
+    expect(getResourceAmount(purchaseResult.state, MEMORY_FRAGMENT_RESOURCE_ID)).toBe(7);
     expect(purchaseResult.state.meguri.buffs.footstepResonance.purchased).toBe(true);
     expect(purchaseMeguriBuff(closeMeguriSettlement(purchaseResult.state), "leftWorkMemo").purchased).toBe(false);
+  });
+
+  it("renders pending settlement as a dedicated screen state", () => {
+    const settlementState = {
+      ...createInitialState(),
+      meguri: {
+        ...createInitialState().meguri,
+        count: 1,
+        pendingSettlement: true
+      }
+    };
+    const html = renderMeguriPanel(settlementState);
+
+    expect(html).toContain("廻後清算中");
+    expect(html).toContain("通常進行へ戻る");
+    expect(html).toContain('data-meguri-action="closeSettlement"');
+  });
+
+  it("shows records with unread annotations on the settlement screen", () => {
+    const settlementState = {
+      ...createInitialState(),
+      records: {
+        ...createInitialState().records,
+        lightResponseObservation: {
+          unlocked: true,
+          read: true,
+          annotationRead: false
+        }
+      },
+      meguri: {
+        ...createInitialState().meguri,
+        count: 1,
+        pendingSettlement: true,
+        buffs: {
+          ...createInitialState().meguri.buffs,
+          footstepResonance: {
+            purchased: true
+          }
+        }
+      }
+    };
+    const html = renderMeguriPanel(settlementState);
+
+    expect(html).toContain(UI_TEXT.meguriSettlementRecordNotesLabel);
+    expect(html).toContain("観測記録・灯り反応");
+    expect(html).toContain('data-meguri-action="openRecords"');
   });
 });
 
@@ -204,7 +268,8 @@ describe("meguri reset and record annotations", () => {
         ...createInitialState().idols,
         otowaAkari: {
           bond: 20,
-          eventIdsRead: ["first"]
+          eventIdsRead: ["first"],
+          joined: true
         }
       },
       records: {
@@ -237,12 +302,13 @@ describe("meguri reset and record annotations", () => {
     expect(result.state.songs.rojiuraIntro.purchased).toBe(false);
     expect(result.state.items.oldNeonTube.purchased).toBe(false);
     expect(result.state.idols.otowaAkari.bond).toBe(0);
+    expect(result.state.idols.otowaAkari.joined).toBe(true);
     expect(result.state.records.alleyStageRestorationMemo).toEqual({ unlocked: true, read: true, annotationRead: true });
     expect(result.state.meguri.buffs.leftWorkMemo.purchased).toBe(true);
     expect(result.state.meguri.idolRecognition.otowaAkari).toBe(true);
     expect(result.state.meguri.count).toBe(1);
     expect(result.state.meguri.pendingSettlement).toBe(true);
-    expect(result.state.recordTabLastSeenContentVersion).toBe(0);
+    expect(result.state.recordTabLastSeenContentVersion).toBe(11);
   });
 
   it("renders meguri-gated record annotations and marks annotation read state", () => {
@@ -280,10 +346,59 @@ describe("meguri reset and record annotations", () => {
       annotationRead: true
     });
   });
+
+  it("notifies record tab for unread annotations without resetting all carried records after meguri", () => {
+    const baseState = createMeguriReadyState({
+      ...createInitialState(),
+      recordTabLastSeenContentVersion: 11,
+      totalTomorusaEarned: 80000,
+      records: {
+        ...createInitialState().records,
+        alleyStageRestorationMemo: {
+          unlocked: true,
+          read: true,
+          annotationRead: false
+        },
+        lightResponseObservation: {
+          unlocked: true,
+          read: true,
+          annotationRead: false
+        }
+      }
+    });
+    const meguriResult = performMeguri(baseState);
+
+    expect(meguriResult.performed).toBe(true);
+
+    if (!meguriResult.performed) {
+      return;
+    }
+
+    expect(getUnreadRecordNotificationCount(meguriResult.state, "restoration")).toBe(0);
+
+    const buffResult = purchaseMeguriBuff({
+      ...meguriResult.state,
+      resources: {
+        ...meguriResult.state.resources,
+        memoryFragment: 10
+      }
+    }, "footstepResonance");
+
+    expect(buffResult.purchased).toBe(true);
+
+    if (!buffResult.purchased) {
+      return;
+    }
+
+    expect(getUnreadRecordNotificationCount(buffResult.state, "restoration")).toBe(1);
+
+    const readState = readRecord(buffResult.state, "lightResponseObservation");
+    expect(getUnreadRecordNotificationCount(readState, "restoration")).toBe(0);
+  });
 });
 
 describe("meguri save migration", () => {
-  it("migrates older saves to v10 with estimated total tomorusa and meguri defaults", () => {
+  it("migrates older saves to v11 with estimated total tomorusa and meguri defaults", () => {
     setupLocalStorage({
       [SAVE_KEY]: JSON.stringify({
         saveVersion: 9,

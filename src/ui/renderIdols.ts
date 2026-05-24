@@ -9,6 +9,8 @@ import {
   GameState,
   getIdolBond,
   hasIdolRecognition,
+  isIdolJoinable,
+  isIdolJoined,
   isIdolUnlocked,
   resolveActiveIdolId
 } from "../game";
@@ -41,7 +43,7 @@ export function renderIdolCards(state: GameState, activeIdolId: IdolId): string 
             </div>
             <div>
               <dt>${UI_TEXT.passiveEffectLabel}</dt>
-              <dd>${isIdolUnlocked(state, activeIdolId) ? idol.passiveDescription : UI_TEXT.lockedIdolLabel}</dd>
+              <dd>${isIdolJoined(state, activeIdolId) ? idol.passiveDescription : UI_TEXT.lockedIdolLabel}</dd>
             </div>
           </dl>
 
@@ -70,19 +72,20 @@ function renderIdolSwitcher(state: GameState, activeIdolId: IdolId): string {
   return IDOL_ORDER.filter((idolId) => isRelatedProgressVisible(state, IDOLS[idolId].unlockRequirement)).map((idolId) => {
     const idol = IDOLS[idolId];
     const isUnlocked = isIdolUnlocked(state, idolId);
+    const isJoined = isIdolJoined(state, idolId);
     const isActive = activeIdolId === idolId;
 
     return `
     <button
-        class="idol-switch ${isActive ? "active" : ""} ${isUnlocked ? "unlocked" : "locked"}"
+        class="idol-switch ${isActive ? "active" : ""} ${isJoined ? "unlocked" : isUnlocked ? "joinable" : "locked"}"
         type="button"
         data-idol-id="${idolId}"
-        ${isUnlocked ? "" : "disabled"}
+        ${isJoined ? "" : "disabled"}
         ${isActive ? 'aria-current="true"' : ""}
         aria-pressed="${isActive ? "true" : "false"}"
       >
         <span>${isUnlocked ? idol.name : UI_TEXT.unknownIdolLabel}</span>
-        <small>${isUnlocked ? idol.reading : getIdolUnlockRequirementText(idolId)}</small>
+        <small>${isJoined ? idol.reading : isUnlocked ? UI_TEXT.joinableIdolLabel : getIdolUnlockRequirementText(idolId)}</small>
       </button>
     `;
   }).join("");
@@ -91,12 +94,16 @@ function renderIdolSwitcher(state: GameState, activeIdolId: IdolId): string {
 function renderIdolTabCard(state: GameState, idolId: IdolId): string {
   const idol = IDOLS[idolId];
   const isUnlocked = isIdolUnlocked(state, idolId);
+  const isJoined = isIdolJoined(state, idolId);
+  const isJoinable = isIdolJoinable(state, idolId);
   const activeIdolId = resolveActiveIdolId(state);
   const isActive = activeIdolId === idolId;
   const stateLabel = isActive
     ? UI_TEXT.focusedIdolLabel
-    : isUnlocked
-      ? (idolId === "otowaAkari" ? UI_TEXT.initialIdolLabel : UI_TEXT.unlockedIdolLabel)
+    : isJoined
+      ? (idolId === "otowaAkari" ? UI_TEXT.initialIdolLabel : UI_TEXT.joinedIdolLabel)
+      : isUnlocked
+        ? UI_TEXT.joinableIdolLabel
       : UI_TEXT.lockedIdolLabel;
 
   if (!isUnlocked) {
@@ -138,7 +145,7 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
   }
 
   return `
-    <article class="card idol-tab-card ${isUnlocked ? "unlocked-card" : "locked-card"} ${isActive ? "active-card" : ""}">
+    <article class="card idol-tab-card ${isJoined ? "unlocked-card" : isJoinable ? "joinable-card" : "locked-card"} ${isActive ? "active-card" : ""}">
       <div class="idol-tab-header">
         <div>
           <span class="card-kicker">${stateLabel}</span>
@@ -154,7 +161,7 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
           <p>${idol.description}</p>
           ${renderRecognitionTrace(state, idolId)}
           <dl class="stats-list">
-            ${isUnlocked
+            ${isJoined
               ? `
             <div>
               <dt>${UI_TEXT.bondLabel}</dt>
@@ -163,7 +170,7 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
               : ""}
             <div>
               <dt>${UI_TEXT.passiveEffectLabel}</dt>
-              <dd>${isUnlocked ? idol.passiveDescription : UI_TEXT.lockedIdolLabel}</dd>
+              <dd>${isJoined ? idol.passiveDescription : UI_TEXT.unjoinedIdolEffectLabel}</dd>
             </div>
             <div>
               <dt>${UI_TEXT.unlockRequirementLabel}</dt>
@@ -171,12 +178,12 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
             </div>
           </dl>
           <button
-            class="secondary-action idol-tab-action ${isActive ? "active" : isUnlocked ? "unlocked" : "locked"}"
+            class="secondary-action idol-tab-action ${isActive ? "active" : isJoined ? "unlocked" : isJoinable ? "joinable" : "locked"}"
             type="button"
-            data-idol-id="${idolId}"
-            ${isUnlocked && !isActive ? "" : "disabled"}
+            ${isJoinable ? `data-idol-join-id="${idolId}"` : `data-idol-id="${idolId}"`}
+            ${(isJoinable || (isJoined && !isActive)) ? "" : "disabled"}
           >
-            ${isActive ? UI_TEXT.focusedIdolLabel : isUnlocked ? UI_TEXT.focusIdolButtonLabel : UI_TEXT.lockedIdolLabel}
+            ${isActive ? UI_TEXT.focusedIdolLabel : isJoinable ? UI_TEXT.joinIdolButtonLabel : isJoined ? UI_TEXT.focusIdolButtonLabel : UI_TEXT.lockedIdolLabel}
           </button>
         </div>
       </div>

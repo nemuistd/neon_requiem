@@ -189,6 +189,7 @@ h2 {
 }
 
 .settings-button:disabled,
+.primary-action:disabled,
 .detail-action:disabled,
 .tab-button:disabled {
   cursor: not-allowed;
@@ -441,6 +442,15 @@ h2 {
     rgba(15, 18, 32, 0.9);
 }
 
+.idol-switch.joinable {
+  cursor: not-allowed;
+  color: #ffe073;
+  border-color: rgba(255, 224, 115, 0.28);
+  background:
+    linear-gradient(180deg, rgba(255, 224, 115, 0.08), transparent),
+    rgba(24, 18, 28, 0.82);
+}
+
 .idol-switch.active {
   border-color: rgba(255, 94, 216, 0.78);
   color: #fff8ff;
@@ -673,6 +683,13 @@ h2 {
   border-color: rgba(127, 233, 255, 0.26);
 }
 
+.idol-tab-card.joinable-card {
+  border-color: rgba(255, 224, 115, 0.38);
+  box-shadow:
+    0 0 18px rgba(255, 224, 115, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
 .idol-tab-card.active-card {
   border-color: rgba(255, 94, 216, 0.68);
   box-shadow:
@@ -760,6 +777,12 @@ h2 {
 .idol-tab-action.unlocked {
   border-color: rgba(127, 233, 255, 0.48);
   background: rgba(18, 42, 47, 0.9);
+}
+
+.idol-tab-action.joinable {
+  color: #100712;
+  border-color: rgba(255, 210, 115, 0.58);
+  background: linear-gradient(90deg, #ffe073, #8df4ff);
 }
 
 .idol-tab-action.active {
@@ -1077,8 +1100,13 @@ h2 {
   gap: 14px;
 }
 
+.meguri-settlement-panel {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+}
+
 .meguri-status-card,
-.meguri-buff-card {
+.meguri-buff-card,
+.meguri-settlement-card {
   min-height: 320px;
 }
 
@@ -1131,8 +1159,95 @@ h2 {
   margin-bottom: 0;
 }
 
+.meguri-fragment-progress {
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid rgba(255, 224, 115, 0.24);
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(255, 224, 115, 0.08), rgba(127, 233, 255, 0.06)),
+    rgba(8, 11, 22, 0.5);
+}
+
+.meguri-progress-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #ffe073;
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+
+.meguri-progress-track {
+  height: 12px;
+  margin-top: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(127, 233, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(8, 11, 22, 0.78);
+}
+
+.meguri-progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ff5ed8, #78efff, #ffe073);
+  box-shadow: 0 0 16px rgba(120, 239, 255, 0.24);
+}
+
+.meguri-fragment-progress p {
+  margin: 8px 0 0;
+  color: #dcd0e7;
+  font-size: 0.9rem;
+}
+
 .meguri-perform-action {
   margin-top: 16px;
+}
+
+.meguri-settlement-actions {
+  margin-top: 16px;
+}
+
+.meguri-settlement-records {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid rgba(255, 224, 115, 0.22);
+  border-radius: 8px;
+  background: rgba(255, 224, 115, 0.07);
+}
+
+.meguri-settlement-records p {
+  margin: 6px 0 0;
+  color: #e8d4ff;
+  font-size: 0.9rem;
+}
+
+.meguri-settlement-record-list {
+  display: grid;
+  gap: 8px;
+}
+
+.meguri-settlement-record-note {
+  display: grid;
+  gap: 3px;
+  padding: 9px 10px;
+  border: 1px solid rgba(127, 233, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(8, 11, 22, 0.46);
+}
+
+.meguri-settlement-record-note span {
+  color: #bdaecb;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.meguri-settlement-record-note strong {
+  color: #fff8ff;
 }
 
 .meguri-buff-list {
@@ -1338,6 +1453,26 @@ h2 {
 
 .settings-panel[hidden] {
   display: none;
+}
+
+#app.settlement-active .main-layout {
+  grid-template-columns: 1fr;
+}
+
+#app.settlement-active .idol-focus {
+  display: none;
+}
+
+#app.settlement-active .content-panel {
+  border-color: rgba(255, 224, 115, 0.34);
+  box-shadow:
+    0 0 28px rgba(255, 224, 115, 0.1),
+    0 0 32px rgba(255, 94, 216, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+#app.settlement-active .action-panel {
+  opacity: 0.72;
 }
 
 @media (max-width: 980px) {

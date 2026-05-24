@@ -12,17 +12,19 @@ import {
   getFacilityTomorusaPerSecond,
   getFacilityLevel,
   getItemCost,
+  getJoinedIdolPassiveEffects,
   getManualTomorusaGain,
   getOfflineRewardMultiplier,
   getOfflineTomorusa,
   getResourceAmount,
   getSongCost,
   getTomorusaPerSecond,
-  getUnlockedIdolPassiveEffects,
   isFacilityUnlocked,
+  isIdolJoined,
   isIdolUnlocked,
   isRecordRead,
   isRecordUnlocked,
+  joinIdol,
   performManualLive,
   purchaseItem,
   purchaseSong,
@@ -41,7 +43,7 @@ import {
   getSongCostMultiplierFromEffects
 } from "./engine/effects";
 import { areRequirementsMet, isRequirementMet } from "./engine/requirements";
-import { IDOL_ORDER } from "./definitions";
+import { IDOL_ORDER, IdolId } from "./definitions";
 import { validateRequirement } from "./contentValidation";
 import { loadGame, SAVE_KEY } from "./storage";
 
@@ -151,6 +153,7 @@ describe("game state and effects", () => {
     expect(state.items.broadcastEquipmentManual.purchased).toBe(false);
     expect(state.items.repairToolSet.purchased).toBe(false);
     expect(state.idols.otowaAkari.bond).toBe(0);
+    expect(state.idols.otowaAkari.joined).toBe(true);
     expect(state.idols.hibikiTooko.bond).toBe(0);
     expect(state.idols.kaminoMeguri.bond).toBe(0);
     expect(state.idols.hinataKoharu.bond).toBe(0);
@@ -172,7 +175,8 @@ describe("game state and effects", () => {
     for (const idolId of IDOL_ORDER) {
       expect(idols[idolId]).toEqual({
         bond: 0,
-        eventIdsRead: []
+        eventIdsRead: [],
+        joined: idolId === "otowaAkari"
       });
     }
   });
@@ -243,7 +247,7 @@ describe("game state and effects", () => {
     expect(getIdolBond(liveState, "mizukiShino")).toBe(0);
   });
 
-  it("adds bond to the selected unlocked idol when performing a manual live", () => {
+  it("adds bond to the selected joined idol when performing a manual live", () => {
     const baseState = createInitialState();
     const unlockedState = {
       ...baseState,
@@ -253,13 +257,48 @@ describe("game state and effects", () => {
         neonBoard: { level: 5 }
       }
     };
-    const selectedState = selectActiveIdol(unlockedState, "asagiriYui");
+    const joinedState = withJoinedIdols(unlockedState, ["asagiriYui"]);
+    const selectedState = selectActiveIdol(joinedState, "asagiriYui");
     const liveState = performManualLive(selectedState);
 
     expect(selectedState.activeIdolId).toBe("asagiriYui");
     expect(getIdolBond(liveState, "otowaAkari")).toBe(0);
     expect(getIdolBond(liveState, "asagiriYui")).toBe(1);
     expect(getResourceAmount(liveState, TOMORUSA_RESOURCE_ID)).toBe(getResourceAmount(selectedState, TOMORUSA_RESOURCE_ID) + getManualTomorusaGain(selectedState));
+  });
+
+  it("requires an active join action before idol effects and selection apply", () => {
+    const baseState = createInitialState();
+    const yuiUnlockedState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        alleyStage: { level: 10 },
+        neonBoard: { level: 5 }
+      }
+    };
+
+    expect(isIdolUnlocked(yuiUnlockedState, "asagiriYui")).toBe(true);
+    expect(isIdolJoined(yuiUnlockedState, "asagiriYui")).toBe(false);
+    expect(getJoinedIdolPassiveEffects(yuiUnlockedState)).toEqual([
+      { type: "facility.production.multiplier", multiplier: 1.2 }
+    ]);
+    expect(selectActiveIdol(yuiUnlockedState, "asagiriYui").activeIdolId).toBe("otowaAkari");
+
+    const joinResult = joinIdol(yuiUnlockedState, "asagiriYui");
+
+    expect(joinResult.joined).toBe(true);
+
+    if (!joinResult.joined) {
+      return;
+    }
+
+    expect(joinResult.state.activeIdolId).toBe("asagiriYui");
+    expect(isIdolJoined(joinResult.state, "asagiriYui")).toBe(true);
+    expect(getJoinedIdolPassiveEffects(joinResult.state)).toEqual([
+      { type: "facility.production.multiplier", multiplier: 1.2 },
+      { type: "facility.production.multiplier", multiplier: 1.15 }
+    ]);
   });
 
   it("reports the default bond gain before bond multipliers are purchased or unlocked", () => {
@@ -308,7 +347,7 @@ describe("game state and effects", () => {
     expect(getTomorusaPerSecond(state)).toBeCloseTo(2.05 * expectedMultiplier);
   });
 
-  it("collects passive effects only from unlocked idols", () => {
+  it("collects passive effects only from joined idols", () => {
     const baseState = createInitialState();
     const yuiUnlockedState = {
       ...baseState,
@@ -319,10 +358,15 @@ describe("game state and effects", () => {
       }
     };
 
-    expect(getUnlockedIdolPassiveEffects(baseState)).toEqual([
+    const yuiJoinedState = withJoinedIdols(yuiUnlockedState, ["asagiriYui"]);
+
+    expect(getJoinedIdolPassiveEffects(baseState)).toEqual([
       { type: "facility.production.multiplier", multiplier: 1.2 }
     ]);
-    expect(getUnlockedIdolPassiveEffects(yuiUnlockedState)).toEqual([
+    expect(getJoinedIdolPassiveEffects(yuiUnlockedState)).toEqual([
+      { type: "facility.production.multiplier", multiplier: 1.2 }
+    ]);
+    expect(getJoinedIdolPassiveEffects(yuiJoinedState)).toEqual([
       { type: "facility.production.multiplier", multiplier: 1.2 },
       { type: "facility.production.multiplier", multiplier: 1.15 }
     ]);
@@ -361,14 +405,14 @@ describe("game state and effects", () => {
         neonBoard: { level: 5 }
       }
     };
-    const guideProgressState = {
+    const guideProgressState = withJoinedIdols({
       ...neonProgressState,
       facilities: {
         ...neonProgressState.facilities,
         twilightPathGuide: { level: 1 },
         temporaryBroadcastBooth: { level: 3 }
       }
-    };
+    }, ["asagiriYui", "hibikiTooko"]);
 
     expect(isFacilityUnlocked(neonProgressState, "twilightPathGuide")).toBe(true);
     expect(isFacilityUnlocked(neonProgressState, "temporaryBroadcastBooth")).toBe(false);
@@ -400,13 +444,13 @@ describe("game state and effects", () => {
         temporaryBroadcastBooth: { level: 5 }
       }
     };
-    const libraryProgressState = {
+    const libraryProgressState = withJoinedIdols({
       ...boothProgressState,
       facilities: {
         ...boothProgressState.facilities,
         memoryLibrary: { level: 3 }
       }
-    };
+    }, ["asagiriYui", "kaminoMeguri"]);
 
     expect(isFacilityUnlocked(boothProgressState, "memoryLibrary")).toBe(true);
     expect(isIdolUnlocked(libraryProgressState, "kaminoMeguri")).toBe(true);
@@ -430,7 +474,7 @@ describe("game state and effects", () => {
 
   it("unlocks recording storage, the old broadcast room, and applies the broadcast equipment manual", () => {
     const baseState = createInitialState();
-    const libraryState = {
+    const libraryState = withJoinedIdols({
       ...addResource(baseState, TOMORUSA_RESOURCE_ID, 80000),
       facilities: {
         ...baseState.facilities,
@@ -442,7 +486,7 @@ describe("game state and effects", () => {
         recordingStorage: { level: 2 },
         oldBroadcastRoom: { level: 1 }
       }
-    };
+    }, ["asagiriYui"]);
 
     expect(isFacilityUnlocked(libraryState, "recordingStorage")).toBe(true);
     expect(isFacilityUnlocked(libraryState, "oldBroadcastRoom")).toBe(true);
@@ -459,7 +503,7 @@ describe("game state and effects", () => {
 
   it("unlocks the underground plaza, Koharu, and applies plaza anthem scaling", () => {
     const baseState = createInitialState();
-    const plazaState = {
+    const plazaState = withJoinedIdols({
       ...addResource(baseState, TOMORUSA_RESOURCE_ID, 120000),
       facilities: {
         ...baseState.facilities,
@@ -472,7 +516,7 @@ describe("game state and effects", () => {
         oldBroadcastRoom: { level: 1 },
         undergroundPlaza: { level: 4 }
       }
-    };
+    }, ["asagiriYui", "hibikiTooko", "hinataKoharu"]);
     const plazaBlockedState = {
       ...plazaState,
       facilities: {
@@ -498,7 +542,7 @@ describe("game state and effects", () => {
 
   it("unlocks the name record wall after the plaza and reveals name records", () => {
     const baseState = createInitialState();
-    const wallState = {
+    const wallState = withJoinedIdols({
       ...baseState,
       facilities: {
         ...baseState.facilities,
@@ -512,7 +556,7 @@ describe("game state and effects", () => {
         undergroundPlaza: { level: 4 },
         nameRecordWall: { level: 3 }
       }
-    };
+    }, ["asagiriYui", "hinataKoharu"]);
 
     expect(isFacilityUnlocked(wallState, "nameRecordWall")).toBe(true);
     expect(isRecordUnlocked(wallState, "nameRecordWallOpeningLog")).toBe(true);
@@ -571,7 +615,7 @@ describe("game state and effects", () => {
 
   it("unlocks the passage repair area and Sakurako before entering the meguri system", () => {
     const baseState = createInitialState();
-    const repairState = {
+    const repairState = withJoinedIdols({
       ...addResource(baseState, TOMORUSA_RESOURCE_ID, 200000),
       facilities: {
         ...baseState.facilities,
@@ -582,7 +626,7 @@ describe("game state and effects", () => {
         ...baseState.songs,
         chapelHarmony: { purchased: true }
       }
-    };
+    }, ["mizukiShino", "tsuginohataSakurako"]);
 
     expect(isFacilityUnlocked(repairState, "undergroundPassageRepair")).toBe(true);
     expect(isIdolUnlocked(repairState, "tsuginohataSakurako")).toBe(true);
@@ -858,9 +902,36 @@ describe("save normalization", () => {
     for (const idolId of IDOL_ORDER) {
       expect(result.state.idols[idolId]).toEqual({
         bond: 0,
-        eventIdsRead: []
+        eventIdsRead: [],
+        joined: idolId === "otowaAkari"
       });
     }
+  });
+
+  it("marks idols that were already unlocked in older saves as joined", () => {
+    setupLocalStorage({
+      [SAVE_KEY]: JSON.stringify({
+        saveVersion: 10,
+        resources: { tomorusa: 100 },
+        activeIdolId: "asagiriYui",
+        facilities: {
+          alleyStage: { level: 10 },
+          neonBoard: { level: 5 }
+        },
+        idols: {
+          otowaAkari: { bond: 0, eventIdsRead: [] },
+          asagiriYui: { bond: 3, eventIdsRead: [] }
+        },
+        lastSavedAt: 1000
+      })
+    });
+
+    const result = loadGame(1000);
+
+    expect(result.state.saveVersion).toBe(SAVE_VERSION);
+    expect(result.state.activeIdolId).toBe("asagiriYui");
+    expect(result.state.idols.otowaAkari.joined).toBe(true);
+    expect(result.state.idols.asagiriYui.joined).toBe(true);
   });
 
   it("normalizes invalid idol save data without crashing", () => {
@@ -888,23 +959,28 @@ describe("save normalization", () => {
 
     expect(result.state.idols.otowaAkari).toEqual({
       bond: 0,
-      eventIdsRead: []
+      eventIdsRead: [],
+      joined: true
     });
     expect(result.state.idols.asagiriYui).toEqual({
       bond: 2.8,
-      eventIdsRead: ["intro", "notice"]
+      eventIdsRead: ["intro", "notice"],
+      joined: false
     });
     expect(result.state.idols.mizukiShino).toEqual({
       bond: 0,
-      eventIdsRead: []
+      eventIdsRead: [],
+      joined: false
     });
     expect(result.state.idols.hibikiTooko).toEqual({
       bond: 0,
-      eventIdsRead: []
+      eventIdsRead: [],
+      joined: false
     });
     expect(result.state.idols.kaminoMeguri).toEqual({
       bond: 0,
-      eventIdsRead: []
+      eventIdsRead: [],
+      joined: false
     });
   });
 
@@ -918,9 +994,9 @@ describe("save normalization", () => {
           alleyStage: { level: 10 }
         },
         idols: {
-          otowaAkari: { bond: 0, eventIdsRead: [] },
-          asagiriYui: { bond: 0, eventIdsRead: [] },
-          mizukiShino: { bond: 0, eventIdsRead: [] }
+          otowaAkari: { bond: 0, eventIdsRead: [], joined: true },
+          asagiriYui: { bond: 0, eventIdsRead: [], joined: false },
+          mizukiShino: { bond: 0, eventIdsRead: [], joined: false }
         },
         songs: {},
         records: {},
@@ -967,4 +1043,22 @@ function setupLocalStorage(entries: Record<string, string>): void {
       }
     }
   });
+}
+
+function withJoinedIdols<T extends ReturnType<typeof createInitialState>>(state: T, idolIds: IdolId[]): T {
+  const joinedIdols = idolIds.reduce((idols, idolId) => ({
+    ...idols,
+    [idolId]: {
+      ...state.idols[idolId],
+      joined: true
+    }
+  }), {} as Partial<Record<IdolId, T["idols"][IdolId]>>);
+
+  return {
+    ...state,
+    idols: {
+      ...state.idols,
+      ...joinedIdols
+    }
+  };
 }

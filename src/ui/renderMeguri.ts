@@ -1,15 +1,20 @@
 import {
   MEGURI_BUFF_ORDER,
   MEGURI_BUFFS,
-  MeguriBuffId
+  MeguriBuffId,
+  RECORD_ORDER,
+  RECORDS,
+  RecordId
 } from "../definitions";
-import { RESOURCE_LABELS, UI_TEXT } from "../data";
+import { createMeguriNextFragmentMessage, RESOURCE_LABELS, UI_TEXT } from "../data";
 import {
   canSpendResource,
   GameState,
   getMeguriFacilityProductionMultiplier,
   getMeguriSettlementPreview,
   getResourceAmount,
+  isRecordAnnotationRead,
+  isRecordAnnotationUnlocked,
   isMeguriAvailable,
   isMeguriBuffPurchased,
   MEMORY_FRAGMENT_RESOURCE_ID
@@ -17,6 +22,10 @@ import {
 import { formatRate, formatWholeAmount } from "./format";
 
 export function renderMeguriPanel(state: GameState): string {
+  if (state.meguri.pendingSettlement) {
+    return renderMeguriSettlementPanel(state);
+  }
+
   const preview = getMeguriSettlementPreview(state);
   const isAvailable = isMeguriAvailable(state);
   const memoryFragments = getResourceAmount(state, MEMORY_FRAGMENT_RESOURCE_ID);
@@ -45,10 +54,15 @@ export function renderMeguriPanel(state: GameState): string {
             <dd data-meguri-preview>${formatWholeAmount(preview.memoryFragmentsAwarded)} / 累計 ${formatWholeAmount(preview.totalEligibleMemoryFragments)}</dd>
           </div>
           <div>
+            <dt>${UI_TEXT.meguriNextFragmentLabel}</dt>
+            <dd data-meguri-next-fragment>${formatWholeAmount(preview.nextMemoryFragmentTotalTomorusa)} 灯るさ</dd>
+          </div>
+          <div>
             <dt>${UI_TEXT.productionMultiplierLabel}</dt>
             <dd>${formatRate(getMeguriFacilityProductionMultiplier(state))}x</dd>
           </div>
         </dl>
+        ${renderMemoryFragmentProgress(preview.memoryFragmentProgressRatio, preview.tomorusaUntilNextMemoryFragment)}
         <div class="meguri-reset-copy">
           <div>
             <strong>${UI_TEXT.meguriCarryOverLabel}</strong>
@@ -81,6 +95,118 @@ export function renderMeguriPanel(state: GameState): string {
         </div>
       </article>
     </section>
+  `;
+}
+
+function renderMeguriSettlementPanel(state: GameState): string {
+  const preview = getMeguriSettlementPreview(state);
+  const memoryFragments = getResourceAmount(state, MEMORY_FRAGMENT_RESOURCE_ID);
+
+  return `
+    <section class="meguri-panel meguri-settlement-panel">
+      <article class="card meguri-settlement-card">
+        <div class="meguri-heading">
+          <span class="card-kicker">${UI_TEXT.meguriSettledLabel}</span>
+          <span class="meguri-state open">${UI_TEXT.meguriSettlementOpenLabel}</span>
+        </div>
+        <h2>${UI_TEXT.meguriSettlementTitle}</h2>
+        <p>${UI_TEXT.meguriSettlementText}</p>
+        <dl class="stats-list">
+          <div>
+            <dt>${UI_TEXT.meguriCountLabel}</dt>
+            <dd>第${state.meguri.count}廻</dd>
+          </div>
+          <div>
+            <dt>${RESOURCE_LABELS.memoryFragment}</dt>
+            <dd data-meguri-memory-fragments>${formatWholeAmount(memoryFragments)}</dd>
+          </div>
+          <div>
+            <dt>${UI_TEXT.meguriNextFragmentLabel}</dt>
+            <dd data-meguri-next-fragment>${formatWholeAmount(preview.nextMemoryFragmentTotalTomorusa)} 灯るさ</dd>
+          </div>
+        </dl>
+        ${renderMemoryFragmentProgress(preview.memoryFragmentProgressRatio, preview.tomorusaUntilNextMemoryFragment)}
+        ${renderMeguriSettlementRecordNotes(state)}
+        <div class="meguri-settlement-actions">
+          <button
+            class="primary-action"
+            type="button"
+            data-meguri-action="closeSettlement"
+          >
+            ${UI_TEXT.meguriSettlementCloseButtonLabel}
+          </button>
+        </div>
+      </article>
+
+      <article class="card meguri-buff-card">
+        <div class="meguri-heading">
+          <span class="card-kicker">${UI_TEXT.meguriBuffListLabel}</span>
+          <span class="meguri-state open">${UI_TEXT.meguriBuffAvailableLabel}</span>
+        </div>
+        <div class="meguri-buff-list">
+          ${MEGURI_BUFF_ORDER.map((buffId) => renderMeguriBuff(state, buffId)).join("")}
+        </div>
+      </article>
+    </section>
+  `;
+}
+
+function renderMeguriSettlementRecordNotes(state: GameState): string {
+  const recordIds = getUnreadAnnotationRecordIds(state);
+
+  if (recordIds.length <= 0) {
+    return "";
+  }
+
+  return `
+        <div class="meguri-settlement-records">
+          <div>
+            <span class="card-kicker">${UI_TEXT.meguriSettlementRecordNotesLabel}</span>
+            <p>${UI_TEXT.meguriSettlementRecordNotesText}</p>
+          </div>
+          <div class="meguri-settlement-record-list">
+            ${recordIds.map((recordId) => renderMeguriSettlementRecordNote(recordId)).join("")}
+          </div>
+          <button
+            class="secondary-action"
+            type="button"
+            data-meguri-action="openRecords"
+          >
+            ${UI_TEXT.meguriSettlementOpenRecordsButtonLabel}
+          </button>
+        </div>
+  `;
+}
+
+function renderMeguriSettlementRecordNote(recordId: RecordId): string {
+  const record = RECORDS[recordId];
+
+  return `
+            <div class="meguri-settlement-record-note">
+              <span>${record.category}</span>
+              <strong>${record.title}</strong>
+            </div>
+  `;
+}
+
+function getUnreadAnnotationRecordIds(state: GameState): RecordId[] {
+  return RECORD_ORDER.filter((recordId) => isRecordAnnotationUnlocked(state, recordId) && !isRecordAnnotationRead(state, recordId));
+}
+
+function renderMemoryFragmentProgress(progressRatio: number, tomorusaUntilNext: number): string {
+  const progressPercent = Math.round(Math.max(0, Math.min(1, progressRatio)) * 100);
+
+  return `
+        <div class="meguri-fragment-progress">
+          <div class="meguri-progress-label">
+            <span>${UI_TEXT.meguriNextFragmentLabel}</span>
+            <strong>${progressPercent}%</strong>
+          </div>
+          <div class="meguri-progress-track" aria-hidden="true">
+            <span style="width: ${progressPercent}%"></span>
+          </div>
+          <p data-meguri-next-fragment-copy>${createMeguriNextFragmentMessage(formatWholeAmount(tomorusaUntilNext))}</p>
+        </div>
   `;
 }
 

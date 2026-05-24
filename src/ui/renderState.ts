@@ -15,12 +15,14 @@ import type { ActiveTabId, UiElements } from "./types";
 
 export function renderState(elements: UiElements, state: GameState, activeTabId: ActiveTabId): void {
   const resolvedActiveIdolId = resolveActiveIdolId(state);
+  const effectiveActiveTabId = state.meguri.pendingSettlement ? "meguri" : activeTabId;
 
-  renderTabs(elements, state, activeTabId);
+  elements.root.classList.toggle("settlement-active", state.meguri.pendingSettlement);
+  renderTabs(elements, state, effectiveActiveTabId);
   renderLiveValues(elements, state);
   elements.idolList.innerHTML = renderIdolCards(state, resolvedActiveIdolId);
-  elements.contentList.className = getContentListClassName(activeTabId);
-  elements.contentList.innerHTML = renderActiveTabContent(state, activeTabId);
+  elements.contentList.className = getContentListClassName(effectiveActiveTabId);
+  elements.contentList.innerHTML = renderActiveTabContent(state, effectiveActiveTabId);
 }
 
 export function setMessage(elements: UiElements, message: string): void {

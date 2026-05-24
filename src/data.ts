@@ -19,6 +19,10 @@ export const UI_TEXT = {
   detailButtonLabel: "詳細を見る",
   focusIdolButtonLabel: "注目にする",
   focusedIdolLabel: "注目中",
+  joinIdolButtonLabel: "声をかける",
+  joinableIdolLabel: "声をかけられる",
+  joinedIdolLabel: "合流済み",
+  unjoinedIdolEffectLabel: "声をかけると効果が加わります。",
   idolRosterLabel: "アイドル切替",
   lockedIdolLabel: "未解放",
   idolUnlockRequirementLabel: "解放条件",
@@ -80,12 +84,19 @@ export const UI_TEXT = {
   meguriSettledLabel: "廻後清算",
   meguriCountLabel: "廻回数",
   meguriPreviewLabel: "獲得見込み",
+  meguriNextFragmentLabel: "次の記憶断片",
   meguriCarryOverLabel: "引き継ぐもの",
   meguriResetLabel: "リセットされるもの",
   meguriCarryOverText: "記録、既読状態、記憶断片、廻後バフ、廻回数、以前の廻の痕跡。",
   meguriResetText: "灯るさ、施設レベル、歌、アイテム、交流、通常進行の表示状態。",
   meguriPerformButtonLabel: "廻を実行",
   meguriPerformLockedLabel: "再固定中枢 Lv1 で実行可能",
+  meguriSettlementTitle: "廻後清算中",
+  meguriSettlementText: "ここで記憶断片を使って、次の廻へ持ち越す支えを選べます。通常進行へ戻ると、追加取得は次の廻後清算まで保留になります。",
+  meguriSettlementCloseButtonLabel: "通常進行へ戻る",
+  meguriSettlementOpenRecordsButtonLabel: "通常進行へ戻って記録を見る",
+  meguriSettlementRecordNotesLabel: "追記が増えた記録",
+  meguriSettlementRecordNotesText: "清算中に変化が見えた記録だけを控えています。",
   meguriSettlementOpenLabel: "清算中",
   meguriSettlementClosedLabel: "通常進行中",
   meguriBuffListLabel: "廻後バフ",
@@ -96,10 +107,16 @@ export const UI_TEXT = {
   meguriUnavailableLog: "再固定中枢を1段階復旧すると、廻を選べるようになります。",
   meguriConfirmText: "廻を実行します。灯るさ、施設、歌、アイテム、交流はリセットされ、記録と記憶断片は残ります。よろしいですか？",
   meguriPerformedLog: "廻を実行しました。復興の痕跡が記憶断片として清算されます。",
+  meguriSettlementClosedLog: "清算を終えました。通常進行へ戻ります。",
+  meguriSettlementOpenRecordsLog: "清算を終えました。追記のある記録を確認できます。",
+  meguriSettlementBlockedLog: "清算中です。通常進行へ戻ると、廻後バフの追加取得は次の廻までできません。",
   meguriBuffPurchasedLog: "記憶断片を使って、廻後バフを取得しました。",
   meguriBuffNotInSettlementLog: "廻後バフを取得できるのは、廻直後の清算中だけです。",
   notEnoughMemoryFragmentsLog: "記憶断片がまだ足りません。",
   alreadyPurchasedMeguriBuffLog: "この廻後バフは取得済みです。",
+  idolJoinedLog: "アイドルに声をかけました。",
+  idolJoinLockedLog: "まだ声をかけられる状態ではありません。",
+  idolAlreadyJoinedLog: "すでに合流しています。",
   idolRecognitionTraceLabel: "以前の廻の痕跡",
   idolRecognitionTraceText: "名前を呼ばれた感触だけが、かすかに残っている。",
   autoSavedLog: "オートセーブしました。"
@@ -130,8 +147,16 @@ export function createMeguriPerformedMessage(memoryFragments: string): string {
   return `${UI_TEXT.meguriPerformedLog} +${memoryFragments} 記憶断片`;
 }
 
+export function createMeguriNextFragmentMessage(tomorusa: string): string {
+  return `あと ${tomorusa} 灯るさで +1 記憶断片`;
+}
+
 export function createMeguriBuffPurchaseMessage(buffName: string, cost: string): string {
   return `${UI_TEXT.meguriBuffPurchasedLog} ${buffName} -${cost} 記憶断片`;
+}
+
+export function createIdolJoinMessage(idolName: string, passiveDescription: string): string {
+  return `${idolName}に声をかけました。${passiveDescription} が加わります。`;
 }
 
 function getGivenName(fullName: string): string {
