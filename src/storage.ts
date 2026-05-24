@@ -1,9 +1,29 @@
-import { FACILITY_ORDER, FacilityId, IDOL_ORDER, ITEM_ORDER, ItemId, IdolId, IDOLS, RECORD_ORDER, RecordId, ResourceId, SONG_ORDER, SongId } from "./definitions";
+import {
+  FACILITIES,
+  FACILITY_ORDER,
+  FacilityId,
+  IDOL_ORDER,
+  ITEM_ORDER,
+  ITEMS,
+  ItemId,
+  IdolId,
+  IDOLS,
+  MEGURI_BUFF_ORDER,
+  MeguriBuffId,
+  RECORD_ORDER,
+  RecordId,
+  ResourceId,
+  SONG_ORDER,
+  SONGS,
+  SongId
+} from "./definitions";
 import {
   addResource,
   createInitialFacilities,
   createInitialIdols,
   createInitialItems,
+  createInitialMeguri,
+  createInitialMeguriBuffs,
   createInitialRecords,
   createInitialResources,
   createInitialSongs,
@@ -15,6 +35,9 @@ import {
   getOfflineTomorusa,
   INITIAL_ACTIVE_IDOL_ID,
   isIdolUnlocked,
+  MEMORY_FRAGMENT_RESOURCE_ID,
+  MeguriState,
+  MeguriBuffState,
   RecordState,
   resolveActiveIdolId,
   SAVE_VERSION,
@@ -36,6 +59,7 @@ type RawSaveData = {
   applause?: unknown;
   lights?: unknown;
   resources?: unknown;
+  totalTomorusaEarned?: unknown;
   activeIdolId?: unknown;
   recordTabLastSeenContentVersion?: unknown;
   alleyStageLevel?: unknown;
@@ -44,6 +68,7 @@ type RawSaveData = {
   songs?: unknown;
   records?: unknown;
   items?: unknown;
+  meguri?: unknown;
   lastSavedAt?: unknown;
 };
 
@@ -108,6 +133,7 @@ function parseSave(rawSave: string, now: number): GameState | null {
       saveVersion === 6 ||
       saveVersion === 7 ||
       saveVersion === 8 ||
+      saveVersion === 9 ||
       saveVersion === SAVE_VERSION ||
       saveVersion === null
     ) {
@@ -121,18 +147,45 @@ function parseSave(rawSave: string, now: number): GameState | null {
 }
 
 function parseLatestSave(data: RawSaveData, now: number): GameState | null {
-  const { applause, lights, resources, activeIdolId, recordTabLastSeenContentVersion, facilities, idols, items, songs, records, lastSavedAt } = data;
+  const {
+    applause,
+    lights,
+    resources,
+    totalTomorusaEarned,
+    activeIdolId,
+    recordTabLastSeenContentVersion,
+    facilities,
+    idols,
+    items,
+    songs,
+    records,
+    meguri,
+    lastSavedAt
+  } = data;
+  const normalizedResources = normalizeResources(resources, lights ?? applause);
+  const normalizedFacilities = normalizeFacilities(facilities, data.alleyStageLevel);
+  const normalizedItems = normalizeItems(items);
+  const normalizedSongs = normalizeSongs(songs);
+  const normalizedMeguri = normalizeMeguri(meguri);
 
   const state: GameState = {
     saveVersion: SAVE_VERSION,
-    resources: normalizeResources(resources, lights ?? applause),
+    resources: normalizedResources,
+    totalTomorusaEarned: normalizeTotalTomorusaEarned(
+      totalTomorusaEarned,
+      normalizedResources,
+      normalizedFacilities,
+      normalizedItems,
+      normalizedSongs
+    ),
     activeIdolId: getSavedActiveIdolId(activeIdolId),
     recordTabLastSeenContentVersion: normalizeRecordTabLastSeenContentVersion(recordTabLastSeenContentVersion),
-    facilities: normalizeFacilities(facilities, data.alleyStageLevel),
+    facilities: normalizedFacilities,
     idols: normalizeIdols(idols),
-    items: normalizeItems(items),
-    songs: normalizeSongs(songs),
+    items: normalizedItems,
+    songs: normalizedSongs,
     records: normalizeRecords(records),
+    meguri: normalizedMeguri,
     lastSavedAt: normalizeSavedAt(lastSavedAt, now)
   };
 
@@ -145,7 +198,8 @@ function parseLatestSave(data: RawSaveData, now: number): GameState | null {
 function normalizeResources(resources: unknown, fallbackTomorusa: unknown): Record<ResourceId, number> {
   return {
     ...createInitialResources(),
-    [TOMORUSA_RESOURCE_ID]: getSavedResourceAmount(resources, TOMORUSA_RESOURCE_ID, fallbackTomorusa)
+    [TOMORUSA_RESOURCE_ID]: getSavedResourceAmount(resources, TOMORUSA_RESOURCE_ID, fallbackTomorusa),
+    [MEMORY_FRAGMENT_RESOURCE_ID]: getSavedResourceAmount(resources, MEMORY_FRAGMENT_RESOURCE_ID, 0)
   };
 }
 
@@ -218,10 +272,55 @@ function normalizeRecords(records: unknown): Record<RecordId, RecordState> {
     (normalizedRecords, recordId) => ({
       ...normalizedRecords,
       [recordId]: {
-        read: getSavedRecordRead(records, recordId)
+        unlocked: getSavedRecordUnlocked(records, recordId),
+        read: getSavedRecordRead(records, recordId),
+        annotationRead: getSavedRecordAnnotationRead(records, recordId)
       }
     }),
     createInitialRecords()
+  );
+}
+
+function normalizeMeguri(meguri: unknown): MeguriState {
+  if (!isRecord(meguri)) {
+    return createInitialMeguri();
+  }
+  const savedMeguri = meguri as {
+    count?: unknown;
+    totalMemoryFragmentsEarned?: unknown;
+    buffs?: unknown;
+    idolRecognition?: unknown;
+    pendingSettlement?: unknown;
+  };
+
+  return {
+    count: normalizeLevel(savedMeguri.count),
+    totalMemoryFragmentsEarned: normalizeLevel(savedMeguri.totalMemoryFragmentsEarned),
+    buffs: normalizeMeguriBuffs(savedMeguri.buffs),
+    idolRecognition: normalizeIdolRecognition(savedMeguri.idolRecognition),
+    pendingSettlement: savedMeguri.pendingSettlement === true
+  };
+}
+
+function normalizeMeguriBuffs(buffs: unknown): Record<MeguriBuffId, MeguriBuffState> {
+  return MEGURI_BUFF_ORDER.reduce(
+    (normalizedBuffs, buffId) => ({
+      ...normalizedBuffs,
+      [buffId]: {
+        purchased: getSavedMeguriBuffPurchased(buffs, buffId)
+      }
+    }),
+    createInitialMeguriBuffs()
+  );
+}
+
+function normalizeIdolRecognition(idolRecognition: unknown): Record<IdolId, boolean> {
+  return IDOL_ORDER.reduce(
+    (normalizedRecognition, idolId) => ({
+      ...normalizedRecognition,
+      [idolId]: getSavedIdolRecognition(idolRecognition, idolId)
+    }),
+    createInitialMeguri().idolRecognition
   );
 }
 
@@ -258,6 +357,26 @@ function getSavedRecordRead(records: unknown, recordId: RecordId): boolean {
   return record?.read === true;
 }
 
+function getSavedRecordUnlocked(records: unknown, recordId: RecordId): boolean {
+  if (!isRecord(records)) {
+    return false;
+  }
+
+  const record = (records as Partial<Record<RecordId, { annotationRead?: unknown; read?: unknown; unlocked?: unknown }>>)[recordId];
+
+  return record?.unlocked === true || record?.read === true || record?.annotationRead === true;
+}
+
+function getSavedRecordAnnotationRead(records: unknown, recordId: RecordId): boolean {
+  if (!isRecord(records)) {
+    return false;
+  }
+
+  const record = (records as Partial<Record<RecordId, { annotationRead?: unknown }>>)[recordId];
+
+  return record?.annotationRead === true;
+}
+
 function getSavedItemPurchased(items: unknown, itemId: ItemId): boolean {
   if (!isRecord(items)) {
     return false;
@@ -276,6 +395,24 @@ function getSavedSongPurchased(songs: unknown, songId: SongId): boolean {
   const song = (songs as Partial<Record<SongId, { purchased?: unknown }>>)[songId];
 
   return song?.purchased === true;
+}
+
+function getSavedMeguriBuffPurchased(buffs: unknown, buffId: MeguriBuffId): boolean {
+  if (!isRecord(buffs)) {
+    return false;
+  }
+
+  const buff = (buffs as Partial<Record<MeguriBuffId, { purchased?: unknown }>>)[buffId];
+
+  return buff?.purchased === true;
+}
+
+function getSavedIdolRecognition(idolRecognition: unknown, idolId: IdolId): boolean {
+  if (!isRecord(idolRecognition)) {
+    return false;
+  }
+
+  return (idolRecognition as Partial<Record<IdolId, unknown>>)[idolId] === true;
 }
 
 function getSavedFacilityLevel(facilities: unknown, facilityId: FacilityId, fallbackAlleyStageLevel?: unknown): number {
@@ -316,6 +453,67 @@ function normalizeAmount(amount: unknown): number {
   }
 
   return Math.max(0, amount);
+}
+
+function normalizeTotalTomorusaEarned(
+  amount: unknown,
+  resources: Record<ResourceId, number>,
+  facilities: Record<FacilityId, FacilityState>,
+  items: Record<ItemId, ItemState>,
+  songs: Record<SongId, SongState>
+): number {
+  const savedAmount = normalizeAmount(amount);
+  const estimatedAmount = estimateTotalTomorusaEarned(resources, facilities, items, songs);
+
+  return Math.max(savedAmount, estimatedAmount);
+}
+
+function estimateTotalTomorusaEarned(
+  resources: Record<ResourceId, number>,
+  facilities: Record<FacilityId, FacilityState>,
+  items: Record<ItemId, ItemState>,
+  songs: Record<SongId, SongState>
+): number {
+  return (
+    resources[TOMORUSA_RESOURCE_ID] +
+    estimateFacilityInvestment(facilities) +
+    estimatePurchasedItemCost(items) +
+    estimatePurchasedSongCost(songs)
+  );
+}
+
+function estimateFacilityInvestment(facilities: Record<FacilityId, FacilityState>): number {
+  return FACILITY_ORDER.reduce((total, facilityId) => {
+    const facility = FACILITIES[facilityId];
+    const level = facilities[facilityId]?.level ?? 0;
+
+    let costTotal = 0;
+    for (let currentLevel = 0; currentLevel < level; currentLevel += 1) {
+      costTotal += Math.floor(facility.baseCost * facility.costMultiplier ** currentLevel);
+    }
+
+    return total + costTotal;
+  }, 0);
+}
+
+function estimatePurchasedItemCost(items: Record<ItemId, ItemState>): number {
+  return ITEM_ORDER.reduce((total, itemId) => {
+    if (!items[itemId]?.purchased) {
+      return total;
+    }
+
+    return total + Math.max(1, Math.floor(ITEMS[itemId].cost * 0.9));
+  }, 0);
+}
+
+function estimatePurchasedSongCost(songs: Record<SongId, SongState>): number {
+  return SONG_ORDER.reduce((total, songId) => {
+    if (!songs[songId]?.purchased) {
+      return total;
+    }
+
+    return total + SONGS[songId].cost;
+  }, 0);
 }
 
 function normalizeLevel(level: unknown): number {

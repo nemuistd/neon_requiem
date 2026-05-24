@@ -1,6 +1,8 @@
 import {
   FACILITY_ORDER,
   ITEM_ORDER,
+  MEGURI_BUFF_ORDER,
+  MEGURI_BUFFS,
   SONG_ORDER,
 } from "../definitions";
 import {
@@ -10,25 +12,32 @@ import {
   getFacilityTomorusaPerSecond,
   getFacilityUpgradeCost,
   getItemCost,
+  getMeguriSettlementPreview,
   getResourceAmount,
   getSongCost,
   getTomorusaPerSecond,
   isFacilityUnlocked,
   isItemPurchased,
   isItemUnlocked,
+  isMeguriAvailable,
+  isMeguriBuffPurchased,
   isSongPurchased,
   isSongUnlocked,
+  MEMORY_FRAGMENT_RESOURCE_ID,
   TOMORUSA_RESOURCE_ID
 } from "../game";
-import { formatAmount, formatRate } from "./format";
+import { formatAmount, formatRate, formatWholeAmount } from "./format";
 import type { UiElements } from "./types";
 
 export function renderLiveValues(elements: UiElements, state: GameState): void {
   elements.lightsAmount.textContent = formatAmount(getResourceAmount(state, TOMORUSA_RESOURCE_ID));
+  elements.memoryFragmentsAmount.textContent = formatWholeAmount(getResourceAmount(state, MEMORY_FRAGMENT_RESOURCE_ID));
+  elements.memoryFragmentResource.hidden = state.meguri.count <= 0;
   elements.lightsPerSecond.textContent = `${formatRate(getTomorusaPerSecond(state))} / 秒`;
   updateFacilityLiveValues(elements, state);
   updateSongLiveValues(elements, state);
   updateItemLiveValues(elements, state);
+  updateMeguriLiveValues(elements, state);
 }
 
 export function updateFacilityLiveValues(elements: UiElements, state: GameState): void {
@@ -84,6 +93,36 @@ export function updateItemLiveValues(elements: UiElements, state: GameState): vo
 
     if (purchaseButton) {
       purchaseButton.disabled = !isItemUnlocked(state, itemId) || isItemPurchased(state, itemId) || !canSpendResource(state, TOMORUSA_RESOURCE_ID, cost);
+    }
+  });
+}
+
+export function updateMeguriLiveValues(elements: UiElements, state: GameState): void {
+  const performButton = elements.contentList.querySelector<HTMLButtonElement>("[data-meguri-action='perform']");
+  const memoryFragmentsElement = elements.contentList.querySelector<HTMLElement>("[data-meguri-memory-fragments]");
+  const previewElement = elements.contentList.querySelector<HTMLElement>("[data-meguri-preview]");
+
+  if (performButton) {
+    performButton.disabled = !isMeguriAvailable(state);
+  }
+
+  if (memoryFragmentsElement) {
+    memoryFragmentsElement.textContent = formatWholeAmount(getResourceAmount(state, MEMORY_FRAGMENT_RESOURCE_ID));
+  }
+
+  if (previewElement) {
+    const preview = getMeguriSettlementPreview(state);
+    previewElement.textContent = `${formatWholeAmount(preview.memoryFragmentsAwarded)} / 累計 ${formatWholeAmount(preview.totalEligibleMemoryFragments)}`;
+  }
+
+  MEGURI_BUFF_ORDER.forEach((buffId) => {
+    const button = elements.contentList.querySelector<HTMLButtonElement>(`[data-meguri-buff-id="${buffId}"]`);
+
+    if (button) {
+      button.disabled =
+        !state.meguri.pendingSettlement ||
+        isMeguriBuffPurchased(state, buffId) ||
+        !canSpendResource(state, MEMORY_FRAGMENT_RESOURCE_ID, MEGURI_BUFFS[buffId].cost);
     }
   });
 }

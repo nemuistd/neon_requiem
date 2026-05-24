@@ -84,3 +84,23 @@ export function getSongCostMultiplierFromEffects(effects: Effect[]): number {
     return multiplier * effect.multiplier;
   }, 1);
 }
+
+export function getMemoryFragmentMultiplierFromEffects(effects: Effect[]): number {
+  return effects.reduce((multiplier, effect) => {
+    if (effect.type !== "memory.fragment.production.add") {
+      return multiplier;
+    }
+
+    return multiplier + effect.ratio;
+  }, 1);
+}
+
+export function getRebirthBonusMultiplierFromEffects(effects: Effect[]): number {
+  return effects.reduce((multiplier, effect) => {
+    if (effect.type !== "rebirth.bonus.multiplier") {
+      return multiplier;
+    }
+
+    return multiplier * effect.multiplier;
+  }, 1);
+}

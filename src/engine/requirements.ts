@@ -3,6 +3,8 @@ export type Requirement =
   | { type: "song.purchased"; songId: string }
   | { type: "resource.amount"; resourceId: string; amount: number }
   | { type: "idol.bond"; idolId: string; amount: number }
+  | { type: "meguri.count"; count: number }
+  | { type: "meguri.buff.purchased"; buffId: string }
   | { type: "all"; requirements: Requirement[] }
   | { type: "any"; requirements: Requirement[] }
   | { type: "not"; requirement: Requirement };
@@ -12,6 +14,10 @@ export type RequirementState = {
   resources: Partial<Record<string, number>>;
   songs: Partial<Record<string, { purchased?: boolean }>>;
   idols?: Partial<Record<string, { bond?: number }>>;
+  meguri?: {
+    count?: number;
+    buffs?: Partial<Record<string, { purchased?: boolean }>>;
+  };
 };
 
 export function isRequirementMet(state: RequirementState, requirement?: Requirement): boolean {
@@ -33,6 +39,14 @@ export function isRequirementMet(state: RequirementState, requirement?: Requirem
 
   if (requirement.type === "idol.bond") {
     return (state.idols?.[requirement.idolId]?.bond ?? 0) >= requirement.amount;
+  }
+
+  if (requirement.type === "meguri.count") {
+    return (state.meguri?.count ?? 0) >= requirement.count;
+  }
+
+  if (requirement.type === "meguri.buff.purchased") {
+    return state.meguri?.buffs?.[requirement.buffId]?.purchased === true;
   }
 
   if (requirement.type === "all") {

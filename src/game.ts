@@ -8,6 +8,9 @@ import {
   IdolId,
   IDOL_ORDER,
   IDOLS,
+  MEGURI_BUFF_ORDER,
+  MEGURI_BUFFS,
+  MeguriBuffId,
   RECORD_CONTENT_VERSION,
   RECORD_ORDER,
   RecordId,
@@ -25,16 +28,21 @@ import {
   getItemCostMultiplierFromEffects,
   getManualGainBonus,
   getManualGainProductionRatio,
+  getMemoryFragmentMultiplierFromEffects,
   getOfflineRewardMultiplierFromEffects,
+  getRebirthBonusMultiplierFromEffects,
   getSongCostMultiplierFromEffects
 } from "./engine/effects";
 import { areRequirementsMet, isRequirementMet } from "./engine/requirements";
 
-export const SAVE_VERSION = 9;
+export const SAVE_VERSION = 10;
 export const INITIAL_ACTIVE_IDOL_ID: IdolId = "otowaAkari";
 export const MAX_OFFLINE_SECONDS = 12 * 60 * 60;
 export const BASE_OFFLINE_REWARD_RATE = 0.5;
 export const TOMORUSA_RESOURCE_ID: ResourceId = "tomorusa";
+export const MEMORY_FRAGMENT_RESOURCE_ID: ResourceId = "memoryFragment";
+export const MEGURI_MEMORY_FRAGMENT_TOMORUSA_SCALE = 20000;
+export const MEGURI_RECOGNITION_BOND_THRESHOLD = 20;
 
 export type FacilityState = {
   level: number;
@@ -49,7 +57,9 @@ export type ItemState = {
 };
 
 export type RecordState = {
+  unlocked: boolean;
   read: boolean;
+  annotationRead: boolean;
 };
 
 export type IdolState = {
@@ -57,9 +67,22 @@ export type IdolState = {
   eventIdsRead: string[];
 };
 
+export type MeguriBuffState = {
+  purchased: boolean;
+};
+
+export type MeguriState = {
+  count: number;
+  totalMemoryFragmentsEarned: number;
+  buffs: Record<MeguriBuffId, MeguriBuffState>;
+  idolRecognition: Record<IdolId, boolean>;
+  pendingSettlement: boolean;
+};
+
 export type GameState = {
   saveVersion: typeof SAVE_VERSION;
   resources: Record<ResourceId, number>;
+  totalTomorusaEarned: number;
   activeIdolId: IdolId;
   recordTabLastSeenContentVersion: number;
   facilities: Record<FacilityId, FacilityState>;
@@ -67,6 +90,7 @@ export type GameState = {
   items: Record<ItemId, ItemState>;
   songs: Record<SongId, SongState>;
   records: Record<RecordId, RecordState>;
+  meguri: MeguriState;
   lastSavedAt: number;
 };
 
@@ -82,6 +106,26 @@ export type PurchaseItemResult =
   | { purchased: true; cost: number; itemId: ItemId; state: GameState }
   | { purchased: false; cost: number; itemId: ItemId; state: GameState; reason: "locked" | "notEnoughLights" | "alreadyPurchased" };
 
+export type PurchaseMeguriBuffResult =
+  | { purchased: true; cost: number; buffId: MeguriBuffId; state: GameState }
+  | {
+      purchased: false;
+      cost: number;
+      buffId: MeguriBuffId;
+      state: GameState;
+      reason: "notInSettlement" | "notEnoughFragments" | "alreadyPurchased";
+    };
+
+export type MeguriSettlementPreview = {
+  totalEligibleMemoryFragments: number;
+  memoryFragmentsAwarded: number;
+  memoryFragmentMultiplier: number;
+};
+
+export type PerformMeguriResult =
+  | { performed: true; preview: MeguriSettlementPreview; state: GameState }
+  | { performed: false; preview: MeguriSettlementPreview; state: GameState; reason: "locked" };
+
 export type FacilityMultiplierEffect = {
   idolId: IdolId;
   multiplier: number;
@@ -91,6 +135,7 @@ export function createInitialState(now = Date.now()): GameState {
   return {
     saveVersion: SAVE_VERSION,
     resources: createInitialResources(),
+    totalTomorusaEarned: 0,
     activeIdolId: INITIAL_ACTIVE_IDOL_ID,
     recordTabLastSeenContentVersion: 0,
     facilities: createInitialFacilities(),
@@ -98,6 +143,7 @@ export function createInitialState(now = Date.now()): GameState {
     items: createInitialItems(),
     songs: createInitialSongs(),
     records: createInitialRecords(),
+    meguri: createInitialMeguri(),
     lastSavedAt: now
   };
 }
@@ -135,6 +181,36 @@ export function createInitialResources(): Record<ResourceId, number> {
   );
 }
 
+export function createInitialMeguri(): MeguriState {
+  return {
+    count: 0,
+    totalMemoryFragmentsEarned: 0,
+    buffs: createInitialMeguriBuffs(),
+    idolRecognition: createInitialIdolRecognition(),
+    pendingSettlement: false
+  };
+}
+
+export function createInitialMeguriBuffs(): Record<MeguriBuffId, MeguriBuffState> {
+  return MEGURI_BUFF_ORDER.reduce(
+    (buffs, buffId) => ({
+      ...buffs,
+      [buffId]: { purchased: false }
+    }),
+    {} as Record<MeguriBuffId, MeguriBuffState>
+  );
+}
+
+export function createInitialIdolRecognition(): Record<IdolId, boolean> {
+  return IDOL_ORDER.reduce(
+    (recognition, idolId) => ({
+      ...recognition,
+      [idolId]: false
+    }),
+    {} as Record<IdolId, boolean>
+  );
+}
+
 export function createInitialFacilities(): Record<FacilityId, FacilityState> {
   return FACILITY_ORDER.reduce(
     (facilities, facilityId) => ({
@@ -149,7 +225,7 @@ export function createInitialRecords(): Record<RecordId, RecordState> {
   return RECORD_ORDER.reduce(
     (records, recordId) => ({
       ...records,
-      [recordId]: { read: false }
+      [recordId]: { unlocked: false, read: false, annotationRead: false }
     }),
     {} as Record<RecordId, RecordState>
   );
@@ -180,6 +256,9 @@ export function addResource(state: GameState, resourceId: ResourceId, amount: nu
 
   return {
     ...state,
+    totalTomorusaEarned: resourceId === TOMORUSA_RESOURCE_ID
+      ? state.totalTomorusaEarned + amount
+      : state.totalTomorusaEarned,
     resources: {
       ...state.resources,
       [resourceId]: getResourceAmount(state, resourceId) + amount
@@ -221,8 +300,29 @@ export function isRecordRead(state: GameState, recordId: RecordId): boolean {
   return state.records[recordId]?.read ?? false;
 }
 
+export function isRecordAnnotationUnlocked(state: GameState, recordId: RecordId): boolean {
+  const record = RECORDS[recordId];
+
+  return Boolean(record.bodyAnnotation && isRecordUnlocked(state, recordId) && isRequirementMet(state, record.annotationRequirement));
+}
+
+export function isRecordAnnotationRead(state: GameState, recordId: RecordId): boolean {
+  return state.records[recordId]?.annotationRead ?? false;
+}
+
+export function hasUnreadRecordContent(state: GameState, recordId: RecordId): boolean {
+  return isRecordUnlocked(state, recordId) && (
+    !isRecordRead(state, recordId) ||
+    (isRecordAnnotationUnlocked(state, recordId) && !isRecordAnnotationRead(state, recordId))
+  );
+}
+
 export function getIdolBond(state: GameState, idolId: IdolId): number {
   return state.idols[idolId]?.bond ?? 0;
+}
+
+export function hasIdolRecognition(state: GameState, idolId: IdolId): boolean {
+  return state.meguri.idolRecognition[idolId] === true;
 }
 
 export function isFacilityUnlocked(state: GameState, facilityId: FacilityId): boolean {
@@ -268,7 +368,7 @@ export function isItemUnlocked(state: GameState, itemId: ItemId): boolean {
 }
 
 export function isRecordUnlocked(state: GameState, recordId: RecordId): boolean {
-  return areRequirementsMet(state, RECORDS[recordId].unlockRequirements);
+  return state.records[recordId]?.unlocked === true || areRequirementsMet(state, RECORDS[recordId].unlockRequirements);
 }
 
 export function getFacilityUpgradeCost(state: GameState, facilityId: FacilityId): number {
@@ -293,7 +393,7 @@ export function getFacilityBaseTomorusaPerSecond(state: GameState, facilityId: F
 export function getFacilityProductionMultiplier(state: GameState, facilityId?: FacilityId): number {
   const facilityTags = facilityId ? FACILITIES[facilityId].tags ?? [] : [];
 
-  return getFacilityProductionMultiplierFromEffects(getGameplayEffects(state), facilityTags);
+  return getFacilityProductionMultiplierFromEffects(getGameplayEffects(state), facilityTags) * getMeguriFacilityProductionMultiplier(state);
 }
 
 export function getFacilityMultiplierEffects(state: GameState, facilityId: FacilityId): FacilityMultiplierEffect[] {
@@ -358,8 +458,30 @@ export function getUnlockedIdolPassiveEffects(state: GameState): Effect[] {
 export function getGameplayEffects(state: GameState): Effect[] {
   return [
     ...getUnlockedIdolPassiveEffects(state),
-    ...getPurchasedContentEffects(state)
+    ...getPurchasedContentEffects(state),
+    ...getPurchasedMeguriBuffEffects(state)
   ];
+}
+
+export function getPurchasedMeguriBuffEffects(state: GameState): Effect[] {
+  return MEGURI_BUFF_ORDER.flatMap((buffId) => (isMeguriBuffPurchased(state, buffId) ? MEGURI_BUFFS[buffId].effects : []));
+}
+
+export function isMeguriBuffPurchased(state: GameState, buffId: MeguriBuffId): boolean {
+  return state.meguri.buffs[buffId]?.purchased ?? false;
+}
+
+export function getMeguriFacilityProductionMultiplier(state: GameState): number {
+  if (state.meguri.count <= 0) {
+    return 1;
+  }
+
+  const baseMultiplier = 1 + 0.05 * state.meguri.count;
+  return baseMultiplier * getRebirthBonusMultiplierFromEffects(getPurchasedMeguriBuffEffects(state));
+}
+
+export function getMemoryFragmentMultiplier(state: GameState): number {
+  return getMemoryFragmentMultiplierFromEffects(getPurchasedMeguriBuffEffects(state));
 }
 
 function getPurchasedSongEffects(state: GameState): Effect[] {
@@ -489,7 +611,9 @@ export function purchaseItem(state: GameState, itemId: ItemId): PurchaseItemResu
 }
 
 export function readRecord(state: GameState, recordId: RecordId): GameState {
-  if (!isRecordUnlocked(state, recordId) || isRecordRead(state, recordId)) {
+  const annotationUnlocked = isRecordAnnotationUnlocked(state, recordId);
+
+  if (!isRecordUnlocked(state, recordId) || (isRecordRead(state, recordId) && (!annotationUnlocked || isRecordAnnotationRead(state, recordId)))) {
     return state;
   }
 
@@ -498,7 +622,9 @@ export function readRecord(state: GameState, recordId: RecordId): GameState {
     records: {
       ...state.records,
       [recordId]: {
-        read: true
+        ...state.records[recordId],
+        read: true,
+        annotationRead: annotationUnlocked ? true : state.records[recordId]?.annotationRead ?? false
       }
     }
   };
@@ -527,6 +653,154 @@ export function upgradeFacility(state: GameState, facilityId: FacilityId): Upgra
         ...paidState.facilities,
         [facilityId]: {
           level: getFacilityLevel(state, facilityId) + 1
+        }
+      }
+    }
+  };
+}
+
+export function isMeguriTabUnlocked(state: GameState): boolean {
+  return state.meguri.count > 0 || isFacilityUnlocked(state, "restabilizationCore");
+}
+
+export function isMeguriAvailable(state: GameState): boolean {
+  return getFacilityLevel(state, "restabilizationCore") >= 1;
+}
+
+export function calculateMeguriMemoryFragmentSettlement(
+  totalTomorusaEarned: number,
+  totalMemoryFragmentsEarned: number,
+  memoryFragmentMultiplier: number
+): MeguriSettlementPreview {
+  const safeTotalTomorusaEarned = Math.max(0, totalTomorusaEarned);
+  const safeTotalMemoryFragmentsEarned = Math.max(0, Math.floor(totalMemoryFragmentsEarned));
+  const safeMultiplier = Number.isFinite(memoryFragmentMultiplier) && memoryFragmentMultiplier > 0 ? memoryFragmentMultiplier : 1;
+  const totalEligibleMemoryFragments = Math.max(
+    0,
+    Math.floor(Math.sqrt(safeTotalTomorusaEarned / MEGURI_MEMORY_FRAGMENT_TOMORUSA_SCALE) * safeMultiplier)
+  );
+
+  return {
+    totalEligibleMemoryFragments,
+    memoryFragmentsAwarded: Math.max(0, totalEligibleMemoryFragments - safeTotalMemoryFragmentsEarned),
+    memoryFragmentMultiplier: safeMultiplier
+  };
+}
+
+export function getMeguriSettlementPreview(state: GameState): MeguriSettlementPreview {
+  return calculateMeguriMemoryFragmentSettlement(
+    state.totalTomorusaEarned,
+    state.meguri.totalMemoryFragmentsEarned,
+    getMemoryFragmentMultiplier(state)
+  );
+}
+
+export function performMeguri(state: GameState): PerformMeguriResult {
+  const preview = getMeguriSettlementPreview(state);
+
+  if (!isMeguriAvailable(state)) {
+    return {
+      performed: false,
+      preview,
+      state,
+      reason: "locked"
+    };
+  }
+
+  const nextMemoryFragments = getResourceAmount(state, MEMORY_FRAGMENT_RESOURCE_ID) + preview.memoryFragmentsAwarded;
+
+  return {
+    performed: true,
+    preview,
+    state: {
+      ...state,
+      resources: {
+        ...createInitialResources(),
+        [MEMORY_FRAGMENT_RESOURCE_ID]: nextMemoryFragments
+      },
+      activeIdolId: INITIAL_ACTIVE_IDOL_ID,
+      recordTabLastSeenContentVersion: 0,
+      facilities: createInitialFacilities(),
+      idols: createInitialIdols(),
+      items: createInitialItems(),
+      songs: createInitialSongs(),
+      records: createMeguriRecords(state),
+      meguri: {
+        ...state.meguri,
+        count: state.meguri.count + 1,
+        totalMemoryFragmentsEarned: state.meguri.totalMemoryFragmentsEarned + preview.memoryFragmentsAwarded,
+        idolRecognition: createMeguriRecognition(state),
+        pendingSettlement: true
+      }
+    }
+  };
+}
+
+export function createMeguriRecords(state: GameState): Record<RecordId, RecordState> {
+  return RECORD_ORDER.reduce(
+    (records, recordId) => ({
+      ...records,
+      [recordId]: {
+        ...state.records[recordId],
+        unlocked: isRecordUnlocked(state, recordId)
+      }
+    }),
+    createInitialRecords()
+  );
+}
+
+export function createMeguriRecognition(state: GameState): Record<IdolId, boolean> {
+  return IDOL_ORDER.reduce(
+    (recognition, idolId) => ({
+      ...recognition,
+      [idolId]: state.meguri.idolRecognition[idolId] === true || getIdolBond(state, idolId) >= MEGURI_RECOGNITION_BOND_THRESHOLD
+    }),
+    createInitialIdolRecognition()
+  );
+}
+
+export function closeMeguriSettlement(state: GameState): GameState {
+  if (!state.meguri.pendingSettlement) {
+    return state;
+  }
+
+  return {
+    ...state,
+    meguri: {
+      ...state.meguri,
+      pendingSettlement: false
+    }
+  };
+}
+
+export function purchaseMeguriBuff(state: GameState, buffId: MeguriBuffId): PurchaseMeguriBuffResult {
+  const cost = MEGURI_BUFFS[buffId].cost;
+
+  if (isMeguriBuffPurchased(state, buffId)) {
+    return { purchased: false, cost, buffId, state, reason: "alreadyPurchased" };
+  }
+
+  if (!state.meguri.pendingSettlement) {
+    return { purchased: false, cost, buffId, state, reason: "notInSettlement" };
+  }
+
+  if (!canSpendResource(state, MEMORY_FRAGMENT_RESOURCE_ID, cost)) {
+    return { purchased: false, cost, buffId, state, reason: "notEnoughFragments" };
+  }
+
+  const paidState = spendResource(state, MEMORY_FRAGMENT_RESOURCE_ID, cost);
+
+  return {
+    purchased: true,
+    cost,
+    buffId,
+    state: {
+      ...paidState,
+      meguri: {
+        ...paidState.meguri,
+        buffs: {
+          ...paidState.meguri.buffs,
+          [buffId]: { purchased: true }
         }
       }
     }

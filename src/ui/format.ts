@@ -6,6 +6,10 @@ export function formatAmount(value: number): string {
   return Math.floor(value).toLocaleString("ja-JP");
 }
 
+export function formatWholeAmount(value: number): string {
+  return Math.max(0, Math.floor(value)).toLocaleString("ja-JP");
+}
+
 export function formatRate(value: number): string {
   return value.toFixed(2);
 }

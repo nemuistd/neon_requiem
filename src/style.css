@@ -110,7 +110,7 @@ h2 {
 
 .resource-panel {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 10px;
 }
 
@@ -477,7 +477,7 @@ h2 {
 
 .tab-strip {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(86px, 1fr));
   border-bottom: 1px solid rgba(127, 233, 255, 0.22);
 }
 
@@ -574,7 +574,8 @@ h2 {
 .facility-grid,
 .song-grid,
 .idol-grid,
-.record-list {
+.record-list,
+.meguri-list {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
@@ -586,6 +587,10 @@ h2 {
 }
 
 .record-list {
+  grid-template-columns: 1fr;
+}
+
+.meguri-list {
   grid-template-columns: 1fr;
 }
 
@@ -827,6 +832,34 @@ h2 {
   font-size: 0.94rem;
 }
 
+.record-annotation {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 224, 115, 0.2);
+  border-radius: 8px;
+  color: #f3dca6;
+  background:
+    linear-gradient(180deg, rgba(255, 224, 115, 0.08), rgba(127, 233, 255, 0.04)),
+    rgba(12, 13, 24, 0.72);
+}
+
+.record-annotation span {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: #ffe073;
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.record-annotation p {
+  color: #dbc5ef;
+}
+
+.record-annotation.unread {
+  border-color: rgba(255, 224, 115, 0.42);
+  box-shadow: 0 0 18px rgba(255, 224, 115, 0.08);
+}
+
 .read-record-card {
   border-color: rgba(127, 233, 255, 0.28);
 }
@@ -1013,6 +1046,165 @@ h2 {
     linear-gradient(135deg, rgba(255, 224, 115, 0.14), rgba(8, 11, 22, 0.9));
 }
 
+.facility-visual-restabilizationCore {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent),
+    repeating-conic-gradient(from 20deg, rgba(255, 224, 115, 0.12) 0deg 14deg, transparent 14deg 32deg),
+    radial-gradient(circle at 50% 52%, rgba(255, 94, 216, 0.32), transparent 28%),
+    radial-gradient(circle at 50% 52%, rgba(127, 233, 255, 0.24), transparent 44%),
+    linear-gradient(135deg, rgba(255, 224, 115, 0.12), rgba(8, 11, 22, 0.92));
+}
+
+.recognition-trace {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-left: 2px solid rgba(255, 224, 115, 0.5);
+  color: #e8d4ff;
+  background: rgba(255, 224, 115, 0.07);
+}
+
+.recognition-trace span {
+  display: block;
+  margin-bottom: 4px;
+  color: #ffe073;
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.meguri-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 14px;
+}
+
+.meguri-status-card,
+.meguri-buff-card {
+  min-height: 320px;
+}
+
+.meguri-heading,
+.meguri-buff-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.meguri-state {
+  flex: none;
+  padding: 4px 10px;
+  border: 1px solid rgba(127, 233, 255, 0.26);
+  border-radius: 999px;
+  color: #8df4ff;
+  font-size: 0.76rem;
+  font-weight: 900;
+  white-space: nowrap;
+  background: rgba(12, 21, 34, 0.84);
+}
+
+.meguri-state.open {
+  color: #ffe073;
+  border-color: rgba(255, 224, 115, 0.34);
+  background: rgba(34, 24, 12, 0.84);
+}
+
+.meguri-reset-copy {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.meguri-reset-copy div {
+  padding: 10px 12px;
+  border: 1px solid rgba(127, 233, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(8, 11, 22, 0.42);
+}
+
+.meguri-reset-copy strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #ffe073;
+}
+
+.meguri-reset-copy p {
+  margin-bottom: 0;
+}
+
+.meguri-perform-action {
+  margin-top: 16px;
+}
+
+.meguri-buff-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.meguri-buff-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 132px;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid rgba(127, 233, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(8, 11, 22, 0.42);
+}
+
+.meguri-buff-row.purchased {
+  border-color: rgba(255, 224, 115, 0.32);
+}
+
+.meguri-buff-title strong {
+  color: #fff8ff;
+}
+
+.meguri-buff-title span {
+  color: #ffe073;
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.meguri-buff-row p {
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+}
+
+.meguri-buff-stats {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+}
+
+.meguri-buff-stats div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: #dcd0e7;
+  font-size: 0.86rem;
+}
+
+.meguri-buff-stats dt {
+  color: #bdaecb;
+}
+
+.meguri-buff-stats dd {
+  margin: 0;
+  font-weight: 800;
+  text-align: right;
+}
+
+.meguri-buff-action {
+  margin-top: 0;
+}
+
+.meguri-buff-action.purchased {
+  color: #100712;
+  border-color: rgba(255, 210, 115, 0.52);
+  background: linear-gradient(90deg, #ffdf73, #ffe9a7);
+}
+
 .stage-card .stats-list {
   margin-top: 0;
   gap: 6px;
@@ -1188,11 +1380,14 @@ h2 {
   .facility-grid,
   .song-grid,
   .idol-grid,
-  .record-list {
+  .record-list,
+  .meguri-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .record-list {
+  .record-list,
+  .meguri-list,
+  .meguri-panel {
     grid-template-columns: 1fr;
   }
 }
@@ -1212,6 +1407,8 @@ h2 {
   .song-grid,
   .idol-grid,
   .record-list,
+  .meguri-list,
+  .meguri-panel,
   .idol-main {
     grid-template-columns: 1fr;
   }
@@ -1243,5 +1440,9 @@ h2 {
   .tab-button {
     border-right: 0;
     border-bottom: 1px solid rgba(127, 233, 255, 0.14);
+  }
+
+  .meguri-buff-row {
+    grid-template-columns: 1fr;
   }
 }

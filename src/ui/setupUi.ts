@@ -20,6 +20,10 @@ export function setupUi(root: HTMLElement): UiElements {
             <span class="label">${RESOURCE_LABELS.tomorusa}</span>
             <strong id="lights-amount">0</strong>
           </div>
+          <div id="memory-fragment-resource" class="resource-item memory-fragment-resource" hidden>
+            <span class="label">${RESOURCE_LABELS.memoryFragment}</span>
+            <strong id="memory-fragments-amount">0</strong>
+          </div>
           <div class="resource-item">
             <span class="label">${UI_TEXT.perSecondLabel}</span>
             <strong id="lights-per-second">0.00 / 秒</strong>
@@ -52,6 +56,7 @@ export function setupUi(root: HTMLElement): UiElements {
             <button class="tab-button" type="button" data-tab-id="item">${UI_TEXT.itemTabLabel}</button>
             <button class="tab-button" type="button" data-tab-id="idol">${UI_TEXT.idolTabLabel}</button>
             <button class="tab-button" type="button" data-tab-id="record">${UI_TEXT.recordTabLabel}</button>
+            <button class="tab-button" type="button" data-tab-id="meguri" hidden>${UI_TEXT.meguriTabLabel}</button>
           </nav>
           <div id="content-list" class="facility-grid"></div>
         </section>
@@ -84,6 +89,8 @@ export function setupUi(root: HTMLElement): UiElements {
   return {
     root,
     lightsAmount: getElement(root, "lights-amount"),
+    memoryFragmentsAmount: getElement(root, "memory-fragments-amount"),
+    memoryFragmentResource: getElement(root, "memory-fragment-resource"),
     lightsPerSecond: getElement(root, "lights-per-second"),
     liveButton: getElement(root, "live-button", HTMLButtonElement),
     settingsButton: getElement(root, "settings-button", HTMLButtonElement),

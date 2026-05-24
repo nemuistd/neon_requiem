@@ -5,6 +5,8 @@ import {
   IDOLS,
   ITEM_ORDER,
   ITEMS,
+  MEGURI_BUFF_ORDER,
+  MEGURI_BUFFS,
   RECORD_ORDER,
   RECORDS,
   RESOURCE_ORDER,
@@ -28,12 +30,14 @@ export function validateContentDefinitions(): string[] {
     ...validateCollection("idol", IDOLS, IDOL_ORDER),
     ...validateCollection("facility", FACILITIES, FACILITY_ORDER),
     ...validateCollection("item", ITEMS, ITEM_ORDER),
+    ...validateCollection("meguri buff", MEGURI_BUFFS, MEGURI_BUFF_ORDER),
     ...validateCollection("resource", RESOURCES, RESOURCE_ORDER),
     ...validateCollection("song", SONGS, SONG_ORDER),
     ...validateCollection("record", RECORDS, RECORD_ORDER),
     ...validateIdols(),
     ...validateFacilities(),
     ...validateItems(),
+    ...validateMeguriBuffs(),
     ...validateSongs(),
     ...validateRecords(),
     ...validateNormalUiTerms(),
@@ -63,6 +67,35 @@ function validateItems(): string[] {
     });
 
     errors.push(...validateRequirement(`item "${itemId}"`, item.unlockRequirement));
+
+    return errors;
+  });
+}
+
+function validateMeguriBuffs(): string[] {
+  return MEGURI_BUFF_ORDER.flatMap((buffId) => {
+    const buff = MEGURI_BUFFS[buffId];
+    const errors: string[] = [];
+
+    if (!isPositiveFiniteNumber(buff.cost)) {
+      errors.push(`meguri buff "${buffId}": cost must be positive.`);
+    }
+
+    if (!buff.description.trim()) {
+      errors.push(`meguri buff "${buffId}": description is empty.`);
+    }
+
+    if (!buff.effectDescription.trim()) {
+      errors.push(`meguri buff "${buffId}": effectDescription is empty.`);
+    }
+
+    if (buff.effects.length === 0) {
+      errors.push(`meguri buff "${buffId}": effects must not be empty.`);
+    }
+
+    buff.effects.forEach((effect) => {
+      errors.push(...validateEffect(`meguri buff "${buffId}"`, effect));
+    });
 
     return errors;
   });
@@ -218,6 +251,18 @@ function validateRecords(): string[] {
       errors.push(...validateRequirement(`record "${recordId}"`, requirement));
     });
 
+    if (record.bodyAnnotation !== undefined && !record.bodyAnnotation.trim()) {
+      errors.push(`record "${recordId}": bodyAnnotation is empty.`);
+    }
+
+    if (record.bodyAnnotation !== undefined && !record.annotationRequirement) {
+      errors.push(`record "${recordId}": bodyAnnotation requires annotationRequirement.`);
+    }
+
+    if (record.annotationRequirement) {
+      errors.push(...validateRequirement(`record "${recordId}" annotation`, record.annotationRequirement));
+    }
+
     return errors;
   });
 }
@@ -277,6 +322,28 @@ export function validateRequirement(label: string, requirement: Requirement): st
     }
 
     return errors;
+  }
+
+  if (requirement.type === "meguri.count") {
+    const errors: string[] = [];
+
+    if (!isNonNegativeFiniteNumber(requirement.count)) {
+      errors.push(`${label}: requirement meguri count must be non-negative.`);
+    }
+
+    if (!Number.isInteger(requirement.count)) {
+      errors.push(`${label}: requirement meguri count must be an integer.`);
+    }
+
+    return errors;
+  }
+
+  if (requirement.type === "meguri.buff.purchased") {
+    if (!Object.prototype.hasOwnProperty.call(MEGURI_BUFFS, requirement.buffId)) {
+      return [`${label}: requirement references missing meguri buff "${requirement.buffId}".`];
+    }
+
+    return [];
   }
 
   if (requirement.type === "all" || requirement.type === "any") {
@@ -433,7 +500,10 @@ function validateReachability(): string[] {
     const record = RECORDS[recordId];
     const isReachable = record.unlockRequirements.every((requirement) => (
       isRequirementPotentiallyReachable(requirement, reachableFacilities, reachableSongs, reachableResources)
-    ));
+    )) && (
+      !record.annotationRequirement ||
+      isRequirementPotentiallyReachable(record.annotationRequirement, reachableFacilities, reachableSongs, reachableResources)
+    );
 
     if (!isReachable) {
       errors.push(`record "${recordId}": unlock requirement is unreachable.`);
@@ -523,6 +593,14 @@ function isRequirementPotentiallyReachable(
 
   if (requirement.type === "idol.bond") {
     return Object.prototype.hasOwnProperty.call(IDOLS, requirement.idolId) && isPositiveFiniteNumber(requirement.amount);
+  }
+
+  if (requirement.type === "meguri.count") {
+    return isNonNegativeFiniteNumber(requirement.count) && Number.isInteger(requirement.count);
+  }
+
+  if (requirement.type === "meguri.buff.purchased") {
+    return Object.prototype.hasOwnProperty.call(MEGURI_BUFFS, requirement.buffId);
   }
 
   if (requirement.type === "all") {

@@ -7,6 +7,7 @@ import { renderLiveValues } from "./liveValues";
 import { renderFacilityCards } from "./renderFacilities";
 import { renderIdolCards, renderIdolTabCards } from "./renderIdols";
 import { renderItemCards } from "./renderItems";
+import { renderMeguriPanel } from "./renderMeguri";
 import { renderRecordCards } from "./renderRecords";
 import { renderSongCards } from "./renderSongs";
 import { renderTabs } from "./renderTabs";
@@ -45,6 +46,10 @@ export function getContentListClassName(activeTabId: ActiveTabId): string {
     return "record-list";
   }
 
+  if (activeTabId === "meguri") {
+    return "meguri-list";
+  }
+
   return "facility-grid";
 }
 
@@ -63,6 +68,10 @@ export function renderActiveTabContent(state: GameState, activeTabId: ActiveTabI
 
   if (activeTabId === "record") {
     return renderRecordCards(state);
+  }
+
+  if (activeTabId === "meguri") {
+    return renderMeguriPanel(state);
   }
 
   return renderFacilityCards(state);

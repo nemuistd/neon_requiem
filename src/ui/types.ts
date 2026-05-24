@@ -1,8 +1,10 @@
-export type ActiveTabId = "restoration" | "song" | "item" | "idol" | "record";
+export type ActiveTabId = "restoration" | "song" | "item" | "idol" | "record" | "meguri";
 
 export type UiElements = {
   root: HTMLElement;
   lightsAmount: HTMLElement;
+  memoryFragmentsAmount: HTMLElement;
+  memoryFragmentResource: HTMLElement;
   lightsPerSecond: HTMLElement;
   liveButton: HTMLButtonElement;
   settingsButton: HTMLButtonElement;

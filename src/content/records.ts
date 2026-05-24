@@ -1,7 +1,7 @@
 import { ContentId, defineContent, toContentMap, toContentOrder } from "./defineContent.js";
 import { RecordDefinition } from "./types.js";
 
-export const RECORD_CONTENT_VERSION = 10;
+export const RECORD_CONTENT_VERSION = 11;
 
 export const RECORD_DEFINITIONS = defineContent([
   {
@@ -37,6 +37,12 @@ export const RECORD_DEFINITIONS = defineContent([
     revealLevel: "uncanny",
     body:
       "路地裏ステージの盛り上がりに合わせて、周辺の灯りが明確に増加していると人々が噂している。観客の数は少ないが、同じ名前を繰り返し呼ぶ声が人々に強くこの場所を印象付けるのだろうか。",
+    bodyAnnotation:
+      "同じ反応が、別の日付の記録にも残っている。筆跡は違うが、観測の言い回しだけが妙に似ている。",
+    annotationRequirement: {
+      type: "meguri.buff.purchased",
+      buffId: "footstepResonance"
+    },
     introducedAtVersion: RECORD_CONTENT_VERSION,
     unlockRequirements: [
       {
@@ -164,6 +170,12 @@ export const RECORD_DEFINITIONS = defineContent([
     revealLevel: "uncanny",
     body:
       "古い路線図を確認した。現在の通路と照合すると、三か所の区画が記載されているが現状では確認できない。複数の住民への聞き込みでも、あそこには行けない、霞が濃くて近づけない、という回答が多い。路線図が正確だった時期はあったはずだ。",
+    bodyAnnotation:
+      "未確認区画のひとつは、廻の後に入口付近の古い案内板として輪郭だけ現れる。文字はまだ読めない。",
+    annotationRequirement: {
+      type: "meguri.buff.purchased",
+      buffId: "leftWorkMemo"
+    },
     introducedAtVersion: RECORD_CONTENT_VERSION,
     unlockRequirements: [
       {
@@ -244,6 +256,12 @@ export const RECORD_DEFINITIONS = defineContent([
     revealLevel: "uncanny",
     body:
       "巡が整理中に出所不明の文書を一束まとめた。紙の劣化から相当古いが、字体は統一されていない。複数の人間が別々の時期に書いたもの、または一人の人間が長期間にわたって書いたものと思われる。巡は、どこにも置けないものを、どこかに置くための棚を作った、とだけ言った。",
+    bodyAnnotation:
+      "巡の追記。束の中に、バインダーの筆跡と似た文書が一冊だけある。著者不明として保管を続ける。",
+    annotationRequirement: {
+      type: "meguri.buff.purchased",
+      buffId: "rememberedCallsign"
+    },
     introducedAtVersion: RECORD_CONTENT_VERSION,
     unlockRequirements: [
       {
@@ -477,6 +495,12 @@ export const RECORD_DEFINITIONS = defineContent([
     revealLevel: "uncanny",
     body:
       "バインダーの一番後ろに、封をされたままの書類が一枚あった。表書きには「地下礼拝堂の復旧が終わるまで開封しないこと」とある。礼拝堂がここまで戻った。封を切ってみた。文字のほとんどが、霞で白く潰れている。読めるのは書き出しの数文字だけだった。「これを、廻——」そこから先は読めない。封書を閉じた。読めない部分を、無理に読もうとはしなかった。霞がそれを覆っているのは、まだその時ではないからだという気がした。",
+    bodyAnnotation:
+      "廻を重ねるごとに、霞で白く潰れていた行がわずかに戻る。今読めるのは、次へ進むための手順の端だけだ。",
+    annotationRequirement: {
+      type: "meguri.buff.purchased",
+      buffId: "fragmentIndex"
+    },
     introducedAtVersion: RECORD_CONTENT_VERSION,
     unlockRequirements: [
       {

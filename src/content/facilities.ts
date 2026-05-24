@@ -172,6 +172,30 @@ export const FACILITY_DEFINITIONS = defineContent([
         }
       ]
     }
+  },
+  {
+    id: "restabilizationCore",
+    name: "再固定中枢",
+    description:
+      "復興した街の状態を一時的に固定し、次の廻へ持ち越せる痕跡へ圧縮するための中枢。稼働そのものは通常施設に近いが、廻を選ぶ瞬間にだけ本来の意味を持つ。",
+    tags: ["infra"],
+    baseCost: 100000,
+    costMultiplier: 1.3,
+    productionPerLevel: 25,
+    unlockRequirement: {
+      type: "all",
+      requirements: [
+        {
+          type: "facility.level",
+          facilityId: "undergroundPassageRepair",
+          level: 5
+        },
+        {
+          type: "song.purchased",
+          songId: "restorationHumming"
+        }
+      ]
+    }
   }
 ] as const satisfies readonly FacilityDefinition[]);
 

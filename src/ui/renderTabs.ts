@@ -6,9 +6,10 @@ import {
 } from "../definitions";
 import {
   GameState,
+  hasUnreadRecordContent,
   isItemPurchased,
   isItemUnlocked,
-  isRecordRead,
+  isMeguriTabUnlocked,
   isRecordUnlocked,
   isSongPurchased,
   isSongUnlocked
@@ -34,6 +35,7 @@ export function renderTabs(elements: UiElements, state: GameState, activeTabId: 
   const itemButton = elements.root.querySelector<HTMLButtonElement>('[data-tab-id="item"]');
   const recordUnreadCount = getUnreadRecordNotificationCount(state, activeTabId);
   const recordButton = elements.root.querySelector<HTMLButtonElement>('[data-tab-id="record"]');
+  const meguriButton = elements.root.querySelector<HTMLButtonElement>('[data-tab-id="meguri"]');
 
   if (songButton) {
     if (activeTabId === "song" || songUnlockCount <= 0) {
@@ -57,6 +59,10 @@ export function renderTabs(elements: UiElements, state: GameState, activeTabId: 
     } else {
       recordButton.dataset.recordUnreadCount = String(recordUnreadCount);
     }
+  }
+
+  if (meguriButton) {
+    meguriButton.hidden = !isMeguriTabUnlocked(state);
   }
 }
 
@@ -87,7 +93,7 @@ function getUnreadRecordNotificationCount(state: GameState, activeTabId: ActiveT
 
   return RECORD_ORDER.reduce((count, recordId) => {
     const record = RECORDS[recordId];
-    const isUnread = isRecordUnlocked(state, recordId) && !isRecordRead(state, recordId);
+    const isUnread = isRecordUnlocked(state, recordId) && hasUnreadRecordContent(state, recordId);
     const isNewSinceLastView = record.introducedAtVersion > state.recordTabLastSeenContentVersion;
 
     return count + (isUnread && isNewSinceLastView ? 1 : 0);

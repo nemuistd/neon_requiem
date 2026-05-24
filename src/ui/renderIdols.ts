@@ -8,6 +8,7 @@ import { UI_TEXT } from "../data";
 import {
   GameState,
   getIdolBond,
+  hasIdolRecognition,
   isIdolUnlocked,
   resolveActiveIdolId
 } from "../game";
@@ -30,6 +31,7 @@ export function renderIdolCards(state: GameState, activeIdolId: IdolId): string 
             <p class="reading">${idol.reading}</p>
             <p class="title-line">${idol.title}</p>
             <p>${idol.description}</p>
+            ${renderRecognitionTrace(state, activeIdolId)}
           </div>
 
           <dl class="idol-details">
@@ -150,6 +152,7 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
           <p class="reading">${idol.reading}</p>
           <p class="title-line">${idol.title}</p>
           <p>${idol.description}</p>
+          ${renderRecognitionTrace(state, idolId)}
           <dl class="stats-list">
             ${isUnlocked
               ? `
@@ -178,6 +181,19 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
         </div>
       </div>
     </article>
+  `;
+}
+
+function renderRecognitionTrace(state: GameState, idolId: IdolId): string {
+  if (!hasIdolRecognition(state, idolId)) {
+    return "";
+  }
+
+  return `
+            <p class="recognition-trace">
+              <span>${UI_TEXT.idolRecognitionTraceLabel}</span>
+              ${UI_TEXT.idolRecognitionTraceText}
+            </p>
   `;
 }
 

@@ -27,9 +27,12 @@ export const UI_TEXT = {
   itemTabLabel: "アイテム",
   idolTabLabel: "アイドル",
   recordTabLabel: "記録",
+  meguriTabLabel: "廻",
   recordCategoryLabel: "種別",
   unreadRecordLabel: "未読",
   readRecordLabel: "既読",
+  recordAnnotationLabel: "追記",
+  unreadRecordAnnotationLabel: "追記あり",
   lockedRecordLabel: "未解放の記録",
   readRecordButtonLabel: "読む",
   versionLabel: "バージョン",
@@ -73,11 +76,38 @@ export const UI_TEXT = {
   lockedItemLog: "まだこのアイテムは解放されていません。",
   alreadyPurchasedItemLog: "このアイテムは購入済みです。",
   recordReadLog: "記録を確認しました。",
+  meguriReadyLabel: "再固定準備",
+  meguriSettledLabel: "廻後清算",
+  meguriCountLabel: "廻回数",
+  meguriPreviewLabel: "獲得見込み",
+  meguriCarryOverLabel: "引き継ぐもの",
+  meguriResetLabel: "リセットされるもの",
+  meguriCarryOverText: "記録、既読状態、記憶断片、廻後バフ、廻回数、以前の廻の痕跡。",
+  meguriResetText: "灯るさ、施設レベル、歌、アイテム、交流、通常進行の表示状態。",
+  meguriPerformButtonLabel: "廻を実行",
+  meguriPerformLockedLabel: "再固定中枢 Lv1 で実行可能",
+  meguriSettlementOpenLabel: "清算中",
+  meguriSettlementClosedLabel: "通常進行中",
+  meguriBuffListLabel: "廻後バフ",
+  meguriBuffPurchasedLabel: "取得済み",
+  meguriBuffAvailableLabel: "清算中のみ取得可能",
+  meguriBuffLockedLabel: "次の廻後清算で取得可能",
+  meguriBuffPurchaseButtonLabel: "取得",
+  meguriUnavailableLog: "再固定中枢を1段階復旧すると、廻を選べるようになります。",
+  meguriConfirmText: "廻を実行します。灯るさ、施設、歌、アイテム、交流はリセットされ、記録と記憶断片は残ります。よろしいですか？",
+  meguriPerformedLog: "廻を実行しました。復興の痕跡が記憶断片として清算されます。",
+  meguriBuffPurchasedLog: "記憶断片を使って、廻後バフを取得しました。",
+  meguriBuffNotInSettlementLog: "廻後バフを取得できるのは、廻直後の清算中だけです。",
+  notEnoughMemoryFragmentsLog: "記憶断片がまだ足りません。",
+  alreadyPurchasedMeguriBuffLog: "この廻後バフは取得済みです。",
+  idolRecognitionTraceLabel: "以前の廻の痕跡",
+  idolRecognitionTraceText: "名前を呼ばれた感触だけが、かすかに残っている。",
   autoSavedLog: "オートセーブしました。"
 } as const;
 
 export const RESOURCE_LABELS = {
-  tomorusa: "灯るさ"
+  tomorusa: "灯るさ",
+  memoryFragment: "記憶断片"
 } as const;
 
 export function createOfflineRewardMessage(idolName: string, tomorusa: string): string {
@@ -94,6 +124,14 @@ export function createSongPurchaseMessage(songName: string, cost: string): strin
 
 export function createItemPurchaseMessage(itemName: string, cost: string): string {
   return `${itemName}を復興用の備品に加えました。-${cost} 灯るさ`;
+}
+
+export function createMeguriPerformedMessage(memoryFragments: string): string {
+  return `${UI_TEXT.meguriPerformedLog} +${memoryFragments} 記憶断片`;
+}
+
+export function createMeguriBuffPurchaseMessage(buffName: string, cost: string): string {
+  return `${UI_TEXT.meguriBuffPurchasedLog} ${buffName} -${cost} 記憶断片`;
 }
 
 function getGivenName(fullName: string): string {

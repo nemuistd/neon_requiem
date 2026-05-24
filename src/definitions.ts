@@ -2,6 +2,7 @@ export type {
   FacilityDefinition,
   ItemDefinition,
   IdolDefinition,
+  MeguriBuffDefinition,
   RecordDefinition,
   ResourceDefinition,
   SongDefinition,
@@ -15,6 +16,8 @@ export type { IdolId } from "./content/idols.js";
 export { IDOLS, IDOL_DEFINITIONS, IDOL_ORDER } from "./content/idols.js";
 export type { ItemId } from "./content/items.js";
 export { ITEMS, ITEM_DEFINITIONS, ITEM_ORDER } from "./content/items.js";
+export type { MeguriBuffId } from "./content/meguriBuffs.js";
+export { MEGURI_BUFFS, MEGURI_BUFF_DEFINITIONS, MEGURI_BUFF_ORDER } from "./content/meguriBuffs.js";
 export type { RecordId } from "./content/records.js";
 export { RECORD_CONTENT_VERSION, RECORD_DEFINITIONS, RECORDS, RECORD_ORDER } from "./content/records.js";
 export type { ResourceId } from "./content/resources.js";

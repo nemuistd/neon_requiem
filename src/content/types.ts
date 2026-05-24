@@ -9,6 +9,15 @@ export type ResourceDefinition = {
   description: string;
 };
 
+export type MeguriBuffDefinition = {
+  id: string;
+  name: string;
+  description: string;
+  cost: number;
+  effectDescription: string;
+  effects: Effect[];
+};
+
 export type IdolDefinition = {
   id: string;
   name: string;
@@ -60,6 +69,8 @@ export type RecordDefinition = {
   category: "復旧報告" | "観測記録" | "施設ログ" | "断片記憶" | "交流メモ";
   revealLevel: RevealLevel;
   body: string;
+  bodyAnnotation?: string;
+  annotationRequirement?: Requirement;
   introducedAtVersion: number;
   unlockRequirements: Requirement[];
 };

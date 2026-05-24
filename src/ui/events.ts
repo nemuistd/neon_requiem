@@ -5,6 +5,8 @@ import {
   IdolId,
   ITEMS,
   ItemId,
+  MEGURI_BUFFS,
+  MeguriBuffId,
   RECORDS,
   RecordId,
   SONGS,
@@ -97,6 +99,36 @@ export function getRecordIdFromEvent(event: Event): RecordId | null {
   return null;
 }
 
+export function getMeguriActionFromEvent(event: Event): "perform" | null {
+  const target = event.target;
+
+  if (!(target instanceof HTMLElement)) {
+    return null;
+  }
+
+  const button = target.closest<HTMLButtonElement>("[data-meguri-action]");
+  const action = button?.dataset.meguriAction;
+
+  return action === "perform" ? action : null;
+}
+
+export function getMeguriBuffIdFromEvent(event: Event): MeguriBuffId | null {
+  const target = event.target;
+
+  if (!(target instanceof HTMLElement)) {
+    return null;
+  }
+
+  const button = target.closest<HTMLButtonElement>("[data-meguri-buff-id]");
+  const buffId = button?.dataset.meguriBuffId;
+
+  if (isMeguriBuffId(buffId)) {
+    return buffId;
+  }
+
+  return null;
+}
+
 export function getTabIdFromEvent(event: Event): ActiveTabId | null {
   const target = event.target;
 
@@ -107,7 +139,7 @@ export function getTabIdFromEvent(event: Event): ActiveTabId | null {
   const button = target.closest<HTMLButtonElement>("[data-tab-id]");
   const tabId = button?.dataset.tabId;
 
-  if (tabId === "restoration" || tabId === "song" || tabId === "item" || tabId === "idol" || tabId === "record") {
+  if (tabId === "restoration" || tabId === "song" || tabId === "item" || tabId === "idol" || tabId === "record" || tabId === "meguri") {
     return tabId;
   }
 
@@ -132,4 +164,8 @@ function isItemId(value: string | undefined): value is ItemId {
 
 function isRecordId(value: string | undefined): value is RecordId {
   return typeof value === "string" && Object.prototype.hasOwnProperty.call(RECORDS, value);
+}
+
+function isMeguriBuffId(value: string | undefined): value is MeguriBuffId {
+  return typeof value === "string" && Object.prototype.hasOwnProperty.call(MEGURI_BUFFS, value);
 }

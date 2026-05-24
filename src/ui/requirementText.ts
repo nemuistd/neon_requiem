@@ -3,6 +3,7 @@ import {
   FacilityId,
   IDOLS,
   IdolId,
+  MEGURI_BUFFS,
   Requirement,
   SONGS,
   SongId
@@ -43,7 +44,7 @@ export function getUnlockRequirementTextFromRequirement(requirement: Requirement
   }
 
   if (requirement.type === "resource.amount") {
-    return `${formatAmount(requirement.amount)} ${RESOURCE_LABELS.tomorusa}`;
+    return `${formatAmount(requirement.amount)} ${RESOURCE_LABELS[requirement.resourceId as keyof typeof RESOURCE_LABELS] ?? "不明な資源"}`;
   }
 
   if (requirement.type === "idol.bond") {
@@ -64,6 +65,18 @@ export function getUnlockRequirementTextFromRequirement(requirement: Requirement
 
   if (requirement.type === "not") {
     return `${getUnlockRequirementTextFromRequirement(requirement.requirement)} 未達成`;
+  }
+
+  if (requirement.type === "meguri.count") {
+    return `廻 ${requirement.count}回以上`;
+  }
+
+  if (requirement.type === "meguri.buff.purchased") {
+    if (!Object.prototype.hasOwnProperty.call(MEGURI_BUFFS, requirement.buffId)) {
+      return "不明な廻後バフ";
+    }
+
+    return `${MEGURI_BUFFS[requirement.buffId as keyof typeof MEGURI_BUFFS].name} 取得`;
   }
 
   if (!isFacilityId(requirement.facilityId)) {

@@ -1,10 +1,10 @@
 import "./style.css";
-import { createFacilityUpgradeMessage, createItemPurchaseMessage, createOfflineRewardMessage, createSongPurchaseMessage, UI_TEXT } from "./data";
-import { FACILITIES, IDOLS, ITEMS, SONGS } from "./definitions";
-import { applyProduction, GameState, markRecordTabSeen, performManualLive, purchaseItem, purchaseSong, readRecord, resolveActiveIdolId, SAVE_VERSION, selectActiveIdol, upgradeFacility } from "./game";
+import { createFacilityUpgradeMessage, createItemPurchaseMessage, createMeguriBuffPurchaseMessage, createMeguriPerformedMessage, createOfflineRewardMessage, createSongPurchaseMessage, UI_TEXT } from "./data";
+import { FACILITIES, IDOLS, ITEMS, MEGURI_BUFFS, SONGS } from "./definitions";
+import { applyProduction, closeMeguriSettlement, GameState, isMeguriTabUnlocked, markRecordTabSeen, performManualLive, performMeguri, purchaseItem, purchaseMeguriBuff, purchaseSong, readRecord, resolveActiveIdolId, SAVE_VERSION, selectActiveIdol, upgradeFacility } from "./game";
 import { loadGame, saveGame, SAVE_KEY } from "./storage";
-import { getFacilityIdFromEvent, getIdolIdFromEvent, getItemIdFromEvent, getRecordIdFromEvent, getSongIdFromEvent, getTabIdFromEvent } from "./ui/events";
-import { formatAmount } from "./ui/format";
+import { getFacilityIdFromEvent, getIdolIdFromEvent, getItemIdFromEvent, getMeguriActionFromEvent, getMeguriBuffIdFromEvent, getRecordIdFromEvent, getSongIdFromEvent, getTabIdFromEvent } from "./ui/events";
+import { formatAmount, formatWholeAmount } from "./ui/format";
 import { renderLiveValues } from "./ui/liveValues";
 import { renderState, setMessage } from "./ui/renderState";
 import { setupUi } from "./ui/setupUi";
@@ -15,6 +15,7 @@ const SAVE_INTERVAL_MS = 5000;
 declare global {
   interface Window {
     __NEON_DEBUG__: {
+      getState: () => GameState;
       resetSave: () => void;
       setSaveForTest: (save: unknown) => void;
     };
@@ -77,6 +78,7 @@ function renderSettings(): void {
 }
 
 window.__NEON_DEBUG__ = {
+  getState: () => state,
   resetSave: () => {
     resetSaveData();
   },
@@ -113,7 +115,7 @@ elements.settingsResetButton.addEventListener("click", () => {
 
 elements.liveButton.addEventListener("click", () => {
   advanceToNow();
-  state = performManualLive(state);
+  state = closeMeguriSettlement(performManualLive(state));
   state = saveGame(state);
   renderState(elements, state, activeTabId);
   setMessage(elements, UI_TEXT.liveSuccessLog);
@@ -128,6 +130,11 @@ elements.root.addEventListener("click", (event) => {
   const tabId = getTabIdFromEvent(event);
 
   if (tabId) {
+    if (tabId === "meguri" && !isMeguriTabUnlocked(state)) {
+      setMessage(elements, UI_TEXT.meguriUnavailableLog);
+      return;
+    }
+
     activeTabId = tabId;
 
     if (tabId === "record") {
@@ -166,7 +173,7 @@ elements.root.addEventListener("click", (event) => {
       return;
     }
 
-    state = saveGame(result.state);
+    state = saveGame(closeMeguriSettlement(result.state));
     renderState(elements, state, activeTabId);
     setMessage(elements, createItemPurchaseMessage(ITEMS[result.itemId].name, formatAmount(result.cost)));
     return;
@@ -190,7 +197,7 @@ elements.root.addEventListener("click", (event) => {
       return;
     }
 
-    state = saveGame(result.state);
+    state = saveGame(closeMeguriSettlement(result.state));
     renderState(elements, state, activeTabId);
     setMessage(elements, createSongPurchaseMessage(SONGS[result.songId].name, formatAmount(result.cost)));
     return;
@@ -203,6 +210,54 @@ elements.root.addEventListener("click", (event) => {
     state = saveGame(readRecord(state, recordId));
     renderState(elements, state, activeTabId);
     setMessage(elements, UI_TEXT.recordReadLog);
+    return;
+  }
+
+  const meguriAction = getMeguriActionFromEvent(event);
+
+  if (meguriAction === "perform") {
+    advanceToNow();
+    const result = performMeguri(state);
+
+    if (!result.performed) {
+      setMessage(elements, UI_TEXT.meguriUnavailableLog);
+      return;
+    }
+
+    const confirmed = window.confirm(UI_TEXT.meguriConfirmText);
+
+    if (!confirmed) {
+      return;
+    }
+
+    state = saveGame(result.state);
+    activeTabId = "meguri";
+    renderState(elements, state, activeTabId);
+    setMessage(elements, createMeguriPerformedMessage(formatWholeAmount(result.preview.memoryFragmentsAwarded)));
+    return;
+  }
+
+  const meguriBuffId = getMeguriBuffIdFromEvent(event);
+
+  if (meguriBuffId) {
+    advanceToNow();
+    const result = purchaseMeguriBuff(state, meguriBuffId);
+
+    if (!result.purchased) {
+      if (result.reason === "alreadyPurchased") {
+        setMessage(elements, UI_TEXT.alreadyPurchasedMeguriBuffLog);
+      } else if (result.reason === "notInSettlement") {
+        setMessage(elements, UI_TEXT.meguriBuffNotInSettlementLog);
+      } else {
+        setMessage(elements, UI_TEXT.notEnoughMemoryFragmentsLog);
+      }
+
+      return;
+    }
+
+    state = saveGame(result.state);
+    renderState(elements, state, activeTabId);
+    setMessage(elements, createMeguriBuffPurchaseMessage(MEGURI_BUFFS[result.buffId].name, formatWholeAmount(result.cost)));
     return;
   }
 
@@ -220,7 +275,7 @@ elements.root.addEventListener("click", (event) => {
     return;
   }
 
-  state = saveGame(result.state);
+  state = saveGame(closeMeguriSettlement(result.state));
   renderState(elements, state, activeTabId);
   setMessage(elements, createFacilityUpgradeMessage(FACILITIES[result.facilityId].name, formatAmount(result.cost)));
 });
