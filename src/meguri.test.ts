@@ -21,6 +21,7 @@ import { getMemoryFragmentMultiplierFromEffects, getRebirthBonusMultiplierFromEf
 import { isRequirementMet } from "./engine/requirements";
 import { validateRequirement } from "./contentValidation";
 import { UI_TEXT } from "./data";
+import { MEGURI_BUFFS, RECORDS } from "./definitions";
 import { renderMeguriPanel } from "./ui/renderMeguri";
 import { renderRecordCards } from "./ui/renderRecords";
 import { getUnreadRecordNotificationCount } from "./ui/renderTabs";
@@ -289,6 +290,59 @@ describe("meguri economy", () => {
     expect(html).toContain("data-meguri-dashboard-recognition>1</strong>");
     expect(html).toContain(UI_TEXT.meguriDashboardNextGoalReadAnnotations);
     expect(postMeguriState.meguri).not.toHaveProperty("dashboard");
+  });
+
+  it("shows a post-meguri annotation index without duplicating annotation body text", () => {
+    const preMeguriHtml = renderMeguriPanel(createMeguriReadyState(createInitialState()));
+    expect(preMeguriHtml).not.toContain('data-meguri-annotation-index="true"');
+
+    const initialState = createInitialState();
+    const unreadState = {
+      ...initialState,
+      records: {
+        ...initialState.records,
+        lightResponseObservation: {
+          unlocked: true,
+          read: true,
+          annotationRead: false
+        }
+      },
+      meguri: {
+        ...initialState.meguri,
+        count: 1,
+        buffs: {
+          ...initialState.meguri.buffs,
+          footstepResonance: {
+            purchased: true
+          }
+        }
+      }
+    };
+    const unreadHtml = renderMeguriPanel(unreadState);
+    const annotationBody = RECORDS.lightResponseObservation.bodyAnnotation ?? "";
+
+    expect(unreadHtml).toContain('data-meguri-annotation-index="true"');
+    expect(unreadHtml).toContain(UI_TEXT.meguriAnnotationIndexLabel);
+    expect(unreadHtml).toContain(RECORDS.lightResponseObservation.title);
+    expect(unreadHtml).toContain(MEGURI_BUFFS.footstepResonance.name);
+    expect(unreadHtml).toContain(UI_TEXT.meguriAnnotationIndexUnreadLabel);
+    expect(unreadHtml).toContain('data-meguri-action="openRecords"');
+    expect(annotationBody.length).toBeGreaterThan(0);
+    expect(unreadHtml).not.toContain(annotationBody);
+
+    const readHtml = renderMeguriPanel({
+      ...unreadState,
+      records: {
+        ...unreadState.records,
+        lightResponseObservation: {
+          unlocked: true,
+          read: true,
+          annotationRead: true
+        }
+      }
+    });
+    expect(readHtml).toContain(UI_TEXT.meguriAnnotationIndexReadLabel);
+    expect(readHtml).not.toContain(UI_TEXT.meguriAnnotationIndexUnreadLabel);
   });
 });
 

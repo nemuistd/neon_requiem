@@ -206,6 +206,8 @@ ceil((nextEligibleFragments / memoryFragmentMultiplier) ** 2 * 20000)
 
 初回廻後の通常進行中は、廻タブに小さな「廻後の見取り図」を表示する。ここでは、現在の廻回数、記憶断片、取得済み廻後バフ数、追記解放数、以前の廻の痕跡が残っているアイドル数、次の小さな目印を、既存の `meguri.count`, `resources.memoryFragment`, `meguri.buffs`, `records`, `idolRecognition` から集計して表示する。新しい保存フィールドは追加しない。
 
+初回廻後の通常進行中は、廻タブに「追記索引」も表示する。廻後バフで追記が解放された記録について、記録名、追記の既読 / 未読、関連する廻後バフ名を確認できる。追記本文は廻タブへ重複表示せず、記録タブで読む。関連バフ名は `annotationRequirement` の `meguri.buff.purchased` から逆引きするため、新しい保存フィールドや専用対応表は追加しない。
+
 初期廻後バフ:
 
 | id | 表示名 | cost | 効果 |

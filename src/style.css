@@ -1164,7 +1164,8 @@ h2 {
   min-height: 320px;
 }
 
-.meguri-dashboard-card {
+.meguri-dashboard-card,
+.meguri-annotation-index-card {
   grid-column: 1 / -1;
   min-height: auto;
 }
@@ -1273,6 +1274,76 @@ h2 {
 .meguri-dashboard-goal strong {
   min-width: 0;
   text-align: right;
+}
+
+.meguri-annotation-index-card.empty p {
+  margin: 12px 0 0;
+  color: #dcd0e7;
+}
+
+.meguri-annotation-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.meguri-annotation-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid rgba(127, 233, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(8, 11, 22, 0.42);
+}
+
+.meguri-annotation-row.unread {
+  border-color: rgba(255, 224, 115, 0.34);
+  background: rgba(34, 24, 12, 0.58);
+}
+
+.meguri-annotation-row div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.meguri-annotation-row span:not(.meguri-annotation-state) {
+  color: #bdaecb;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.meguri-annotation-row strong {
+  color: #fff8ff;
+  overflow-wrap: anywhere;
+}
+
+.meguri-annotation-row small {
+  color: #dcd0e7;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.meguri-annotation-state {
+  justify-self: end;
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 224, 115, 0.34);
+  border-radius: 999px;
+  color: #ffe073;
+  font-size: 0.76rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.meguri-annotation-row.read .meguri-annotation-state {
+  border-color: rgba(127, 233, 255, 0.2);
+  color: #bdaecb;
+}
+
+.meguri-annotation-open-records {
+  margin-top: 12px;
 }
 
 .meguri-fragment-progress {
@@ -1699,6 +1770,14 @@ h2 {
 
   .meguri-buff-row {
     grid-template-columns: 1fr;
+  }
+
+  .meguri-annotation-row {
+    grid-template-columns: 1fr;
+  }
+
+  .meguri-annotation-state {
+    justify-self: start;
   }
 
   .meguri-dashboard-grid {

@@ -6,7 +6,8 @@
 
 - 現在実装済み仕様は `docs/current_spec.md` を優先する。
 - 世界観正史は `docs/worldbuilding.md` と `docs/fiction/` を優先する。
-- このフォルダの文書は、未実装の将来候補や設計意図を扱う。実装済み仕様と食い違う場合は、現在仕様に合わせて読み替えるか、このフォルダを更新する。
+- `docs/fiction/` は、このフォルダの粗い将来設計より後に承認された物語・コンテンツ正史である。planning 側に古い候補扱い、仮名、未定扱い、章順のズレが残っている場合は、fiction を優先して planning を更新する。
+- このフォルダの文書は、未実装の将来候補や設計意図を扱う。実装済み仕様または fiction 正史と食い違う場合は、現在仕様・fiction に合わせて読み替えるか、このフォルダを更新する。
 - 実装直前のタスク化は `docs/product/40_task_backlog.md` で行う。
 
 ## 現役文書
@@ -14,7 +15,7 @@
 - `project_long_term_direction.md`: 長期方針。
 - `world_reveal_and_prestige_plan.md`: 世界観開示と廻の扱い。
 - `meguri_system_spec.md`: 廻本体の実装済み仕様と将来調整候補。
-- `chapter_progression_design.md`: 章進行と Ch.7 以降の候補。
+- `chapter_progression_design.md`: 章進行と Ch.7 以降の正史配置。
 - `facility_progression_strategy.md`: 施設カテゴリと進行配置。
 - `idol_roster_expansion_design.md`: アイドル拡張、加入、交流、効果方針。
 - `next_facility_candidates.md`: 廻前施設候補の履歴と、今後の施設検討時の参考。
@@ -22,4 +23,3 @@
 ## 履歴文書
 
 完了済みの実装計画や、現在の進行と食い違いやすい古い計画は `archive/` に移す。
-

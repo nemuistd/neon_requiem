@@ -39,6 +39,7 @@ export function renderMeguriPanel(state: GameState): string {
   return `
     <section class="meguri-panel">
       ${renderMeguriDashboard(state)}
+      ${renderMeguriAnnotationIndex(state)}
       <article class="card meguri-status-card">
         <div class="meguri-heading">
           <span class="card-kicker">${state.meguri.pendingSettlement ? UI_TEXT.meguriSettledLabel : UI_TEXT.meguriReadyLabel}</span>
@@ -149,6 +150,78 @@ function renderMeguriDashboard(state: GameState): string {
         </div>
       </article>
   `;
+}
+
+function renderMeguriAnnotationIndex(state: GameState): string {
+  if (state.meguri.count <= 0) {
+    return "";
+  }
+
+  const recordIds = getUnlockedAnnotationRecordIds(state);
+
+  if (recordIds.length <= 0) {
+    return `
+      <article class="card meguri-annotation-index-card empty" data-meguri-annotation-index="true">
+        <div class="meguri-heading">
+          <span class="card-kicker">${UI_TEXT.meguriAnnotationIndexLabel}</span>
+          <span class="meguri-state closed">${UI_TEXT.meguriAnnotationIndexEmptyLabel}</span>
+        </div>
+        <p>${UI_TEXT.meguriAnnotationIndexEmptyText}</p>
+      </article>
+    `;
+  }
+
+  return `
+      <article class="card meguri-annotation-index-card" data-meguri-annotation-index="true">
+        <div class="meguri-heading">
+          <span class="card-kicker">${UI_TEXT.meguriAnnotationIndexLabel}</span>
+          <span class="meguri-state closed">${recordIds.length}件</span>
+        </div>
+        <div class="meguri-annotation-list">
+          ${recordIds.map((recordId) => renderMeguriAnnotationIndexRow(state, recordId)).join("")}
+        </div>
+        <button
+          class="secondary-action meguri-annotation-open-records"
+          type="button"
+          data-meguri-action="openRecords"
+        >
+          ${UI_TEXT.meguriAnnotationIndexOpenRecordsButtonLabel}
+        </button>
+      </article>
+  `;
+}
+
+function renderMeguriAnnotationIndexRow(state: GameState, recordId: RecordId): string {
+  const record = RECORDS[recordId];
+  const isRead = isRecordAnnotationRead(state, recordId);
+  const statusLabel = isRead ? UI_TEXT.meguriAnnotationIndexReadLabel : UI_TEXT.meguriAnnotationIndexUnreadLabel;
+
+  return `
+          <div class="meguri-annotation-row ${isRead ? "read" : "unread"}">
+            <div>
+              <span>${record.category}</span>
+              <strong>${record.title}</strong>
+              <small>${UI_TEXT.meguriAnnotationIndexRelatedBuffLabel}: ${getRecordAnnotationBuffName(recordId)}</small>
+            </div>
+            <span class="meguri-annotation-state">${statusLabel}</span>
+          </div>
+  `;
+}
+
+function getRecordAnnotationBuffName(recordId: RecordId): string {
+  const requirement = RECORDS[recordId].annotationRequirement;
+
+  if (requirement?.type !== "meguri.buff.purchased") {
+    return UI_TEXT.meguriAnnotationIndexUnknownBuffLabel;
+  }
+
+  const buffId = requirement.buffId as MeguriBuffId;
+
+  if (!MEGURI_BUFF_ORDER.includes(buffId)) {
+    return UI_TEXT.meguriAnnotationIndexUnknownBuffLabel;
+  }
+
+  return MEGURI_BUFFS[buffId].name;
 }
 
 function renderMeguriSettlementPanel(state: GameState): string {
