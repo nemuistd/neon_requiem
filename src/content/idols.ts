@@ -48,6 +48,8 @@ export const IDOL_DEFINITIONS = defineContent([
     title: "仮設配信ブースの届け手",
     description:
       "どこまで届いているかを確認する方法はない。それでも遠子は今日も配信を続ける。声が届くかどうかより、続けることの方が仕事だからと言う。",
+    imageUrl: new URL("../../assets/idol/hibiki-tooko.png", import.meta.url).href,
+    imagePosition: "center top",
     passiveDescription: "ライブ1回の灯るさ獲得に、全施設合計の秒間灯るさ x0.05 を加算",
     passiveEffects: [
       {
@@ -90,6 +92,8 @@ export const IDOL_DEFINITIONS = defineContent([
     title: "記憶図書館の整理係",
     description:
       "名前がないと、どこにも置けない。巡はそう言いながら、著者不明の文書をひとつずつ棚に戻す。名前を与えることが彼女の仕事で、その手が止まる記録は一つだけある。",
+    imageUrl: new URL("../../assets/idol/kamino-meguri.png", import.meta.url).href,
+    imagePosition: "center top",
     passiveDescription: "全アイドルの交流増加量 x1.25",
     passiveEffects: [
       {
@@ -110,6 +114,8 @@ export const IDOL_DEFINITIONS = defineContent([
     title: "地下広場の呼び込み",
     description:
       "大声でよく笑い、会ったばかりの人の名前を必ず覚える。次に会った時には必ず呼ぶ。名前を呼ぶのは礼儀だから、と彼女は言う。それ以上の理由があるかどうか、本人は話さない。",
+    imageUrl: new URL("../../assets/idol/hinata-koharu.png", import.meta.url).href,
+    imagePosition: "center top",
     passiveDescription: "全灯るさ生産 x1.08 / アイテム購入コスト x0.90",
     passiveEffects: [
       {
@@ -134,6 +140,8 @@ export const IDOL_DEFINITIONS = defineContent([
     title: "地下通路の修復士",
     description:
       "壊れたのではなく、外されていたものがある。桜子はそう言って修理という言葉を使うのをやめた。何を復元しているのかを正確に知っているような手つきで、通路を一本ずつつなぎ直す。",
+    imageUrl: new URL("../../assets/idol/tsuginohata-sakurako.png", import.meta.url).href,
+    imagePosition: "center top",
     passiveDescription: "オフライン灯るさ報酬 x1.15",
     passiveEffects: [
       {
