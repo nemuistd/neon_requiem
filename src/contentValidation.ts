@@ -153,6 +153,10 @@ function validateIdolEvents(): string[] {
       errors.push(`idol event "${eventId}": revealLevel is invalid.`);
     }
 
+    if (event.eventKind !== undefined && event.eventKind !== "normal" && event.eventKind !== "twilightMemory") {
+      errors.push(`idol event "${eventId}": eventKind is invalid.`);
+    }
+
     if (event.revealLevel === "surface") {
       errors.push(...validateSurfaceRecordTerms(eventId, event.title));
       errors.push(...validateSurfaceRecordTerms(eventId, event.body));
@@ -378,6 +382,14 @@ export function validateRequirement(label: string, requirement: Requirement): st
     }
 
     return errors;
+  }
+
+  if (requirement.type === "meguri.idolRecognition") {
+    if (!Object.prototype.hasOwnProperty.call(IDOLS, requirement.idolId)) {
+      return [`${label}: requirement references missing idol "${requirement.idolId}".`];
+    }
+
+    return [];
   }
 
   if (requirement.type === "meguri.buff.purchased") {
@@ -645,6 +657,10 @@ function isRequirementPotentiallyReachable(
 
   if (requirement.type === "meguri.count") {
     return isNonNegativeFiniteNumber(requirement.count) && Number.isInteger(requirement.count);
+  }
+
+  if (requirement.type === "meguri.idolRecognition") {
+    return Object.prototype.hasOwnProperty.call(IDOLS, requirement.idolId);
   }
 
   if (requirement.type === "meguri.buff.purchased") {

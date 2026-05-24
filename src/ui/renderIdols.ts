@@ -4,26 +4,35 @@ import {
   IdolEventId,
   IDOL_ORDER,
   IDOLS,
-  IdolId
+  IdolId,
+  RECORD_ORDER,
+  RECORDS,
+  RecordId,
+  Requirement
 } from "../definitions";
 import type { IdolDefinition } from "../definitions";
 import { UI_TEXT } from "../data";
 import {
   GameState,
   getIdolBond,
+  hasUnreadRecordContent,
   hasIdolRecognition,
   isIdolEventRead,
   isIdolEventUnlocked,
   isIdolJoinable,
   isIdolJoined,
   isIdolUnlocked,
+  isRecordAnnotationRead,
+  isRecordAnnotationUnlocked,
+  isRecordRead,
+  isRecordUnlocked,
   resolveActiveIdolId
 } from "../game";
 import { isRelatedProgressVisible } from "./contentVisibility";
 import { formatBond } from "./format";
 import { getIdolUnlockRequirementText } from "./requirementText";
 
-export function renderIdolCards(state: GameState, activeIdolId: IdolId): string {
+export function renderIdolCards(state: GameState, activeIdolId: IdolId, isDetailOpen = false): string {
   const idol = IDOLS[activeIdolId];
 
   return `
@@ -52,9 +61,19 @@ export function renderIdolCards(state: GameState, activeIdolId: IdolId): string 
             </div>
           </dl>
 
-          <button class="detail-action" type="button" disabled>${UI_TEXT.detailButtonLabel}</button>
+          <button
+            class="detail-action"
+            type="button"
+            data-idol-detail-action="toggle"
+            aria-expanded="${isDetailOpen ? "true" : "false"}"
+            aria-controls="idol-detail-panel"
+          >
+            ${isDetailOpen ? UI_TEXT.closeDetailButtonLabel : UI_TEXT.detailButtonLabel}
+          </button>
         </div>
       </div>
+
+      ${isDetailOpen ? renderActiveIdolDetailPanel(state, activeIdolId) : ""}
 
       <section class="idol-roster" aria-label="${UI_TEXT.idolRosterLabel}">
         <span class="card-kicker">${UI_TEXT.idolRosterLabel}</span>
@@ -63,6 +82,41 @@ export function renderIdolCards(state: GameState, activeIdolId: IdolId): string 
         </div>
       </section>
     </article>
+  `;
+}
+
+function renderActiveIdolDetailPanel(state: GameState, idolId: IdolId): string {
+  const idol = IDOLS[idolId];
+  const eventIds = getUnlockedIdolEventIds(state, idolId);
+  const recordIds = getUnlockedIdolRecordIds(state, idolId);
+
+  return `
+      <section class="idol-detail-panel" id="idol-detail-panel" aria-label="${idol.name} ${UI_TEXT.idolDetailPanelLabel}">
+        <div class="idol-detail-panel-heading">
+          <span class="card-kicker">${UI_TEXT.idolDetailPanelLabel}</span>
+          <h3>${idol.name}</h3>
+        </div>
+        <div class="idol-detail-columns">
+          <section class="idol-detail-section" aria-label="${UI_TEXT.idolEventsLabel}">
+            <div class="idol-detail-section-heading">
+              <span>${UI_TEXT.idolEventsLabel}</span>
+              <strong>${eventIds.length}</strong>
+            </div>
+            ${eventIds.length > 0
+              ? eventIds.map((eventId) => renderIdolEventCard(state, eventId)).join("")
+              : `<p class="idol-detail-empty">${UI_TEXT.noIdolEventsLabel}</p>`}
+          </section>
+          <section class="idol-detail-section" aria-label="${UI_TEXT.idolRelatedRecordsLabel}">
+            <div class="idol-detail-section-heading">
+              <span>${UI_TEXT.idolRelatedRecordsLabel}</span>
+              <strong>${recordIds.length}</strong>
+            </div>
+            ${recordIds.length > 0
+              ? recordIds.map((recordId) => renderIdolRecordCard(state, recordId)).join("")
+              : `<p class="idol-detail-empty">${UI_TEXT.noIdolRecordsLabel}</p>`}
+          </section>
+        </div>
+      </section>
   `;
 }
 
@@ -84,8 +138,8 @@ function renderIdolSwitcher(state: GameState, activeIdolId: IdolId): string {
     <button
         class="idol-switch ${isActive ? "active" : ""} ${isJoined ? "unlocked" : isUnlocked ? "joinable" : "locked"}"
         type="button"
-        data-idol-id="${idolId}"
-        ${isJoined ? "" : "disabled"}
+        ${isJoined ? `data-idol-id="${idolId}"` : isUnlocked ? `data-idol-join-id="${idolId}"` : ""}
+        ${isJoined || isUnlocked ? "" : "disabled"}
         ${isActive ? 'aria-current="true"' : ""}
         aria-pressed="${isActive ? "true" : "false"}"
       >
@@ -198,11 +252,7 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
 }
 
 function renderIdolEventList(state: GameState, idolId: IdolId): string {
-  const eventIds = IDOL_EVENT_ORDER.filter((eventId) => {
-    const event = IDOL_EVENTS[eventId];
-
-    return event.idolId === idolId && isIdolEventUnlocked(state, eventId);
-  });
+  const eventIds = getUnlockedIdolEventIds(state, idolId);
 
   if (eventIds.length === 0) {
     return "";
@@ -216,14 +266,26 @@ function renderIdolEventList(state: GameState, idolId: IdolId): string {
   `;
 }
 
+function getUnlockedIdolEventIds(state: GameState, idolId: IdolId): IdolEventId[] {
+  return IDOL_EVENT_ORDER.filter((eventId) => {
+    const event = IDOL_EVENTS[eventId];
+
+    return event.idolId === idolId && isIdolEventUnlocked(state, eventId);
+  });
+}
+
 function renderIdolEventCard(state: GameState, eventId: IdolEventId): string {
   const event = IDOL_EVENTS[eventId];
+  const eventKind = event.eventKind ?? "normal";
   const isRead = isIdolEventRead(state, eventId);
 
   return `
-            <article class="idol-event-card ${isRead ? "read" : "unread"}">
+            <article class="idol-event-card ${isRead ? "read" : "unread"} ${eventKind}">
               <div class="idol-event-heading">
-                <h3>${event.title}</h3>
+                <div>
+                  <span class="card-kicker">${getIdolEventKindLabel(eventKind)}</span>
+                  <h3>${event.title}</h3>
+                </div>
                 <span class="idol-event-state">${isRead ? UI_TEXT.readIdolEventLabel : UI_TEXT.unreadIdolEventLabel}</span>
               </div>
               <p>${event.body}</p>
@@ -237,6 +299,74 @@ function renderIdolEventCard(state: GameState, eventId: IdolEventId): string {
               </button>
             </article>
   `;
+}
+
+function getIdolEventKindLabel(eventKind: "normal" | "twilightMemory"): string {
+  return eventKind === "twilightMemory" ? UI_TEXT.idolTwilightMemoryEventLabel : UI_TEXT.idolNormalEventLabel;
+}
+
+function renderIdolRecordCard(state: GameState, recordId: RecordId): string {
+  const record = RECORDS[recordId];
+  const hasUnread = hasUnreadRecordContent(state, recordId);
+  const isAnnotationUnlocked = isRecordAnnotationUnlocked(state, recordId);
+  const isAnnotationRead = isRecordAnnotationRead(state, recordId);
+  const stateLabel = hasUnread
+    ? isRecordRead(state, recordId)
+      ? UI_TEXT.unreadRecordAnnotationLabel
+      : UI_TEXT.unreadRecordLabel
+    : UI_TEXT.readRecordLabel;
+
+  return `
+            <article class="idol-record-card ${hasUnread ? "unread" : "read"}">
+              <div class="idol-event-heading">
+                <div>
+                  <span class="card-kicker">${record.category}</span>
+                  <h3>${record.title}</h3>
+                </div>
+                <span class="idol-event-state">${stateLabel}</span>
+              </div>
+              <p>${record.body}</p>
+              ${isAnnotationUnlocked
+                ? `
+              <aside class="record-annotation ${isAnnotationRead ? "read" : "unread"}">
+                <span>${UI_TEXT.recordAnnotationLabel}</span>
+                <p>${record.bodyAnnotation}</p>
+              </aside>`
+                : ""}
+              <button
+                class="secondary-action idol-event-action"
+                type="button"
+                data-record-id="${recordId}"
+                ${hasUnread ? "" : "disabled"}
+              >
+                ${hasUnread ? UI_TEXT.readRecordButtonLabel : UI_TEXT.readRecordLabel}
+              </button>
+            </article>
+  `;
+}
+
+function getUnlockedIdolRecordIds(state: GameState, idolId: IdolId): RecordId[] {
+  return RECORD_ORDER.filter((recordId) => {
+    const record = RECORDS[recordId];
+
+    return isRecordUnlocked(state, recordId) && record.unlockRequirements.some((requirement) => hasIdolBondRequirement(requirement, idolId));
+  });
+}
+
+function hasIdolBondRequirement(requirement: Requirement, idolId: IdolId): boolean {
+  if (requirement.type === "idol.bond") {
+    return requirement.idolId === idolId;
+  }
+
+  if (requirement.type === "all" || requirement.type === "any") {
+    return requirement.requirements.some((childRequirement) => hasIdolBondRequirement(childRequirement, idolId));
+  }
+
+  if (requirement.type === "not") {
+    return hasIdolBondRequirement(requirement.requirement, idolId);
+  }
+
+  return false;
 }
 
 function renderRecognitionTrace(state: GameState, idolId: IdolId): string {

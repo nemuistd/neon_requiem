@@ -15,6 +15,34 @@ export const IDOL_EVENT_DEFINITIONS = defineContent([
       amount: 5
     },
     introducedAtVersion: 12
+  },
+  {
+    id: "otowaAkari.twilightFirstPause",
+    idolId: "otowaAkari",
+    title: "灯里・一拍遅い返事",
+    eventKind: "twilightMemory",
+    revealLevel: "uncanny",
+    body:
+      "名前を呼ぶと、灯里は一拍だけ遅れて振り向いた。「……はい。変ですね。初めてなのに、その声の近さだけ、少し安心します」",
+    unlockRequirement: {
+      type: "all",
+      requirements: [
+        {
+          type: "meguri.count",
+          count: 1
+        },
+        {
+          type: "meguri.idolRecognition",
+          idolId: "otowaAkari"
+        },
+        {
+          type: "idol.bond",
+          idolId: "otowaAkari",
+          amount: 5
+        }
+      ]
+    },
+    introducedAtVersion: 12
   }
 ] as const satisfies readonly IdolEventDefinition[]);
 

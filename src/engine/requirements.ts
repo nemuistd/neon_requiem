@@ -4,6 +4,7 @@ export type Requirement =
   | { type: "resource.amount"; resourceId: string; amount: number }
   | { type: "idol.bond"; idolId: string; amount: number }
   | { type: "meguri.count"; count: number }
+  | { type: "meguri.idolRecognition"; idolId: string }
   | { type: "meguri.buff.purchased"; buffId: string }
   | { type: "all"; requirements: Requirement[] }
   | { type: "any"; requirements: Requirement[] }
@@ -17,6 +18,7 @@ export type RequirementState = {
   meguri?: {
     count?: number;
     buffs?: Partial<Record<string, { purchased?: boolean }>>;
+    idolRecognition?: Partial<Record<string, boolean>>;
   };
 };
 
@@ -43,6 +45,10 @@ export function isRequirementMet(state: RequirementState, requirement?: Requirem
 
   if (requirement.type === "meguri.count") {
     return (state.meguri?.count ?? 0) >= requirement.count;
+  }
+
+  if (requirement.type === "meguri.idolRecognition") {
+    return state.meguri?.idolRecognition?.[requirement.idolId] === true;
   }
 
   if (requirement.type === "meguri.buff.purchased") {

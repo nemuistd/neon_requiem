@@ -52,6 +52,9 @@ describe("meguri state and requirements", () => {
         count: 2,
         buffs: {
           footstepResonance: { purchased: true }
+        },
+        idolRecognition: {
+          otowaAkari: true
         }
       }
     };
@@ -59,8 +62,13 @@ describe("meguri state and requirements", () => {
     expect(isRequirementMet(state, { type: "meguri.count", count: 2 })).toBe(true);
     expect(isRequirementMet(state, { type: "meguri.count", count: 3 })).toBe(false);
     expect(isRequirementMet(state, { type: "meguri.buff.purchased", buffId: "footstepResonance" })).toBe(true);
+    expect(isRequirementMet(state, { type: "meguri.idolRecognition", idolId: "otowaAkari" })).toBe(true);
+    expect(isRequirementMet(state, { type: "meguri.idolRecognition", idolId: "asagiriYui" })).toBe(false);
     expect(validateRequirement("test", { type: "meguri.buff.purchased", buffId: "missingBuff" })).toContain(
       'test: requirement references missing meguri buff "missingBuff".'
+    );
+    expect(validateRequirement("test", { type: "meguri.idolRecognition", idolId: "missingIdol" })).toContain(
+      'test: requirement references missing idol "missingIdol".'
     );
   });
 

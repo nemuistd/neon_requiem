@@ -289,7 +289,7 @@ ceil((nextEligibleFragments / memoryFragmentMultiplier) ** 2 * 20000)
 
 #### 3. 薄明の記憶イベントの入口
 
-将来の小タスクとして、廻後に同じアイドルと再び交流を積むと、通常交流イベントとは別に「薄明の記憶」イベントを出せるようにする。
+廻後に同じアイドルと再び交流を積むと、通常交流イベントとは別に「薄明の記憶」イベントを出せるようにする。
 
 ただし初期実装では、次の制約を置く。
 
@@ -298,7 +298,16 @@ ceil((nextEligibleFragments / memoryFragmentMultiplier) ** 2 * 20000)
 - 「夢で見た気がする」「この距離を知っている気がする」程度に留める。
 - 白霧 燐、霞山 澪、七城 皐月など Ch.7 以降の人物を出さない。
 
-実装上は、既存の `IdolEventDefinition` と `eventIdsRead` を拡張して扱える。ただし `idolRecognition` を Requirement 化するかどうかは、実装前に小さく設計する。
+P-M7-IDOL-15 での結論:
+
+- `idolRecognition` は薄明の記憶イベント専用の隠し判定ではなく、`Requirement` に `meguri.idolRecognition` として追加する。
+- `meguri.idolRecognition` は `state.meguri.idolRecognition[idolId] === true` を見るだけで、アイドル本人が記憶を保持していることを意味しない。
+- `IdolEventDefinition` には `eventKind?: "normal" | "twilightMemory"` を追加し、省略時は `"normal"` と扱う。
+- 既読状態は既存の `eventIdsRead` を使う。薄明の記憶イベント専用の保存フィールドは追加しない。
+- 表示では通常交流イベントと同じカード基盤を使いつつ、見出しまたは小さなラベルで「薄明の記憶」と分ける。既存イベント本文は差し替えない。
+- 最初の実装対象は音羽 灯里 1件に絞る。ID 候補は `otowaAkari.twilightFirstPause`。
+- 解放条件は `all([meguri.count >= 1, meguri.idolRecognition(otowaAkari), idol.bond(otowaAkari) >= 5])` とする。
+- 本文方針は、灯里の第一声や返事の間合いが少し違う程度に留める。「前にも会った」「廻を覚えている」とは書かない。
 
 ### まだ追加しないもの
 
@@ -347,7 +356,7 @@ ceil((nextEligibleFragments / memoryFragmentMultiplier) ** 2 * 20000)
 - 記録本文は記録タブに残し、廻タブへ本文を重複表示しない。
 - 追記通知ポリシーと矛盾しない。
 
-#### P-M7-IDOL-15: 薄明の記憶イベント仕様化
+#### P-M7-IDOL-15: 薄明の記憶イベント仕様化（実施済み）
 
 対象:
 
@@ -360,6 +369,29 @@ ceil((nextEligibleFragments / memoryFragmentMultiplier) ** 2 * 20000)
 - `idolRecognition` と `IdolEventDefinition` をどう接続するか決まっている。
 - 最初に追加する対象アイドルと解放条件が1〜2件に絞られている。
 - アイドルが廻を理解している、または記憶を保持していると断定しない。
+- Ch.7以降、霞山 澪、七城 皐月、白霧 燐、Ch.9収束に入らない。
+
+#### P-M7-IDOL-17: 薄明の記憶イベント最小実装（実装済み）
+
+対象:
+
+- `src/engine/requirements.ts`
+- `src/content/types.ts`
+- `src/content/idolEvents.ts`
+- `src/ui/renderIdols.ts`
+- `src/data.ts`
+- `src/uiVisibility.test.ts` または `src/meguri.test.ts`
+- `docs/current_spec.md`
+- `docs/product/40_task_backlog.md`
+
+受け入れ条件:
+
+- `Requirement` に `meguri.idolRecognition` を追加し、廻後の痕跡フラグを汎用条件として扱える。
+- 音羽 灯里の薄明の記憶イベントを1件追加する。
+- イベントは `meguri.count >= 1`、灯里の `idolRecognition`、灯里の再交流 `bond >= 5` が揃った時だけ表示される。
+- イベント本文は「覚えている」と断定しない。
+- 表示上、通常交流イベントと薄明の記憶イベントの区別が分かる。
+- 既読状態は既存の `eventIdsRead` に保存され、新しい保存フィールドを増やさない。
 - Ch.7以降、霞山 澪、七城 皐月、白霧 燐、Ch.9収束に入らない。
 
 ## 実装分割案
@@ -395,14 +427,18 @@ ceil((nextEligibleFragments / memoryFragmentMultiplier) ** 2 * 20000)
 5. アイドル加入アクションとの接続
    - アイドル解放条件を満たしただけでは効果を発動せず、能動的な加入操作後にバフを有効化する。
 
-### v3 軽量設計済み / 次候補
+### v3 実装済み
 
-1. 薄明の記憶イベント仕様化
-   - `idolRecognition` と交流イベント基盤の接続を、実装前に小さく決める。
+1. 薄明の記憶イベント最小実装
+   - `meguri.idolRecognition` Requirement と `eventKind: "twilightMemory"` を追加し、灯里の最初の薄明の記憶イベントを実装した。
+
+### 次候補
+
+1. 廻清算画面の戻り導線整理
+   - 清算中であることは維持しつつ、通常進行へ戻るボタンと記録タブ導線の見た目の強さを調整する。
 
 ## 未決事項
 
 - 記憶断片ゲージで、次の 1 個だけを見せるか、複数段階の見通しも見せるか。
 - 記録通知用のバージョン管理を、本文と追記で別フィールドにするか、通知キー配列で扱うか。
 - アイドル加入状態を廻後に毎回リセットするか、一部を廻後バフで引き継げるようにするか。
-- `idolRecognition` を Requirement として追加するか、薄明の記憶イベント専用の判定として扱うか。

@@ -71,6 +71,14 @@ export function getUnlockRequirementTextFromRequirement(requirement: Requirement
     return `廻 ${requirement.count}回以上`;
   }
 
+  if (requirement.type === "meguri.idolRecognition") {
+    if (!isIdolId(requirement.idolId)) {
+      return "不明なアイドルの痕跡";
+    }
+
+    return `${IDOLS[requirement.idolId].name} ${UI_TEXT.idolRecognitionTraceLabel}`;
+  }
+
   if (requirement.type === "meguri.buff.purchased") {
     if (!Object.prototype.hasOwnProperty.call(MEGURI_BUFFS, requirement.buffId)) {
       return "不明な廻後バフ";

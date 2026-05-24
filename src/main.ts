@@ -3,7 +3,7 @@ import { createFacilityUpgradeMessage, createIdolEventReadMessage, createIdolJoi
 import { FACILITIES, IDOL_EVENTS, IDOLS, ITEMS, MEGURI_BUFFS, SONGS } from "./definitions";
 import { applyProduction, closeMeguriSettlement, GameState, isMeguriTabUnlocked, joinIdol, markRecordTabSeen, performManualLive, performMeguri, purchaseItem, purchaseMeguriBuff, purchaseSong, readIdolEvent, readRecord, resolveActiveIdolId, SAVE_VERSION, selectActiveIdol, upgradeFacility } from "./game";
 import { loadGame, saveGame, SAVE_KEY } from "./storage";
-import { getFacilityIdFromEvent, getIdolEventIdFromEvent, getIdolIdFromEvent, getIdolJoinIdFromEvent, getItemIdFromEvent, getMeguriActionFromEvent, getMeguriBuffIdFromEvent, getRecordIdFromEvent, getSongIdFromEvent, getTabIdFromEvent } from "./ui/events";
+import { getFacilityIdFromEvent, getIdolDetailActionFromEvent, getIdolEventIdFromEvent, getIdolIdFromEvent, getIdolJoinIdFromEvent, getItemIdFromEvent, getMeguriActionFromEvent, getMeguriBuffIdFromEvent, getRecordIdFromEvent, getSongIdFromEvent, getTabIdFromEvent } from "./ui/events";
 import { formatAmount, formatWholeAmount } from "./ui/format";
 import { renderLiveValues } from "./ui/liveValues";
 import { renderState, setMessage } from "./ui/renderState";
@@ -35,6 +35,7 @@ let lastTickAt = Date.now();
 let activeTabId: ActiveTabId = state.meguri.pendingSettlement ? "meguri" : "restoration";
 let isSettingsOpen = false;
 let isDebugReloading = false;
+let isIdolDetailOpen = false;
 
 function advanceToNow(): void {
   const now = Date.now();
@@ -42,6 +43,10 @@ function advanceToNow(): void {
   lastTickAt = now;
 
   state = applyProduction(state, elapsedSeconds);
+}
+
+function renderGameState(): void {
+  renderState(elements, state, activeTabId, { isIdolDetailOpen });
 }
 
 function reloadWithSaveSuppressed(): void {
@@ -89,7 +94,7 @@ window.__NEON_DEBUG__ = {
   }
 };
 
-renderState(elements, state, activeTabId);
+renderGameState();
 renderSettings();
 
 if (loadResult.offlineTomorusa > 0) {
@@ -116,7 +121,7 @@ elements.settingsResetButton.addEventListener("click", () => {
 elements.liveButton.addEventListener("click", () => {
   if (state.meguri.pendingSettlement) {
     activeTabId = "meguri";
-    renderState(elements, state, activeTabId);
+    renderGameState();
     setMessage(elements, UI_TEXT.meguriSettlementBlockedLog);
     return;
   }
@@ -124,7 +129,7 @@ elements.liveButton.addEventListener("click", () => {
   advanceToNow();
   state = performManualLive(state);
   state = saveGame(state);
-  renderState(elements, state, activeTabId);
+  renderGameState();
   setMessage(elements, UI_TEXT.liveSuccessLog);
 });
 
@@ -144,7 +149,7 @@ elements.root.addEventListener("click", (event) => {
 
     if (state.meguri.pendingSettlement && tabId !== "meguri") {
       activeTabId = "meguri";
-      renderState(elements, state, activeTabId);
+      renderGameState();
       setMessage(elements, UI_TEXT.meguriSettlementBlockedLog);
       return;
     }
@@ -156,7 +161,7 @@ elements.root.addEventListener("click", (event) => {
       state = saveGame(markRecordTabSeen(state));
     }
 
-    renderState(elements, state, activeTabId);
+    renderGameState();
     return;
   }
 
@@ -166,7 +171,7 @@ elements.root.addEventListener("click", (event) => {
     advanceToNow();
     state = saveGame(closeMeguriSettlement(state));
     activeTabId = "restoration";
-    renderState(elements, state, activeTabId);
+    renderGameState();
     setMessage(elements, UI_TEXT.meguriSettlementClosedLog);
     return;
   }
@@ -175,7 +180,7 @@ elements.root.addEventListener("click", (event) => {
     advanceToNow();
     state = saveGame(markRecordTabSeen(closeMeguriSettlement(state)));
     activeTabId = "record";
-    renderState(elements, state, activeTabId);
+    renderGameState();
     setMessage(elements, UI_TEXT.meguriSettlementOpenRecordsLog);
     return;
   }
@@ -197,7 +202,7 @@ elements.root.addEventListener("click", (event) => {
 
     state = saveGame(result.state);
     activeTabId = "meguri";
-    renderState(elements, state, activeTabId);
+    renderGameState();
     setMessage(elements, createMeguriPerformedMessage(formatWholeAmount(result.preview.memoryFragmentsAwarded)));
     return;
   }
@@ -221,15 +226,23 @@ elements.root.addEventListener("click", (event) => {
     }
 
     state = saveGame(result.state);
-    renderState(elements, state, activeTabId);
+    renderGameState();
     setMessage(elements, createMeguriBuffPurchaseMessage(MEGURI_BUFFS[result.buffId].name, formatWholeAmount(result.cost)));
     return;
   }
 
   if (state.meguri.pendingSettlement) {
     activeTabId = "meguri";
-    renderState(elements, state, activeTabId);
+    renderGameState();
     setMessage(elements, UI_TEXT.meguriSettlementBlockedLog);
+    return;
+  }
+
+  const idolDetailAction = getIdolDetailActionFromEvent(event);
+
+  if (idolDetailAction === "toggle") {
+    isIdolDetailOpen = !isIdolDetailOpen;
+    renderGameState();
     return;
   }
 
@@ -246,7 +259,7 @@ elements.root.addEventListener("click", (event) => {
 
     state = saveGame(result.state);
     activeTabId = "idol";
-    renderState(elements, state, activeTabId);
+    renderGameState();
     setMessage(elements, createIdolJoinMessage(IDOLS[result.idolId].name, IDOLS[result.idolId].passiveDescription));
     return;
   }
@@ -256,7 +269,7 @@ elements.root.addEventListener("click", (event) => {
   if (idolEventId) {
     advanceToNow();
     state = saveGame(readIdolEvent(state, idolEventId));
-    renderState(elements, state, activeTabId);
+    renderGameState();
     setMessage(elements, createIdolEventReadMessage(IDOL_EVENTS[idolEventId].title));
     return;
   }
@@ -266,7 +279,7 @@ elements.root.addEventListener("click", (event) => {
   if (idolId) {
     advanceToNow();
     state = saveGame(selectActiveIdol(state, idolId));
-    renderState(elements, state, activeTabId);
+    renderGameState();
     return;
   }
 
@@ -289,7 +302,7 @@ elements.root.addEventListener("click", (event) => {
     }
 
     state = saveGame(closeMeguriSettlement(result.state));
-    renderState(elements, state, activeTabId);
+    renderGameState();
     setMessage(elements, createItemPurchaseMessage(ITEMS[result.itemId].name, formatAmount(result.cost)));
     return;
   }
@@ -313,7 +326,7 @@ elements.root.addEventListener("click", (event) => {
     }
 
     state = saveGame(closeMeguriSettlement(result.state));
-    renderState(elements, state, activeTabId);
+    renderGameState();
     setMessage(elements, createSongPurchaseMessage(SONGS[result.songId].name, formatAmount(result.cost)));
     return;
   }
@@ -323,7 +336,7 @@ elements.root.addEventListener("click", (event) => {
   if (recordId) {
     advanceToNow();
     state = saveGame(readRecord(state, recordId));
-    renderState(elements, state, activeTabId);
+    renderGameState();
     setMessage(elements, UI_TEXT.recordReadLog);
     return;
   }
@@ -343,7 +356,7 @@ elements.root.addEventListener("click", (event) => {
   }
 
   state = saveGame(closeMeguriSettlement(result.state));
-  renderState(elements, state, activeTabId);
+  renderGameState();
   setMessage(elements, createFacilityUpgradeMessage(FACILITIES[result.facilityId].name, formatAmount(result.cost)));
 });
 
@@ -359,7 +372,7 @@ window.setInterval(() => {
 
   advanceToNow();
   state = saveGame(state);
-  renderState(elements, state, activeTabId);
+  renderGameState();
 }, SAVE_INTERVAL_MS);
 
 window.addEventListener("beforeunload", () => {
@@ -374,5 +387,11 @@ window.addEventListener("beforeunload", () => {
 window.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && isSettingsOpen) {
     closeSettings();
+    return;
+  }
+
+  if (event.key === "Escape" && isIdolDetailOpen) {
+    isIdolDetailOpen = false;
+    renderGameState();
   }
 });

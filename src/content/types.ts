@@ -36,6 +36,7 @@ export type IdolEventDefinition = {
   id: string;
   idolId: string;
   title: string;
+  eventKind?: "normal" | "twilightMemory";
   revealLevel: RevealLevel;
   body: string;
   unlockRequirement: Requirement;

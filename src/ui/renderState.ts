@@ -13,14 +13,18 @@ import { renderSongCards } from "./renderSongs";
 import { renderTabs } from "./renderTabs";
 import type { ActiveTabId, UiElements } from "./types";
 
-export function renderState(elements: UiElements, state: GameState, activeTabId: ActiveTabId): void {
+export type UiRenderOptions = {
+  isIdolDetailOpen?: boolean;
+};
+
+export function renderState(elements: UiElements, state: GameState, activeTabId: ActiveTabId, options: UiRenderOptions = {}): void {
   const resolvedActiveIdolId = resolveActiveIdolId(state);
   const effectiveActiveTabId = state.meguri.pendingSettlement ? "meguri" : activeTabId;
 
   elements.root.classList.toggle("settlement-active", state.meguri.pendingSettlement);
   renderTabs(elements, state, effectiveActiveTabId);
   renderLiveValues(elements, state);
-  elements.idolList.innerHTML = renderIdolCards(state, resolvedActiveIdolId);
+  elements.idolList.innerHTML = renderIdolCards(state, resolvedActiveIdolId, options.isIdolDetailOpen ?? false);
   elements.contentList.className = getContentListClassName(effectiveActiveTabId);
   elements.contentList.innerHTML = renderActiveTabContent(state, effectiveActiveTabId);
 }

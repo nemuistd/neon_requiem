@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createInitialState } from "./game";
 import { renderFacilityCards } from "./ui/renderFacilities";
-import { renderIdolTabCards } from "./ui/renderIdols";
+import { renderIdolCards, renderIdolTabCards } from "./ui/renderIdols";
 import { renderItemCards } from "./ui/renderItems";
 import { renderRecordCards } from "./ui/renderRecords";
 import { renderSongCards } from "./ui/renderSongs";
@@ -60,4 +60,82 @@ describe("locked content visibility", () => {
     expect(renderIdolTabCards(eventReadyState)).toContain("灯里・客席の灯");
     expect(renderIdolTabCards(eventReadyState)).toContain("data-idol-event-id=\"otowaAkari.firstSeat\"");
   });
+
+  it("shows twilight memory events only after meguri recognition and renewed bond", () => {
+    const baseState = createInitialState();
+    const renewedBondState = {
+      ...baseState,
+      idols: {
+        ...baseState.idols,
+        otowaAkari: {
+          ...baseState.idols.otowaAkari,
+          bond: 5
+        }
+      },
+      meguri: {
+        ...baseState.meguri,
+        count: 1
+      }
+    };
+    const twilightReadyState = {
+      ...renewedBondState,
+      meguri: {
+        ...renewedBondState.meguri,
+        idolRecognition: {
+          ...renewedBondState.meguri.idolRecognition,
+          otowaAkari: true
+        }
+      }
+    };
+    const tabHtml = renderIdolTabCards(twilightReadyState);
+    const detailHtml = renderIdolCards(twilightReadyState, "otowaAkari", true);
+
+    expect(renderIdolTabCards(renewedBondState)).not.toContain("灯里・一拍遅い返事");
+    expect(tabHtml).toContain("灯里・一拍遅い返事");
+    expect(tabHtml).toContain("薄明の記憶");
+    expect(detailHtml).toContain("data-idol-event-id=\"otowaAkari.twilightFirstPause\"");
+  });
+
+  it("lets the left idol switcher join idols that are ready to be invited", () => {
+    const baseState = createInitialState();
+    const yuiReadyState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        alleyStage: { level: 10 },
+        neonBoard: { level: 5 }
+      }
+    };
+    const html = renderIdolCards(yuiReadyState, "otowaAkari");
+    const yuiButtonHtml = getButtonHtml(html, "asagiriYui");
+
+    expect(yuiButtonHtml).toContain("data-idol-join-id=\"asagiriYui\"");
+    expect(yuiButtonHtml).not.toContain("data-idol-id=\"asagiriYui\"");
+    expect(yuiButtonHtml).not.toContain("disabled");
+  });
+
+  it("shows unlocked idol events and idol bond records in the left detail panel", () => {
+    const baseState = createInitialState();
+    const detailReadyState = {
+      ...baseState,
+      idols: {
+        ...baseState.idols,
+        otowaAkari: {
+          ...baseState.idols.otowaAkari,
+          bond: 5
+        }
+      }
+    };
+    const closedHtml = renderIdolCards(detailReadyState, "otowaAkari");
+    const openHtml = renderIdolCards(detailReadyState, "otowaAkari", true);
+
+    expect(closedHtml).not.toContain("class=\"idol-detail-panel\"");
+    expect(openHtml).toContain("idol-detail-panel");
+    expect(openHtml).toContain("data-idol-event-id=\"otowaAkari.firstSeat\"");
+    expect(openHtml).toContain("data-record-id=\"idolBondAkariFirstVoice\"");
+  });
 });
+
+function getButtonHtml(html: string, text: string): string {
+  return Array.from(html.matchAll(/<button[\s\S]*?<\/button>/g)).find((match) => match[0].includes(text))?.[0] ?? "";
+}
