@@ -11,32 +11,33 @@
 3. [20_design_translation.md](20_design_translation.md): 体験要件を、UI、文言、コンテンツ、進行設計の判断基準へ翻訳したもの。
 4. [30_milestone_roadmap.md](30_milestone_roadmap.md): タスクではなく、段階的に満たすべき状態と未解決論点を整理したもの。
 5. [40_task_backlog.md](40_task_backlog.md): マイルストーンから十分具体化できたものだけを、順序付きタスク候補として置く場所。
-6. [50_parallel_execution_plan.md](50_parallel_execution_plan.md): 実行可能なタスクを、並列ユニット、write scope、合流順へ割り当てたもの。
+6. [50_parallel_execution_plan.md](50_parallel_execution_plan.md): 複数の作業者や worktree で並列実行する必要がある時だけ、並列ユニット、write scope、合流順へ割り当てたもの。
 7. [90_feedback_loop.md](90_feedback_loop.md): 下位レイヤから上位レイヤへ戻る条件、更新手順、同期先を定義する運用ルール。
 
 補助文書:
 
 - [content_addition_acceptance_template.md](content_addition_acceptance_template.md): 新しい施設、歌、アイテム、アイドル、記録、交流イベントを追加する時の受け入れ条件テンプレート。
+- [archive/](archive/): 完了済み、統合済み、または現行仕様と役割が違う product 文書の履歴置き場。
 
 ## 基本の進め方
 
-文書を書く順序は `00 -> 10 -> 20 -> 30 -> 40 -> 50` を基本にする。
+文書を書く順序は `00 -> 10 -> 20 -> 30 -> 40` を基本にする。
 
-実装タスクへ進めるのは、`40_task_backlog.md` で目的、対象範囲、受け入れ条件、確認方法が明確になり、`50_parallel_execution_plan.md` で実行順と並列可否が整理された項目だけにする。タスク化の途中で前提が曖昧になった場合は、`90_feedback_loop.md` に従って上位文書を更新してから下位へ戻る。
+実装タスクへ進めるのは、`40_task_backlog.md` で目的、対象範囲、受け入れ条件、確認方法が明確になった項目だけにする。複数の作業者や worktree で同時に進める場合だけ、`50_parallel_execution_plan.md` で実行順と並列可否を整理する。タスク化の途中で前提が曖昧になった場合は、`90_feedback_loop.md` に従って上位文書を更新してから下位へ戻る。
 
 ## 参照順
 
 プロダクト判断で迷った場合は、この順に確認する。
 
-1. `docs/product/00_product_charter.md`
-2. `docs/product/10_product_requirements.md`
-3. `docs/product/20_design_translation.md`
-4. `docs/product/30_milestone_roadmap.md`
-5. `docs/product/40_task_backlog.md`
-6. `docs/product/50_parallel_execution_plan.md`
-7. `docs/current_spec.md`
-8. `docs/worldbuilding.md`
-9. `docs/planning/`
+1. `docs/current_spec.md`
+2. `docs/worldbuilding.md`
+3. `docs/fiction/`
+4. `docs/product/00_product_charter.md`
+5. `docs/product/10_product_requirements.md`
+6. `docs/product/20_design_translation.md`
+7. `docs/product/30_milestone_roadmap.md`
+8. `docs/product/40_task_backlog.md`
+9. `docs/planning/README.md`
 
 ただし、実装済み仕様は [current_spec.md](../current_spec.md)、世界観・用語体系は [worldbuilding.md](../worldbuilding.md)、長期構想は [planning/](../planning/) を正とする。このフォルダの文書は、それらを置き換えるものではなく、実装判断に使える段階へ翻訳するための入口である。
 
@@ -47,7 +48,7 @@
 - `20_design_translation.md` は、UI、文言、コンテンツ、進行設計の判断基準が変わった時に更新する。
 - `30_milestone_roadmap.md` は、どの段階を先に満たすべきか、未解決論点が変わった時に更新する。
 - `40_task_backlog.md` は、実装可能な粒度まで具体化できた項目だけを追加・並べ替えする。
-- `50_parallel_execution_plan.md` は、タスクの依存関係、write scope、並列ユニット、合流順が変わった時に更新する。
+- `50_parallel_execution_plan.md` は、並列実行が必要な期間だけ更新する。完了した並列計画は `archive/` へ移す。
 - `content_addition_acceptance_template.md` は、新規コンテンツの受け入れ条件や同期先が変わった時に更新する。
 - 実装済み内容が変わったら、必要に応じて [current_spec.md](../current_spec.md) も同期する。
 - 世界観や用語の正史を変える場合は、まず [worldbuilding.md](../worldbuilding.md) を確認する。

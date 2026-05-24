@@ -52,7 +52,7 @@ UIは、最初に何をすればよいかを明確にしつつ、地下都市の
 - 短期では、最初の記録や小さなアップグレードによって「街が少し戻る」感覚を作る。
 - 中期では、ネオン掲示板、地下礼拝堂、追加アイドルを通じて、場所と人物の意味を広げる。
 - 長期では、霞、観測者、アンカー、祈念工学、聖歌を段階的に扱う。
-- 再固定 / 再観測のような仕組みは、実装前に [world_reveal_and_prestige_plan.md](../planning/world_reveal_and_prestige_plan.md) と照合する。
+- 廻や廻後コンテンツを拡張する場合は、[world_reveal_and_prestige_plan.md](../planning/world_reveal_and_prestige_plan.md)、[meguri_system_spec.md](../planning/meguri_system_spec.md)、および現在仕様と照合する。
 
 ## 技術設計への翻訳
 

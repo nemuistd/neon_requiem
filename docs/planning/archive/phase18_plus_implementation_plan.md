@@ -1,4 +1,7 @@
-# Phase 18以降 実装計画
+# Phase 18以降 実装計画 (Archived)
+
+> 履歴文書。Phase 18〜29 の多くは実装または設計整理済み。
+> 現在の実装仕様は `docs/current_spec.md`、現役の長期計画は `docs/planning/README.md` から参照する。
 
 ## 方針
 
