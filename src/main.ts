@@ -1,9 +1,9 @@
 import "./style.css";
-import { createFacilityUpgradeMessage, createIdolJoinMessage, createItemPurchaseMessage, createMeguriBuffPurchaseMessage, createMeguriPerformedMessage, createOfflineRewardMessage, createSongPurchaseMessage, UI_TEXT } from "./data";
-import { FACILITIES, IDOLS, ITEMS, MEGURI_BUFFS, SONGS } from "./definitions";
-import { applyProduction, closeMeguriSettlement, GameState, isMeguriTabUnlocked, joinIdol, markRecordTabSeen, performManualLive, performMeguri, purchaseItem, purchaseMeguriBuff, purchaseSong, readRecord, resolveActiveIdolId, SAVE_VERSION, selectActiveIdol, upgradeFacility } from "./game";
+import { createFacilityUpgradeMessage, createIdolEventReadMessage, createIdolJoinMessage, createItemPurchaseMessage, createMeguriBuffPurchaseMessage, createMeguriPerformedMessage, createOfflineRewardMessage, createSongPurchaseMessage, UI_TEXT } from "./data";
+import { FACILITIES, IDOL_EVENTS, IDOLS, ITEMS, MEGURI_BUFFS, SONGS } from "./definitions";
+import { applyProduction, closeMeguriSettlement, GameState, isMeguriTabUnlocked, joinIdol, markRecordTabSeen, performManualLive, performMeguri, purchaseItem, purchaseMeguriBuff, purchaseSong, readIdolEvent, readRecord, resolveActiveIdolId, SAVE_VERSION, selectActiveIdol, upgradeFacility } from "./game";
 import { loadGame, saveGame, SAVE_KEY } from "./storage";
-import { getFacilityIdFromEvent, getIdolIdFromEvent, getIdolJoinIdFromEvent, getItemIdFromEvent, getMeguriActionFromEvent, getMeguriBuffIdFromEvent, getRecordIdFromEvent, getSongIdFromEvent, getTabIdFromEvent } from "./ui/events";
+import { getFacilityIdFromEvent, getIdolEventIdFromEvent, getIdolIdFromEvent, getIdolJoinIdFromEvent, getItemIdFromEvent, getMeguriActionFromEvent, getMeguriBuffIdFromEvent, getRecordIdFromEvent, getSongIdFromEvent, getTabIdFromEvent } from "./ui/events";
 import { formatAmount, formatWholeAmount } from "./ui/format";
 import { renderLiveValues } from "./ui/liveValues";
 import { renderState, setMessage } from "./ui/renderState";
@@ -248,6 +248,16 @@ elements.root.addEventListener("click", (event) => {
     activeTabId = "idol";
     renderState(elements, state, activeTabId);
     setMessage(elements, createIdolJoinMessage(IDOLS[result.idolId].name, IDOLS[result.idolId].passiveDescription));
+    return;
+  }
+
+  const idolEventId = getIdolEventIdFromEvent(event);
+
+  if (idolEventId) {
+    advanceToNow();
+    state = saveGame(readIdolEvent(state, idolEventId));
+    renderState(elements, state, activeTabId);
+    setMessage(elements, createIdolEventReadMessage(IDOL_EVENTS[idolEventId].title));
     return;
   }
 

@@ -1,6 +1,8 @@
 import {
   FACILITIES,
   FacilityId,
+  IDOL_EVENTS,
+  IdolEventId,
   IDOLS,
   IdolId,
   ITEMS,
@@ -60,6 +62,23 @@ export function getIdolJoinIdFromEvent(event: Event): IdolId | null {
 
   if (isIdolId(idolId)) {
     return idolId;
+  }
+
+  return null;
+}
+
+export function getIdolEventIdFromEvent(event: Event): IdolEventId | null {
+  const target = event.target;
+
+  if (!(target instanceof HTMLElement)) {
+    return null;
+  }
+
+  const button = target.closest<HTMLButtonElement>("[data-idol-event-id]");
+  const eventId = button?.dataset.idolEventId;
+
+  if (isIdolEventId(eventId)) {
+    return eventId;
   }
 
   return null;
@@ -169,6 +188,10 @@ function isFacilityId(value: string | undefined): value is FacilityId {
 
 function isIdolId(value: string | undefined): value is IdolId {
   return typeof value === "string" && Object.prototype.hasOwnProperty.call(IDOLS, value);
+}
+
+function isIdolEventId(value: string | undefined): value is IdolEventId {
+  return typeof value === "string" && Object.prototype.hasOwnProperty.call(IDOL_EVENTS, value);
 }
 
 function isSongId(value: string | undefined): value is SongId {

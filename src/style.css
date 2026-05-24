@@ -799,6 +799,60 @@ h2 {
   background: rgba(95, 83, 105, 0.14);
 }
 
+.idol-event-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.idol-event-card {
+  padding: 12px;
+  border: 1px solid rgba(127, 233, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(8, 11, 22, 0.34);
+}
+
+.idol-event-card.unread {
+  border-color: rgba(255, 210, 115, 0.34);
+}
+
+.idol-event-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.idol-event-heading h3 {
+  margin: 0;
+  color: #fff8ff;
+  font-size: 0.96rem;
+}
+
+.idol-event-state {
+  flex: none;
+  color: #ffe073;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.idol-event-card.read .idol-event-state {
+  color: #8df4ff;
+}
+
+.idol-event-card p {
+  margin: 8px 0 0;
+  color: #e6d9f0;
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.idol-event-action {
+  min-height: 40px;
+  margin-top: 10px;
+  font-size: 0.88rem;
+}
+
 .record-card {
   display: flex;
   min-height: 210px;
@@ -1110,6 +1164,11 @@ h2 {
   min-height: 320px;
 }
 
+.meguri-dashboard-card {
+  grid-column: 1 / -1;
+  min-height: auto;
+}
+
 .meguri-heading,
 .meguri-buff-title {
   display: flex;
@@ -1157,6 +1216,63 @@ h2 {
 
 .meguri-reset-copy p {
   margin-bottom: 0;
+}
+
+.meguri-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.meguri-dashboard-stat {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(127, 233, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(8, 11, 22, 0.42);
+}
+
+.meguri-dashboard-stat span {
+  display: block;
+  color: #bdaecb;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.meguri-dashboard-stat strong {
+  display: block;
+  margin-top: 5px;
+  color: #fff8ff;
+  font-size: 1.05rem;
+  line-height: 1.2;
+}
+
+.meguri-dashboard-goal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 224, 115, 0.22);
+  border-radius: 8px;
+  color: #ffe073;
+  background:
+    linear-gradient(90deg, rgba(255, 224, 115, 0.07), rgba(127, 233, 255, 0.05)),
+    rgba(8, 11, 22, 0.46);
+}
+
+.meguri-dashboard-goal span {
+  flex: none;
+  color: #bdaecb;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.meguri-dashboard-goal strong {
+  min-width: 0;
+  text-align: right;
 }
 
 .meguri-fragment-progress {
@@ -1525,6 +1641,10 @@ h2 {
   .meguri-panel {
     grid-template-columns: 1fr;
   }
+
+  .meguri-dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 720px) {
@@ -1579,5 +1699,18 @@ h2 {
 
   .meguri-buff-row {
     grid-template-columns: 1fr;
+  }
+
+  .meguri-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .meguri-dashboard-goal {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .meguri-dashboard-goal strong {
+    text-align: left;
   }
 }

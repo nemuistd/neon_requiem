@@ -23,74 +23,75 @@
 
 ## 現在の優先候補
 
-### P-M7-MEGURI-12: 廻後再進行の軽量設計
+### P-M7-RECORD-14: 追記索引の追加
 
 目的:
 
-- 初回廻後に、再進行する意味と見え方を増やす前に、追加範囲を小さく設計する。
+- 廻後バフで解放された記録追記を、廻タブから見失わないようにする。
 
 対象範囲:
 
-- 廻後の軽い再読・再進行表示。
-- 廻回数、購入済み廻後バフ、記録追記の使い道。
-- Ch.7 以降の大型展開に入らない範囲の整理。
+- 廻タブ内の追記索引。
+- 追記解放済み記録名、既読 / 未読、関連する廻後バフ名。
+- 記録本文は記録タブに残し、廻タブへ重複表示しない。
 
 依存:
 
-- 廻 v1/v2 実装済み。
-- `docs/planning/meguri_system_spec.md`
-- `docs/planning/world_reveal_and_prestige_plan.md`
+- P-M7-MEGURI-12 設計済み。
+- 記録追記と追記既読状態が実装済み。
 
 Write scope:
 
-- 主に `docs/planning/meguri_system_spec.md`
-- 必要なら `docs/product/30_milestone_roadmap.md`
+- `src/ui/renderMeguri.ts`
+- 必要なら `src/game.ts` の小さな表示 helper
+- `src/meguri.test.ts` または UI表示テスト
+- `docs/current_spec.md`
 
 受け入れ条件:
 
-- 廻後に何を増やすか、何をまだ増やさないかが分かる。
-- Ch.7 以降、新アイドル、白霧 燐、Ch.9 収束を勝手に確定しない。
-- 実装タスクに落とせる小さな候補が1〜3個に絞られている。
+- 廻後バフで追記が解放された記録を廻タブから確認できる。
+- 既読 / 未読の区別が見える。
+- 追記通知ポリシーと矛盾しない。
+- Ch.7 以降や白霧 燐に触れない。
 
 確認方法:
 
-- `docs/current_spec.md` と `docs/fiction/` との矛盾確認。
-- `rg "白霧|Ch.7|Ch.9|再固定|廻" docs src`
+- `npm.cmd run test`
+- `npm.cmd run build`
+- 廻後バフ購入済み debug save でブラウザQA。
 
-### P-M3-IDOL-13: 交流イベント最小実装の仕様化
+### P-M7-IDOL-15: 薄明の記憶イベント仕様化
 
 目的:
 
-- `bond` と `eventIdsRead` を、アイドル個別の短い交流イベントへつなぐための最小仕様を決める。
+- `idolRecognition` と交流イベント基盤を接続する前に、最初の対象と条件を小さく決める。
 
 対象範囲:
 
-- 初期実装済みアイドルのうち、対象人数を絞った交流イベント候補。
-- イベント解放条件。
-- 既読管理。
-- 記録タブとの役割分離。
+- `idolRecognition` を Requirement 化するか、専用判定にするか。
+- 最初に追加する対象アイドル 1〜2人。
+- 通常交流イベントと「薄明の記憶」の表示差分。
 
 依存:
 
-- アイドル加入導線実装済み。
+- P-M7-MEGURI-12 設計済み。
+- 交流イベント最小実装済み。
+
+Write scope:
+
 - `docs/planning/idol_roster_expansion_design.md`
-
-Write scope:
-
-- 主に `docs/planning/idol_roster_expansion_design.md`
-- 実装に進む場合は `src/game.ts`, `src/storage.ts`, `src/ui/renderIdols.ts`, テスト。
+- `docs/planning/meguri_system_spec.md`
+- 必要なら `docs/product/40_task_backlog.md`
 
 受け入れ条件:
 
-- 交流イベントが数値報酬だけになっていない。
-- アイドルを所有・搾取しているように見えない。
-- `eventIdsRead` と記録既読状態の役割が分かれている。
-- 初期実装済みアイドルだけで物語を閉じない。
+- アイドルが廻を理解している、または記憶を保持していると断定しない。
+- Ch.7 以降、新アイドル、白霧 燐、Ch.9 収束に入らない。
+- 実装タスクへ落とす場合の対象ファイルと確認方法が分かる。
 
 確認方法:
 
-- `docs/current_spec.md` と `docs/planning/idol_roster_expansion_design.md` の照合。
-- 実装する場合は `npm.cmd run test`, `npm.cmd run check:content`, 必要ならブラウザQA。
+- `docs/current_spec.md`, `docs/fiction/meguri_after_design.md`, `docs/planning/meguri_system_spec.md` との照合。
 
 ## 完了済みタスク概要
 
@@ -128,6 +129,31 @@ Write scope:
 - 古い Phase 18+ 実装計画を `docs/planning/archive/` へ移動。
 - planning の廻前提、再固定中枢、アイドル効果モデル、施設候補の表現を現行仕様に同期。
 - `docs/planning/README.md` と archive 入口を追加し、現役文書と履歴文書の参照先を明確化。
+
+### 交流イベント最小実装
+
+2026-05-25 実施済み。
+
+- `IdolEventDefinition` と `src/content/idolEvents.ts` を追加。
+- 音羽 灯里の `otowaAkari.firstSeat` を交流 5 で解放。
+- `eventIdsRead` で既読を保存し、アイドルタブに交流イベント表示を追加。
+- 交流イベント読了では、灯るさ、生産量、交流値を変化させない。
+
+### 廻後再進行の軽量設計
+
+2026-05-25 実施済み。
+
+- 廻後に増やすものを、廻後ダッシュボード、追記索引、薄明の記憶イベント入口の3つへ絞った。
+- まだ増やさないものとして、Ch.7以降、新アイドル、白霧 燐、Ch.9収束、施設レベル持ち越し、記憶断片常時生産を明記した。
+- 次の実装候補を `P-M7-MEGURI-13`, `P-M7-RECORD-14`, `P-M7-IDOL-15` に分割した。
+
+### 廻後ダッシュボード最小実装
+
+2026-05-25 実装済み。
+
+- `P-M7-MEGURI-13` として、初回廻後の通常進行中に廻タブへ「廻後の見取り図」を追加。
+- 廻回数、記憶断片、取得済み廻後バフ数、追記解放数、痕跡アイドル数、次の小さな目印を既存 state から集計する。
+- 新しい保存フィールド、Ch.7以降、新アイドル、白霧 燐、Ch.9収束は追加していない。
 
 ## 保留中の候補
 

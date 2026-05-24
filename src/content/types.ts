@@ -32,6 +32,16 @@ export type IdolDefinition = {
   unlockRequirement?: Requirement;
 };
 
+export type IdolEventDefinition = {
+  id: string;
+  idolId: string;
+  title: string;
+  revealLevel: RevealLevel;
+  body: string;
+  unlockRequirement: Requirement;
+  introducedAtVersion: number;
+};
+
 export type FacilityDefinition = {
   id: string;
   name: string;

@@ -2,6 +2,7 @@ export type { ActiveTabId, UiElements } from "./ui/types";
 export { formatAmount, formatBond, formatRate } from "./ui/format";
 export {
   getFacilityIdFromEvent,
+  getIdolEventIdFromEvent,
   getIdolIdFromEvent,
   getItemIdFromEvent,
   getRecordIdFromEvent,

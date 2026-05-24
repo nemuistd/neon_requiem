@@ -20,6 +20,8 @@ import {
   getSongCost,
   getTomorusaPerSecond,
   isFacilityUnlocked,
+  isIdolEventRead,
+  isIdolEventUnlocked,
   isIdolJoined,
   isIdolUnlocked,
   isRecordRead,
@@ -28,6 +30,7 @@ import {
   performManualLive,
   purchaseItem,
   purchaseSong,
+  readIdolEvent,
   readRecord,
   SAVE_VERSION,
   selectActiveIdol,
@@ -879,6 +882,41 @@ describe("game state and effects", () => {
     expect(isRecordUnlocked(almostUnlockedState, "idolBondAkariFirstVoice")).toBe(false);
     expect(isRecordUnlocked(unlockedState, "idolBondAkariFirstVoice")).toBe(true);
     expect(isRecordRead(readState, "idolBondAkariFirstVoice")).toBe(true);
+  });
+
+  it("unlocks and reads the first idol event from bond without changing resources", () => {
+    const baseState = createInitialState();
+    const almostUnlockedState = {
+      ...baseState,
+      idols: {
+        ...baseState.idols,
+        otowaAkari: {
+          ...baseState.idols.otowaAkari,
+          bond: 4
+        }
+      }
+    };
+    const unlockedState = {
+      ...almostUnlockedState,
+      idols: {
+        ...almostUnlockedState.idols,
+        otowaAkari: {
+          ...almostUnlockedState.idols.otowaAkari,
+          bond: 5
+        }
+      }
+    };
+    const readState = readIdolEvent(unlockedState, "otowaAkari.firstSeat");
+    const rereadState = readIdolEvent(readState, "otowaAkari.firstSeat");
+
+    expect(isIdolEventUnlocked(almostUnlockedState, "otowaAkari.firstSeat")).toBe(false);
+    expect(isIdolEventUnlocked(unlockedState, "otowaAkari.firstSeat")).toBe(true);
+    expect(isIdolEventRead(unlockedState, "otowaAkari.firstSeat")).toBe(false);
+    expect(isIdolEventRead(readState, "otowaAkari.firstSeat")).toBe(true);
+    expect(readState.idols.otowaAkari.eventIdsRead).toEqual(["otowaAkari.firstSeat"]);
+    expect(rereadState).toBe(readState);
+    expect(getResourceAmount(readState, TOMORUSA_RESOURCE_ID)).toBe(getResourceAmount(unlockedState, TOMORUSA_RESOURCE_ID));
+    expect(getTomorusaPerSecond(readState)).toBe(getTomorusaPerSecond(unlockedState));
   });
 });
 

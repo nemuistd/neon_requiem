@@ -1,4 +1,7 @@
 import {
+  IDOL_EVENT_ORDER,
+  IDOL_EVENTS,
+  IdolEventId,
   IDOL_ORDER,
   IDOLS,
   IdolId
@@ -9,6 +12,8 @@ import {
   GameState,
   getIdolBond,
   hasIdolRecognition,
+  isIdolEventRead,
+  isIdolEventUnlocked,
   isIdolJoinable,
   isIdolJoined,
   isIdolUnlocked,
@@ -177,6 +182,7 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
               <dd>${getIdolUnlockRequirementText(idolId)}</dd>
             </div>
           </dl>
+          ${isJoined ? renderIdolEventList(state, idolId) : ""}
           <button
             class="secondary-action idol-tab-action ${isActive ? "active" : isJoined ? "unlocked" : isJoinable ? "joinable" : "locked"}"
             type="button"
@@ -188,6 +194,48 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
         </div>
       </div>
     </article>
+  `;
+}
+
+function renderIdolEventList(state: GameState, idolId: IdolId): string {
+  const eventIds = IDOL_EVENT_ORDER.filter((eventId) => {
+    const event = IDOL_EVENTS[eventId];
+
+    return event.idolId === idolId && isIdolEventUnlocked(state, eventId);
+  });
+
+  if (eventIds.length === 0) {
+    return "";
+  }
+
+  return `
+          <section class="idol-event-list" aria-label="${UI_TEXT.idolEventsLabel}">
+            <span class="card-kicker">${UI_TEXT.idolEventsLabel}</span>
+            ${eventIds.map((eventId) => renderIdolEventCard(state, eventId)).join("")}
+          </section>
+  `;
+}
+
+function renderIdolEventCard(state: GameState, eventId: IdolEventId): string {
+  const event = IDOL_EVENTS[eventId];
+  const isRead = isIdolEventRead(state, eventId);
+
+  return `
+            <article class="idol-event-card ${isRead ? "read" : "unread"}">
+              <div class="idol-event-heading">
+                <h3>${event.title}</h3>
+                <span class="idol-event-state">${isRead ? UI_TEXT.readIdolEventLabel : UI_TEXT.unreadIdolEventLabel}</span>
+              </div>
+              <p>${event.body}</p>
+              <button
+                class="secondary-action idol-event-action"
+                type="button"
+                data-idol-event-id="${eventId}"
+                ${isRead ? "disabled" : ""}
+              >
+                ${isRead ? UI_TEXT.readIdolEventLabel : UI_TEXT.readIdolEventButtonLabel}
+              </button>
+            </article>
   `;
 }
 

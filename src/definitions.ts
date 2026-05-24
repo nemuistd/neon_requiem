@@ -1,5 +1,6 @@
 export type {
   FacilityDefinition,
+  IdolEventDefinition,
   ItemDefinition,
   IdolDefinition,
   MeguriBuffDefinition,
@@ -14,6 +15,8 @@ export type { FacilityId } from "./content/facilities.js";
 export { FACILITIES, FACILITY_DEFINITIONS, FACILITY_ORDER } from "./content/facilities.js";
 export type { IdolId } from "./content/idols.js";
 export { IDOLS, IDOL_DEFINITIONS, IDOL_ORDER } from "./content/idols.js";
+export type { IdolEventId } from "./content/idolEvents.js";
+export { IDOL_EVENTS, IDOL_EVENT_DEFINITIONS, IDOL_EVENT_ORDER } from "./content/idolEvents.js";
 export type { ItemId } from "./content/items.js";
 export { ITEMS, ITEM_DEFINITIONS, ITEM_ORDER } from "./content/items.js";
 export type { MeguriBuffId } from "./content/meguriBuffs.js";

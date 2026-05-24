@@ -1,6 +1,8 @@
 import {
   FACILITIES,
   FACILITY_ORDER,
+  IDOL_EVENT_ORDER,
+  IDOL_EVENTS,
   IDOL_ORDER,
   IDOLS,
   ITEM_ORDER,
@@ -20,6 +22,7 @@ import {
 const SURFACE_FORBIDDEN_TERMS = ["祈念工学", "アンカー", "聖歌", "祈念負荷"] as const;
 const NORMAL_UI_TEXTS = [
   ...Object.values(IDOLS).flatMap((idol) => [idol.title, idol.description, idol.passiveDescription]),
+  ...Object.values(IDOL_EVENTS).flatMap((event) => [event.title, event.body]),
   ...Object.values(FACILITIES).map((facility) => facility.description),
   ...Object.values(ITEMS).flatMap((item) => [item.name, item.description, item.effectDescription]),
   ...Object.values(SONGS).flatMap((song) => [song.name, song.description, song.effectDescription])
@@ -28,6 +31,7 @@ const NORMAL_UI_TEXTS = [
 export function validateContentDefinitions(): string[] {
   return [
     ...validateCollection("idol", IDOLS, IDOL_ORDER),
+    ...validateCollection("idol event", IDOL_EVENTS, IDOL_EVENT_ORDER),
     ...validateCollection("facility", FACILITIES, FACILITY_ORDER),
     ...validateCollection("item", ITEMS, ITEM_ORDER),
     ...validateCollection("meguri buff", MEGURI_BUFFS, MEGURI_BUFF_ORDER),
@@ -35,6 +39,7 @@ export function validateContentDefinitions(): string[] {
     ...validateCollection("song", SONGS, SONG_ORDER),
     ...validateCollection("record", RECORDS, RECORD_ORDER),
     ...validateIdols(),
+    ...validateIdolEvents(),
     ...validateFacilities(),
     ...validateItems(),
     ...validateMeguriBuffs(),
@@ -117,6 +122,43 @@ function validateIdols(): string[] {
     if (idol.unlockRequirement) {
       errors.push(...validateRequirement(`idol "${idolId}"`, idol.unlockRequirement));
     }
+
+    return errors;
+  });
+}
+
+function validateIdolEvents(): string[] {
+  return IDOL_EVENT_ORDER.flatMap((eventId) => {
+    const event = IDOL_EVENTS[eventId];
+    const errors: string[] = [];
+
+    if (!Object.prototype.hasOwnProperty.call(IDOLS, event.idolId)) {
+      errors.push(`idol event "${eventId}": references missing idol "${event.idolId}".`);
+    }
+
+    if (!event.title.trim()) {
+      errors.push(`idol event "${eventId}": title is empty.`);
+    }
+
+    if (!event.body.trim()) {
+      errors.push(`idol event "${eventId}": body is empty.`);
+    }
+
+    if (
+      event.revealLevel !== "surface" &&
+      event.revealLevel !== "uncanny" &&
+      event.revealLevel !== "technical" &&
+      event.revealLevel !== "deep"
+    ) {
+      errors.push(`idol event "${eventId}": revealLevel is invalid.`);
+    }
+
+    if (event.revealLevel === "surface") {
+      errors.push(...validateSurfaceRecordTerms(eventId, event.title));
+      errors.push(...validateSurfaceRecordTerms(eventId, event.body));
+    }
+
+    errors.push(...validateRequirement(`idol event "${eventId}"`, event.unlockRequirement));
 
     return errors;
   });
@@ -507,6 +549,12 @@ function validateReachability(): string[] {
 
     if (!isReachable) {
       errors.push(`record "${recordId}": unlock requirement is unreachable.`);
+    }
+  });
+
+  IDOL_EVENT_ORDER.forEach((eventId) => {
+    if (!isRequirementPotentiallyReachable(IDOL_EVENTS[eventId].unlockRequirement, reachableFacilities, reachableSongs, reachableResources)) {
+      errors.push(`idol event "${eventId}": unlock requirement is unreachable.`);
     }
   });
 

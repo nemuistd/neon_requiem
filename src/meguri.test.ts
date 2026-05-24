@@ -243,6 +243,53 @@ describe("meguri economy", () => {
     expect(html).toContain("観測記録・灯り反応");
     expect(html).toContain('data-meguri-action="openRecords"');
   });
+
+  it("renders a compact post-meguri dashboard during regular progress", () => {
+    const preMeguriHtml = renderMeguriPanel(createMeguriReadyState(createInitialState()));
+    expect(preMeguriHtml).not.toContain('data-meguri-dashboard="true"');
+
+    const initialState = createInitialState();
+    const postMeguriState = {
+      ...initialState,
+      resources: {
+        ...initialState.resources,
+        memoryFragment: 6
+      },
+      records: {
+        ...initialState.records,
+        lightResponseObservation: {
+          unlocked: true,
+          read: true,
+          annotationRead: false
+        }
+      },
+      meguri: {
+        ...initialState.meguri,
+        count: 1,
+        buffs: {
+          ...initialState.meguri.buffs,
+          footstepResonance: {
+            purchased: true
+          }
+        },
+        idolRecognition: {
+          ...initialState.meguri.idolRecognition,
+          otowaAkari: true
+        }
+      }
+    };
+    const html = renderMeguriPanel(postMeguriState);
+
+    expect(html).toContain('data-meguri-dashboard="true"');
+    expect(html).toContain(UI_TEXT.meguriDashboardLabel);
+    expect(html).toContain("data-meguri-dashboard-loop>第1廻</strong>");
+    expect(html).toContain("data-meguri-dashboard-memory-fragments>6</strong>");
+    expect(html).toContain("data-meguri-dashboard-purchased-buffs>1 / 4</strong>");
+    expect(html).toContain("data-meguri-dashboard-annotations>1</strong>");
+    expect(html).toContain("data-meguri-dashboard-recognition>1</strong>");
+    expect(html).toContain(UI_TEXT.meguriDashboardNextGoalReadAnnotations);
+    expect(postMeguriState.meguri).not.toHaveProperty("dashboard");
+  });
 });
 
 describe("meguri reset and record annotations", () => {

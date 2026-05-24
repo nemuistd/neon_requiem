@@ -42,4 +42,22 @@ describe("locked content visibility", () => {
     expect(renderIdolTabCards(chapelVisibleState)).toContain("未確認のアイドル");
     expect(renderIdolTabCards(chapelVisibleState)).not.toContain("深月 詩乃");
   });
+
+  it("shows unlocked idol events only after their bond requirement is met", () => {
+    const baseState = createInitialState();
+    const eventReadyState = {
+      ...baseState,
+      idols: {
+        ...baseState.idols,
+        otowaAkari: {
+          ...baseState.idols.otowaAkari,
+          bond: 5
+        }
+      }
+    };
+
+    expect(renderIdolTabCards(baseState)).not.toContain("灯里・客席の灯");
+    expect(renderIdolTabCards(eventReadyState)).toContain("灯里・客席の灯");
+    expect(renderIdolTabCards(eventReadyState)).toContain("data-idol-event-id=\"otowaAkari.firstSeat\"");
+  });
 });

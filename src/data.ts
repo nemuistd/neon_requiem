@@ -43,6 +43,7 @@ export const UI_TEXT = {
   closeButtonLabel: "閉じる",
   resetSaveButtonLabel: "セーブデータを削除",
   idolSectionLabel: "アイドル",
+  idolEventsLabel: "交流イベント",
   facilitySectionLabel: "施設",
   initialIdolLabel: "初期アイドル",
   unlockedIdolLabel: "解放アイドル",
@@ -83,6 +84,14 @@ export const UI_TEXT = {
   meguriReadyLabel: "再固定準備",
   meguriSettledLabel: "廻後清算",
   meguriCountLabel: "廻回数",
+  meguriDashboardLabel: "廻後の見取り図",
+  meguriDashboardPurchasedBuffCountLabel: "取得済みバフ",
+  meguriDashboardAnnotationCountLabel: "追記解放",
+  meguriDashboardRecognitionCountLabel: "痕跡アイドル",
+  meguriDashboardNextGoalLabel: "次の目印",
+  meguriDashboardNextGoalReadAnnotations: "追記が増えた記録を読み直す",
+  meguriDashboardNextGoalChooseBuff: "次の清算で未取得バフを選ぶ",
+  meguriDashboardNextGoalContinueMeguri: "次の廻で断片と痕跡をもう少し増やす",
   meguriPreviewLabel: "獲得見込み",
   meguriNextFragmentLabel: "次の記憶断片",
   meguriCarryOverLabel: "引き継ぐもの",
@@ -117,6 +126,10 @@ export const UI_TEXT = {
   idolJoinedLog: "アイドルに声をかけました。",
   idolJoinLockedLog: "まだ声をかけられる状態ではありません。",
   idolAlreadyJoinedLog: "すでに合流しています。",
+  unreadIdolEventLabel: "未読",
+  readIdolEventLabel: "既読",
+  readIdolEventButtonLabel: "読む",
+  idolEventReadLog: "交流メモを確認しました。",
   idolRecognitionTraceLabel: "以前の廻の痕跡",
   idolRecognitionTraceText: "名前を呼ばれた感触だけが、かすかに残っている。",
   autoSavedLog: "オートセーブしました。"
@@ -151,12 +164,20 @@ export function createMeguriNextFragmentMessage(tomorusa: string): string {
   return `あと ${tomorusa} 灯るさで +1 記憶断片`;
 }
 
+export function createMeguriDashboardNextGoalFragmentMessage(memoryFragments: string): string {
+  return `次の未取得バフまで記憶断片あと ${memoryFragments}`;
+}
+
 export function createMeguriBuffPurchaseMessage(buffName: string, cost: string): string {
   return `${UI_TEXT.meguriBuffPurchasedLog} ${buffName} -${cost} 記憶断片`;
 }
 
 export function createIdolJoinMessage(idolName: string, passiveDescription: string): string {
   return `${idolName}に声をかけました。${passiveDescription} が加わります。`;
+}
+
+export function createIdolEventReadMessage(eventTitle: string): string {
+  return `${UI_TEXT.idolEventReadLog} ${eventTitle}`;
 }
 
 function getGivenName(fullName: string): string {

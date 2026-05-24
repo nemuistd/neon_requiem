@@ -2,10 +2,12 @@ import {
   FACILITIES,
   FACILITY_ORDER,
   FacilityId,
+  IDOL_EVENTS,
   ITEM_ORDER,
   ItemId,
   ITEMS,
   IdolId,
+  IdolEventId,
   IDOL_ORDER,
   IDOLS,
   MEGURI_BUFF_ORDER,
@@ -350,6 +352,20 @@ export function isIdolJoinable(state: GameState, idolId: IdolId): boolean {
   return isIdolUnlocked(state, idolId) && !isIdolJoined(state, idolId);
 }
 
+export function isIdolEventUnlocked(state: GameState, eventId: IdolEventId): boolean {
+  const event = IDOL_EVENTS[eventId];
+  const idolId = event.idolId as IdolId;
+
+  return isIdolJoined(state, idolId) && isRequirementMet(state, event.unlockRequirement);
+}
+
+export function isIdolEventRead(state: GameState, eventId: IdolEventId): boolean {
+  const event = IDOL_EVENTS[eventId];
+  const idolId = event.idolId as IdolId;
+
+  return state.idols[idolId]?.eventIdsRead.includes(eventId) ?? false;
+}
+
 export function resolveActiveIdolId(state: GameState): IdolId {
   return isIdolJoined(state, state.activeIdolId) ? state.activeIdolId : INITIAL_ACTIVE_IDOL_ID;
 }
@@ -392,6 +408,31 @@ export function joinIdol(state: GameState, idolId: IdolId): JoinIdolResult {
           ...currentIdolState,
           joined: true
         }
+      }
+    }
+  };
+}
+
+export function readIdolEvent(state: GameState, eventId: IdolEventId): GameState {
+  if (!isIdolEventUnlocked(state, eventId) || isIdolEventRead(state, eventId)) {
+    return state;
+  }
+
+  const event = IDOL_EVENTS[eventId];
+  const idolId = event.idolId as IdolId;
+  const currentIdolState = state.idols[idolId] ?? {
+    bond: 0,
+    eventIdsRead: [],
+    joined: false
+  };
+
+  return {
+    ...state,
+    idols: {
+      ...state.idols,
+      [idolId]: {
+        ...currentIdolState,
+        eventIdsRead: [...currentIdolState.eventIdsRead, eventId]
       }
     }
   };

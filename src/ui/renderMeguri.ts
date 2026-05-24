@@ -1,4 +1,5 @@
 import {
+  IDOL_ORDER,
   MEGURI_BUFF_ORDER,
   MEGURI_BUFFS,
   MeguriBuffId,
@@ -6,7 +7,12 @@ import {
   RECORDS,
   RecordId
 } from "../definitions";
-import { createMeguriNextFragmentMessage, RESOURCE_LABELS, UI_TEXT } from "../data";
+import {
+  createMeguriDashboardNextGoalFragmentMessage,
+  createMeguriNextFragmentMessage,
+  RESOURCE_LABELS,
+  UI_TEXT
+} from "../data";
 import {
   canSpendResource,
   GameState,
@@ -32,6 +38,7 @@ export function renderMeguriPanel(state: GameState): string {
 
   return `
     <section class="meguri-panel">
+      ${renderMeguriDashboard(state)}
       <article class="card meguri-status-card">
         <div class="meguri-heading">
           <span class="card-kicker">${state.meguri.pendingSettlement ? UI_TEXT.meguriSettledLabel : UI_TEXT.meguriReadyLabel}</span>
@@ -95,6 +102,52 @@ export function renderMeguriPanel(state: GameState): string {
         </div>
       </article>
     </section>
+  `;
+}
+
+function renderMeguriDashboard(state: GameState): string {
+  if (state.meguri.count <= 0) {
+    return "";
+  }
+
+  const memoryFragments = getResourceAmount(state, MEMORY_FRAGMENT_RESOURCE_ID);
+  const purchasedBuffCount = getPurchasedMeguriBuffCount(state);
+  const unlockedAnnotationCount = getUnlockedAnnotationRecordIds(state).length;
+  const recognitionCount = getMeguriRecognitionCount(state);
+
+  return `
+      <article class="card meguri-dashboard-card" data-meguri-dashboard="true">
+        <div class="meguri-heading">
+          <span class="card-kicker">${UI_TEXT.meguriDashboardLabel}</span>
+          <span class="meguri-state closed">${UI_TEXT.meguriSettlementClosedLabel}</span>
+        </div>
+        <div class="meguri-dashboard-grid">
+          <div class="meguri-dashboard-stat">
+            <span>${UI_TEXT.meguriCountLabel}</span>
+            <strong data-meguri-dashboard-loop>第${state.meguri.count}廻</strong>
+          </div>
+          <div class="meguri-dashboard-stat">
+            <span>${RESOURCE_LABELS.memoryFragment}</span>
+            <strong data-meguri-dashboard-memory-fragments>${formatWholeAmount(memoryFragments)}</strong>
+          </div>
+          <div class="meguri-dashboard-stat">
+            <span>${UI_TEXT.meguriDashboardPurchasedBuffCountLabel}</span>
+            <strong data-meguri-dashboard-purchased-buffs>${purchasedBuffCount} / ${MEGURI_BUFF_ORDER.length}</strong>
+          </div>
+          <div class="meguri-dashboard-stat">
+            <span>${UI_TEXT.meguriDashboardAnnotationCountLabel}</span>
+            <strong data-meguri-dashboard-annotations>${unlockedAnnotationCount}</strong>
+          </div>
+          <div class="meguri-dashboard-stat">
+            <span>${UI_TEXT.meguriDashboardRecognitionCountLabel}</span>
+            <strong data-meguri-dashboard-recognition>${recognitionCount}</strong>
+          </div>
+        </div>
+        <div class="meguri-dashboard-goal">
+          <span>${UI_TEXT.meguriDashboardNextGoalLabel}</span>
+          <strong data-meguri-dashboard-next-goal>${getMeguriDashboardNextGoal(state, memoryFragments)}</strong>
+        </div>
+      </article>
   `;
 }
 
@@ -190,7 +243,41 @@ function renderMeguriSettlementRecordNote(recordId: RecordId): string {
 }
 
 function getUnreadAnnotationRecordIds(state: GameState): RecordId[] {
-  return RECORD_ORDER.filter((recordId) => isRecordAnnotationUnlocked(state, recordId) && !isRecordAnnotationRead(state, recordId));
+  return getUnlockedAnnotationRecordIds(state).filter((recordId) => !isRecordAnnotationRead(state, recordId));
+}
+
+function getUnlockedAnnotationRecordIds(state: GameState): RecordId[] {
+  return RECORD_ORDER.filter((recordId) => isRecordAnnotationUnlocked(state, recordId));
+}
+
+function getPurchasedMeguriBuffCount(state: GameState): number {
+  return MEGURI_BUFF_ORDER.filter((buffId) => isMeguriBuffPurchased(state, buffId)).length;
+}
+
+function getMeguriRecognitionCount(state: GameState): number {
+  return IDOL_ORDER.filter((idolId) => state.meguri.idolRecognition[idolId] === true).length;
+}
+
+function getMeguriDashboardNextGoal(state: GameState, memoryFragments: number): string {
+  if (getUnreadAnnotationRecordIds(state).length > 0) {
+    return UI_TEXT.meguriDashboardNextGoalReadAnnotations;
+  }
+
+  const unpurchasedBuffCosts = MEGURI_BUFF_ORDER
+    .filter((buffId) => !isMeguriBuffPurchased(state, buffId))
+    .map((buffId) => MEGURI_BUFFS[buffId].cost);
+
+  if (unpurchasedBuffCosts.length <= 0) {
+    return UI_TEXT.meguriDashboardNextGoalContinueMeguri;
+  }
+
+  const nextBuffCost = Math.min(...unpurchasedBuffCosts);
+
+  if (memoryFragments >= nextBuffCost) {
+    return UI_TEXT.meguriDashboardNextGoalChooseBuff;
+  }
+
+  return createMeguriDashboardNextGoalFragmentMessage(formatWholeAmount(Math.ceil(nextBuffCost - memoryFragments)));
 }
 
 function renderMemoryFragmentProgress(progressRatio: number, tomorusaUntilNext: number): string {
