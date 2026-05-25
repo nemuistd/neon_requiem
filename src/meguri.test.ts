@@ -8,6 +8,7 @@ import {
   getRequiredTomorusaForEligibleMemoryFragments,
   getResourceAmount,
   isMeguriTabUnlocked,
+  markRecordTabSeen,
   MEMORY_FRAGMENT_RESOURCE_ID,
   performManualLive,
   performMeguri,
@@ -534,6 +535,29 @@ describe("meguri reset and record annotations", () => {
 
     const readState = readRecord(buffResult.state, "lightResponseObservation");
     expect(getUnreadRecordNotificationCount(readState, "restoration")).toBe(0);
+  });
+
+  it("notifies record tab when a regular record unlocks after the tab was last opened", () => {
+    const seenState = markRecordTabSeen(createInitialState());
+
+    expect(seenState.records.alleyStageRestorationMemo.unlocked).toBe(true);
+    expect(seenState.records.firstAudienceNote.unlocked).toBe(false);
+    expect(getUnreadRecordNotificationCount(seenState, "restoration")).toBe(0);
+
+    const progressedState = {
+      ...seenState,
+      facilities: {
+        ...seenState.facilities,
+        alleyStage: { level: 2 }
+      }
+    };
+
+    expect(getUnreadRecordNotificationCount(progressedState, "restoration")).toBe(1);
+
+    const seenAgainState = markRecordTabSeen(progressedState);
+
+    expect(seenAgainState.records.firstAudienceNote.unlocked).toBe(true);
+    expect(getUnreadRecordNotificationCount(seenAgainState, "restoration")).toBe(0);
   });
 });
 

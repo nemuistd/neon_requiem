@@ -439,12 +439,20 @@ export function readIdolEvent(state: GameState, eventId: IdolEventId): GameState
 }
 
 export function markRecordTabSeen(state: GameState): GameState {
-  if (state.recordTabLastSeenContentVersion >= RECORD_CONTENT_VERSION) {
-    return state;
-  }
+  const records = RECORD_ORDER.reduce(
+    (seenRecords, recordId) => ({
+      ...seenRecords,
+      [recordId]: {
+        ...seenRecords[recordId],
+        unlocked: seenRecords[recordId].unlocked || isRecordUnlocked(state, recordId)
+      }
+    }),
+    state.records
+  );
 
   return {
     ...state,
+    records,
     recordTabLastSeenContentVersion: RECORD_CONTENT_VERSION
   };
 }

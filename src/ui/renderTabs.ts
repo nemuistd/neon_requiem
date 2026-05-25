@@ -1,7 +1,6 @@
 import {
   ITEM_ORDER,
   RECORD_ORDER,
-  RECORDS,
   SONG_ORDER
 } from "../definitions";
 import {
@@ -97,11 +96,10 @@ export function getUnreadRecordNotificationCount(state: GameState, activeTabId: 
   }
 
   return RECORD_ORDER.reduce((count, recordId) => {
-    const record = RECORDS[recordId];
     const hasUnreadBody =
       isRecordUnlocked(state, recordId) &&
       !isRecordRead(state, recordId) &&
-      record.introducedAtVersion > state.recordTabLastSeenContentVersion;
+      !state.records[recordId]?.unlocked;
     const hasUnreadAnnotation = isRecordAnnotationUnlocked(state, recordId) && !isRecordAnnotationRead(state, recordId);
 
     return count + ((hasUnreadBody || hasUnreadAnnotation) && hasUnreadRecordContent(state, recordId) ? 1 : 0);
