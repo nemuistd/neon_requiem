@@ -219,7 +219,7 @@
 
 ## Ch.7以降の実装境界
 
-Ch.7以降の章・施設・アイドル名は fiction 正史として扱う。ただし、現在は未実装であり、実装する場合は `docs/fiction/`、`docs/current_spec.md`、関連 planning を確認して個別タスクへ落とす。
+Ch.7以降の章・施設・アイドル名は fiction 正史として扱う。Ch.7〜Ch.8 の最小縦切りは実装済みであり、Ch.9 以降を実装する場合は `docs/fiction/`、`docs/current_spec.md`、関連 planning を確認して個別タスクへ落とす。
 
 白霧 燐、主人公の正体、霞の意志、旧計画の全貌は、fiction で定義された範囲を超えてこの文書だけで確定しない。
 

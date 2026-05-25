@@ -1,8 +1,9 @@
 import { ContentId, defineContent, toContentMap, toContentOrder } from "./defineContent.js";
 import { RecordDefinition } from "./types.js";
 
-export const RECORD_CONTENT_VERSION = 12;
+export const RECORD_CONTENT_VERSION = 13;
 const PRE_CH7_RECORD_CONTENT_VERSION = 11;
+const CH7_RECORD_CONTENT_VERSION = 12;
 
 export const RECORD_DEFINITIONS = defineContent([
   {
@@ -559,7 +560,7 @@ export const RECORD_DEFINITIONS = defineContent([
     revealLevel: "technical",
     body:
       "深層観測所の前室に到達した。内部には長期間使われていなかった形跡がある一方で、電源系統は完全には死んでおらず、一部の計測機器は現在も動作する。最後に誰が使ったのかは不明。霞山 澪は、いつからここにいたのかを訊かれると、来た時期を覚えていないと答えた。",
-    introducedAtVersion: RECORD_CONTENT_VERSION,
+    introducedAtVersion: CH7_RECORD_CONTENT_VERSION,
     unlockRequirements: [
       {
         type: "all",
@@ -584,7 +585,7 @@ export const RECORD_DEFINITIONS = defineContent([
     revealLevel: "technical",
     body:
       "深層観測所の前室に、霞山 澪の記録が残されている。「霞濃度：通常値より低い。原因として観測者数の増加が考えられる。ただし増加分と低下幅の相関は線形ではない。認知の質が数より重要な可能性がある」。その観測が誰に頼まれたものなのか、澪自身の意思によるものなのかは、まだ問わないことにした。",
-    introducedAtVersion: RECORD_CONTENT_VERSION,
+    introducedAtVersion: CH7_RECORD_CONTENT_VERSION,
     unlockRequirements: [
       {
         type: "all",
@@ -597,6 +598,56 @@ export const RECORD_DEFINITIONS = defineContent([
             type: "facility.level",
             facilityId: "deepLayerObservatory",
             level: 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "prayerEngineeringRecordFragment",
+    title: "祈念工学・記録断片",
+    category: "断片記憶",
+    revealLevel: "deep",
+    body:
+      "皐月が翻訳した断片の要約。祈念工学とは、人々の願い、祈り、期待、注目を束ね、現実を望ましい形へ固定または改変しようとした技術体系である、と記されている。制御は完全ではなく、霞を介して外部の応答を招く方法だったという評価も残る。皐月は、読めるが完全には理解できていない、と余白に書き添えた。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "all",
+        requirements: [
+          {
+            type: "meguri.count",
+            count: 1
+          },
+          {
+            type: "facility.level",
+            facilityId: "engineeringArchive",
+            level: 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "experimentalRuinsFieldReport",
+    title: "実験跡地・現地調査報告",
+    category: "観測記録",
+    revealLevel: "deep",
+    body:
+      "祈念工学実験跡地の調査を行った。建物の構造は残っている。機材の一部も残っているが、ほとんどは使用不能。焼けたのではなく、急速に使われなくなった形跡がある。部屋の中央に大きな機材が残っているが、接続先がない。澪は一度だけその機材を見て「知っている」と言った。どこで知ったかは聞かなかった。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "all",
+        requirements: [
+          {
+            type: "meguri.count",
+            count: 1
+          },
+          {
+            type: "facility.level",
+            facilityId: "prayerEngineeringRuins",
+            level: 1
           }
         ]
       }

@@ -151,6 +151,8 @@ describe("game state and effects", () => {
     expect(state.facilities.undergroundPassageRepair.level).toBe(0);
     expect(state.facilities.restabilizationCore.level).toBe(0);
     expect(state.facilities.deepLayerObservatory.level).toBe(0);
+    expect(state.facilities.engineeringArchive.level).toBe(0);
+    expect(state.facilities.prayerEngineeringRuins.level).toBe(0);
     expect(state.items.oldNeonTube.purchased).toBe(false);
     expect(state.items.ticketStubBundle.purchased).toBe(false);
     expect(state.items.oldRadioTowerDebris.purchased).toBe(false);
@@ -164,6 +166,7 @@ describe("game state and effects", () => {
     expect(state.idols.hinataKoharu.bond).toBe(0);
     expect(state.idols.tsuginohataSakurako.bond).toBe(0);
     expect(state.idols.kasumiyamaMio.bond).toBe(0);
+    expect(state.idols.nanashiroSatsuki.bond).toBe(0);
     expect(state.idols.otowaAkari.eventIdsRead).toEqual([]);
     expect(state.songs.rojiuraIntro.purchased).toBe(false);
     expect(state.songs.prebroadcastAcapella.purchased).toBe(false);
@@ -710,6 +713,77 @@ describe("game state and effects", () => {
     expect(getFacilityTomorusaPerSecond(productionState, "alleyStage")).toBeCloseTo(1 * 1.2 * 1.05);
   });
 
+  it("unlocks the Ch.8 engineering areas and Satsuki after the Ch.7 observatory", () => {
+    const baseState = createInitialState();
+    const observatoryLevelFiveState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        restabilizationCore: { level: 3 },
+        deepLayerObservatory: { level: 5 }
+      },
+      meguri: {
+        ...baseState.meguri,
+        count: 1
+      }
+    };
+    const archiveLevelTwoState = {
+      ...observatoryLevelFiveState,
+      facilities: {
+        ...observatoryLevelFiveState.facilities,
+        engineeringArchive: { level: 2 }
+      }
+    };
+    const archiveLevelThreeState = {
+      ...archiveLevelTwoState,
+      facilities: {
+        ...archiveLevelTwoState.facilities,
+        engineeringArchive: { level: 3 }
+      }
+    };
+    const archiveLevelFiveState = {
+      ...archiveLevelThreeState,
+      facilities: {
+        ...archiveLevelThreeState.facilities,
+        engineeringArchive: { level: 5 }
+      }
+    };
+    const ruinsLevelOneState = {
+      ...archiveLevelFiveState,
+      facilities: {
+        ...archiveLevelFiveState.facilities,
+        prayerEngineeringRuins: { level: 1 }
+      }
+    };
+
+    expect(isFacilityUnlocked(baseState, "engineeringArchive")).toBe(false);
+    expect(isFacilityUnlocked(observatoryLevelFiveState, "engineeringArchive")).toBe(true);
+    expect(isRecordUnlocked(archiveLevelTwoState, "prayerEngineeringRecordFragment")).toBe(true);
+    expect(isIdolUnlocked(archiveLevelTwoState, "nanashiroSatsuki")).toBe(false);
+    expect(isIdolUnlocked(archiveLevelThreeState, "nanashiroSatsuki")).toBe(true);
+    expect(isFacilityUnlocked(archiveLevelFiveState, "prayerEngineeringRuins")).toBe(true);
+    expect(isRecordUnlocked(ruinsLevelOneState, "experimentalRuinsFieldReport")).toBe(true);
+  });
+
+  it("applies Satsuki's song and item cost multipliers after she joins", () => {
+    const baseState = createInitialState();
+    const satsukiJoinedState = withJoinedIdols({
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        deepLayerObservatory: { level: 5 },
+        engineeringArchive: { level: 3 }
+      },
+      meguri: {
+        ...baseState.meguri,
+        count: 1
+      }
+    }, ["nanashiroSatsuki"]);
+
+    expect(getSongCost(satsukiJoinedState, "rojiuraIntro")).toBe(68);
+    expect(getItemCost(satsukiJoinedState, "oldNeonTube")).toBe(85);
+  });
+
   it("applies production and caps offline reward at 12 hours", () => {
     const baseState = createInitialState();
     const state = {
@@ -1004,6 +1078,10 @@ describe("game state and effects", () => {
       {
         idolId: "kasumiyamaMio",
         eventId: "kasumiyamaMio.mistObservation"
+      },
+      {
+        idolId: "nanashiroSatsuki",
+        eventId: "nanashiroSatsuki.readableUnknown"
       }
     ] as const;
 

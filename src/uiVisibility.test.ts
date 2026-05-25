@@ -46,6 +46,30 @@ describe("locked content visibility", () => {
     expect(renderIdolTabCards(postMeguriState)).toContain("霞山 澪");
   });
 
+  it("reveals Ch.8 content only after the observatory path is open", () => {
+    const baseState = createInitialState();
+    const observatoryHiddenState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        deepLayerObservatory: { level: 5 },
+        engineeringArchive: { level: 3 }
+      }
+    };
+    const archiveVisibleState = {
+      ...observatoryHiddenState,
+      meguri: {
+        ...observatoryHiddenState.meguri,
+        count: 1
+      }
+    };
+
+    expect(renderFacilityCards(observatoryHiddenState)).not.toContain("工学記録保管区");
+    expect(renderIdolTabCards(observatoryHiddenState)).not.toContain("七城 皐月");
+    expect(renderFacilityCards(archiveVisibleState)).toContain("工学記録保管区");
+    expect(renderIdolTabCards(archiveVisibleState)).toContain("七城 皐月");
+  });
+
   it("hides locked record titles and requirements", () => {
     const html = renderRecordCards(createInitialState());
 

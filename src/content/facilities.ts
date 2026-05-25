@@ -220,6 +220,54 @@ export const FACILITY_DEFINITIONS = defineContent([
         }
       ]
     }
+  },
+  {
+    id: "engineeringArchive",
+    name: "工学記録保管区",
+    description:
+      "旧時代の工学記録を収めた保管区。閉ざされた棚には、読めるが理解できたとは言い切れない文書束が並ぶ。皐月は一冊ずつ、断定を避けるようにラベルを貼り直している。",
+    tags: ["deep"],
+    baseCost: 800000,
+    costMultiplier: 1.32,
+    productionPerLevel: 120,
+    unlockRequirement: {
+      type: "all",
+      requirements: [
+        {
+          type: "meguri.count",
+          count: 1
+        },
+        {
+          type: "facility.level",
+          facilityId: "deepLayerObservatory",
+          level: 5
+        }
+      ]
+    }
+  },
+  {
+    id: "prayerEngineeringRuins",
+    name: "祈念工学実験跡地",
+    description:
+      "大崩壊に関係する実験が行われていたと思われる跡地。設備のほとんどは沈黙しているが、一部の計器だけが今も何かを測り続けている。分かったことより、分からないまま残ったことの方が多い。",
+    tags: ["deep"],
+    baseCost: 1500000,
+    costMultiplier: 1.35,
+    productionPerLevel: 200,
+    unlockRequirement: {
+      type: "all",
+      requirements: [
+        {
+          type: "meguri.count",
+          count: 1
+        },
+        {
+          type: "facility.level",
+          facilityId: "engineeringArchive",
+          level: 5
+        }
+      ]
+    }
   }
 ] as const satisfies readonly FacilityDefinition[]);
 

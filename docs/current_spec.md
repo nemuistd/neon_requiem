@@ -7,7 +7,7 @@
 世界観・用語体系は [worldbuilding.md](worldbuilding.md) を正史とする。承認済みの物語・コンテンツ正史は [fiction/](fiction/) 配下を参照する。README とこの文書に差分が出た場合は、実装と README を確認して同期する。
 長期方針と未実装計画は [planning/](planning/) 配下を参照する。
 
-`docs/fiction/world_design.md` で定義された **廻（めぐり）** は正式システム名として扱う。現在の実装では、再固定中枢到達後に任意で廻を実行し、記憶断片を清算して廻後バフを購入し、記録の追記を表示できる。Ch.7 の最小縦切りとして、廻1後の深層観測所と霞山 澪は実装済み。Ch.8 以降の大型展開、白霧 燐、Ch.9 収束は未実装であり、長期仕様は `docs/planning/meguri_system_spec.md` と `docs/fiction/meguri_after_design.md` を参照する。
+`docs/fiction/world_design.md` で定義された **廻（めぐり）** は正式システム名として扱う。現在の実装では、再固定中枢到達後に任意で廻を実行し、記憶断片を清算して廻後バフを購入し、記録の追記を表示できる。Ch.7 の深層観測所と霞山 澪、Ch.8 の工学記録保管区、祈念工学実験跡地、七城 皐月は最小縦切りとして実装済み。白霧 燐、Ch.9 収束、バインダー封書の全文解読は未実装であり、長期仕様は `docs/planning/meguri_system_spec.md` と `docs/fiction/meguri_after_design.md` を参照する。
 
 ## 技術構成
 
@@ -75,10 +75,12 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `undergroundPassageRepair` | 地下通路修復区画 | 地下礼拝堂 Lv8 / 礼拝堂のハーモニー取得 | 60000 | 1.28 | 20 |
 | `restabilizationCore` | 再固定中枢 | 地下通路修復区画 Lv5 / 修復の仮歌取得 | 100000 | 1.30 | 25 |
 | `deepLayerObservatory` | 深層観測所 | 廻 1回以上 / 再固定中枢 Lv3 | 300000 | 1.30 | 60 |
+| `engineeringArchive` | 工学記録保管区 | 廻 1回以上 / 深層観測所 Lv5 | 800000 | 1.32 | 120 |
+| `prayerEngineeringRuins` | 祈念工学実験跡地 | 廻 1回以上 / 工学記録保管区 Lv5 | 1500000 | 1.35 | 200 |
 
 地下礼拝堂は序盤施設ではなく、中盤以降の深層施設として扱う。
 地下通路修復区画は Chapter 5 末尾の深層接続施設として扱う。`再固定中枢` は廻本体の起点であり、Lv1 になると廻を実行できる。
-深層観測所は Ch.7 の最初の実装施設であり、初回廻前には通常UIに出さない。新しい章保存フィールドは使わず、`meguri.count` と再固定中枢 Lv で解放する。
+深層観測所は Ch.7 の最初の実装施設であり、初回廻前には通常UIに出さない。工学記録保管区と祈念工学実験跡地は Ch.8 の最小実装施設であり、皐月と工学記録の入口に接続する。新しい章保存フィールドは使わず、`meguri.count` と施設 Lv で解放する。
 録音保管庫と古い放送室は、地下広場へ進む前の主導線として扱う。任意分岐ではなく、記録と名前の章を通過させるための前提施設である。
 
 ## アイドル
@@ -93,8 +95,9 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `hinataKoharu` | 陽向 小春 | 地下広場 Lv1 | 全灯るさ生産 x1.08 / アイテム購入コスト x0.90 |
 | `tsuginohataSakurako` | 継ノ端 桜子 | 地下通路修復区画 Lv1 | オフライン灯るさ報酬 x1.15 |
 | `kasumiyamaMio` | 霞山 澪 | 廻 1回以上 / 深層観測所 Lv1 | deepタグ施設の灯るさ生産 x1.35 |
+| `nanashiroSatsuki` | 七城 皐月 | 廻 1回以上 / 工学記録保管区 Lv3 | 歌・アイテム取得コスト x0.85 |
 
-アイドル効果は `passiveEffects: Effect[]` として定義する。解放条件を満たしただけでは常時発動せず、アイドルタブで「声をかける」を実行して加入済みになった後に発動する。灯里・結・詩乃は `facility.production.multiplier`、遠子は `manual.gain.add.production.ratio`、巡は `bond.rate.multiplier`、小春は `facility.production.multiplier` と `item.cost.multiplier`、桜子は `offline.reward.multiplier`、澪は `facility.production.multiplier.tag` を持つ。`focusEffects` は型だけ用意しているが、注目アイドルは「好きなアイドルを画面に置く」ための枠でもあるため、進行効率に直結する注目アイドル限定効果の適用は保留する。
+アイドル効果は `passiveEffects: Effect[]` として定義する。解放条件を満たしただけでは常時発動せず、アイドルタブで「声をかける」を実行して加入済みになった後に発動する。灯里・結・詩乃は `facility.production.multiplier`、遠子は `manual.gain.add.production.ratio`、巡は `bond.rate.multiplier`、小春は `facility.production.multiplier` と `item.cost.multiplier`、桜子は `offline.reward.multiplier`、澪は `facility.production.multiplier.tag`、皐月は `song.cost.multiplier` と `item.cost.multiplier` を持つ。`focusEffects` は型だけ用意しているが、注目アイドルは「好きなアイドルを画面に置く」ための枠でもあるため、進行効率に直結する注目アイドル限定効果の適用は保留する。
 
 音羽 灯里は新規開始時点で加入済み。ほかのアイドルは、関連施設が見える、解放条件を満たす、声をかける、効果が加わる、の順に進む。声をかける操作は、アイドルタブのカードと左側の注目アイドル枠の切替リストから行える。既存セーブからの移行では、旧仕様で解放済みだったアイドルを加入済みにして、既存プレイヤーの効果を突然失わせない。
 
@@ -116,6 +119,7 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `hibikiTooko.preBroadcastCheck` | 交流イベント | 響木 遠子 | 響木 遠子 交流 5 | 配信前の機材確認で、いる前提で話す理由を聞く短い場面 |
 | `kaminoMeguri.unknownAuthorProof` | 交流イベント | 紙野 巡 | 紙野 巡 交流 5 | 著者不明というラベルを、残っている証明として扱う短い場面 |
 | `kasumiyamaMio.mistObservation` | 交流イベント | 霞山 澪 | 霞山 澪 交流 5 | 霞を観測対象として扱う澪の距離感を聞く短い場面 |
+| `nanashiroSatsuki.readableUnknown` | 交流イベント | 七城 皐月 | 七城 皐月 交流 5 | 読めることと理解できることを分ける皐月の姿勢を聞く短い場面 |
 | `otowaAkari.twilightFirstPause` | 薄明の記憶 | 音羽 灯里 | 廻 1回以上、音羽 灯里の以前の廻の痕跡、音羽 灯里 交流 5 | 名前を呼ばれた時の返事の間合いが少し違う |
 
 効果エンジンは、追加アイドル・追加施設に備えて以下の効果タイプを扱える。
@@ -282,6 +286,8 @@ ceil((nextEligibleFragments / memoryFragmentMultiplier) ** 2 * 20000)
 - 桜子・外されていた記録
 - 深層観測所・前室報告
 - 澪・霞の観測記録
+- 祈念工学・記録断片
+- 実験跡地・現地調査報告
 
 現在の廻後追記:
 

@@ -87,6 +87,20 @@ export const IDOL_EVENT_DEFINITIONS = defineContent([
     introducedAtVersion: 14
   },
   {
+    id: "nanashiroSatsuki.readableUnknown",
+    idolId: "nanashiroSatsuki",
+    title: "皐月・読める、でも分からない",
+    revealLevel: "technical",
+    body:
+      "工学記録の束を前に、皐月は行を指で追いながら言った。「これは観測者数の記録。多分」多分、と聞き返すと、「読めるけど、理解しているかどうかは別。読んだことを、正しいと思い込まないようにしてる」と答えた。",
+    unlockRequirement: {
+      type: "idol.bond",
+      idolId: "nanashiroSatsuki",
+      amount: 5
+    },
+    introducedAtVersion: 15
+  },
+  {
     id: "otowaAkari.twilightFirstPause",
     idolId: "otowaAkari",
     title: "灯里・一拍遅い返事",

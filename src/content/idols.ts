@@ -184,6 +184,39 @@ export const IDOL_DEFINITIONS = defineContent([
         }
       ]
     }
+  },
+  {
+    id: "nanashiroSatsuki",
+    name: "七城 皐月",
+    reading: "ななしろ さつき",
+    title: "工学記録の解読者",
+    description:
+      "祈念工学の文書を読める数少ない人間。ただし、読めることと理解できることは別だと言い続ける。危険な知識を怖がるより、分からないまま丁寧に扱うことを選んでいる。",
+    passiveDescription: "歌・アイテム取得コスト x0.85",
+    passiveEffects: [
+      {
+        type: "song.cost.multiplier",
+        multiplier: 0.85
+      },
+      {
+        type: "item.cost.multiplier",
+        multiplier: 0.85
+      }
+    ],
+    unlockRequirement: {
+      type: "all",
+      requirements: [
+        {
+          type: "meguri.count",
+          count: 1
+        },
+        {
+          type: "facility.level",
+          facilityId: "engineeringArchive",
+          level: 3
+        }
+      ]
+    }
   }
 ] as const satisfies readonly IdolDefinition[]);
 
