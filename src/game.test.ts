@@ -26,6 +26,7 @@ import {
   isIdolEventUnlocked,
   isIdolJoined,
   isIdolUnlocked,
+  isItemUnlocked,
   isRecordRead,
   isRecordUnlocked,
   isSongUnlocked,
@@ -49,7 +50,7 @@ import {
   getSongCostMultiplierFromEffects
 } from "./engine/effects";
 import { areRequirementsMet, isRequirementMet } from "./engine/requirements";
-import { IDOL_ORDER, IdolId } from "./definitions";
+import { IDOL_ORDER, IdolId, RECORD_CONTENT_VERSION, RECORDS } from "./definitions";
 import { validateRequirement } from "./contentValidation";
 import { loadGame, SAVE_KEY } from "./storage";
 
@@ -624,6 +625,17 @@ describe("game state and effects", () => {
         undergroundChapel: { level: 8 }
       }
     };
+    const chapelLevelNineMeguriState = {
+      ...chapelLevelEightState,
+      facilities: {
+        ...chapelLevelEightState.facilities,
+        undergroundChapel: { level: 9 }
+      },
+      meguri: {
+        ...chapelLevelEightState.meguri,
+        count: 1
+      }
+    };
     const chapelSongState = {
       ...chapelLevelEightState,
       songs: {
@@ -640,6 +652,8 @@ describe("game state and effects", () => {
     expect(isRecordUnlocked(chapelSongState, "songAndHymnDistinction")).toBe(true);
     expect(isRecordUnlocked(chapelLevelEightState, "binderSealedLetterOpening")).toBe(false);
     expect(isRecordUnlocked(chapelSongState, "binderSealedLetterOpening")).toBe(true);
+    expect(isRecordUnlocked(chapelLevelEightState, "binderSealedLetterFirstLine")).toBe(false);
+    expect(isRecordUnlocked(chapelLevelNineMeguriState, "binderSealedLetterFirstLine")).toBe(true);
   });
 
   it("unlocks the passage repair area and Sakurako before entering the meguri system", () => {
@@ -660,6 +674,7 @@ describe("game state and effects", () => {
     expect(isFacilityUnlocked(repairState, "undergroundPassageRepair")).toBe(true);
     expect(isIdolUnlocked(repairState, "tsuginohataSakurako")).toBe(true);
     expect(isRecordUnlocked(repairState, "sakurakoRemovedPartsReport")).toBe(true);
+    expect(isRecordUnlocked(repairState, "deepDistrictBlueprintDiscrepancy")).toBe(false);
     expect(getOfflineRewardMultiplier(repairState)).toBeCloseTo(1.15);
     expect(getItemCost(repairState, "repairToolSet")).toBe(50000);
     expect(getSongCost(repairState, "restorationHumming")).toBe(80000);
@@ -669,8 +684,45 @@ describe("game state and effects", () => {
 
     expect(itemResult.purchased).toBe(true);
     expect(songResult.purchased).toBe(true);
+    expect(isRecordUnlocked({
+      ...repairState,
+      facilities: {
+        ...repairState.facilities,
+        undergroundPassageRepair: { level: 4 }
+      }
+    }, "deepDistrictBlueprintDiscrepancy")).toBe(true);
     expect(getFacilityTomorusaPerSecond(itemResult.state, "undergroundPassageRepair")).toBeCloseTo(60 * 1.2 * 1.1 * 1.1 * 1.08);
     expect(getOfflineRewardMultiplier(songResult.state)).toBeCloseTo(1.15 * 1.1);
+  });
+
+  it("unlocks post-meguri alley records only after the required meguri count", () => {
+    const baseState = createInitialState();
+    const alleyLevelOneState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        alleyStage: { level: 1 }
+      }
+    };
+    const firstMeguriAlleyState = {
+      ...alleyLevelOneState,
+      meguri: {
+        ...alleyLevelOneState.meguri,
+        count: 1
+      }
+    };
+    const secondMeguriState = {
+      ...firstMeguriAlleyState,
+      meguri: {
+        ...firstMeguriAlleyState.meguri,
+        count: 2
+      }
+    };
+
+    expect(isRecordUnlocked(alleyLevelOneState, "postMeguriAlleySubtleChange")).toBe(false);
+    expect(isRecordUnlocked(firstMeguriAlleyState, "postMeguriAlleySubtleChange")).toBe(true);
+    expect(isRecordUnlocked(firstMeguriAlleyState, "secondMeguriRecord")).toBe(false);
+    expect(isRecordUnlocked(secondMeguriState, "secondMeguriRecord")).toBe(true);
   });
 
   it("unlocks the Ch.7 observatory and Mio only after the first meguri", () => {
@@ -703,6 +755,27 @@ describe("game state and effects", () => {
         deepLayerObservatory: { level: 2 }
       }
     };
+    const observatoryLevelThreeState = {
+      ...observatoryLevelTwoState,
+      facilities: {
+        ...observatoryLevelTwoState.facilities,
+        deepLayerObservatory: { level: 3 }
+      }
+    };
+    const observatoryLevelFourState = {
+      ...observatoryLevelThreeState,
+      facilities: {
+        ...observatoryLevelThreeState.facilities,
+        deepLayerObservatory: { level: 4 }
+      }
+    };
+    const observatoryLevelFiveState = {
+      ...observatoryLevelFourState,
+      facilities: {
+        ...observatoryLevelFourState.facilities,
+        deepLayerObservatory: { level: 5 }
+      }
+    };
 
     expect(isFacilityUnlocked(coreLevelThreeState, "deepLayerObservatory")).toBe(false);
     expect(isFacilityUnlocked(postMeguriCoreState, "deepLayerObservatory")).toBe(true);
@@ -711,6 +784,15 @@ describe("game state and effects", () => {
     expect(isRecordUnlocked(observatoryLevelOneState, "deepLayerObservatoryAnteroomReport")).toBe(true);
     expect(isRecordUnlocked(observatoryLevelOneState, "mioMistObservationLog")).toBe(false);
     expect(isRecordUnlocked(observatoryLevelTwoState, "mioMistObservationLog")).toBe(true);
+    expect(isItemUnlocked(observatoryLevelTwoState, "coverlessObservationLog")).toBe(true);
+    expect(isRecordUnlocked(observatoryLevelTwoState, "coverlessObservationLogFragment")).toBe(true);
+    expect(isSongUnlocked(observatoryLevelTwoState, "deepLayerSilence")).toBe(false);
+    expect(isSongUnlocked(observatoryLevelThreeState, "deepLayerSilence")).toBe(true);
+    expect(isRecordUnlocked(observatoryLevelThreeState, "deepLayerSilenceMeasurement")).toBe(true);
+    expect(isRecordUnlocked(observatoryLevelTwoState, "cognitiveFixationRateChangeLog")).toBe(false);
+    expect(isRecordUnlocked(observatoryLevelThreeState, "cognitiveFixationRateChangeLog")).toBe(true);
+    expect(isRecordUnlocked(observatoryLevelFourState, "observerThresholdFragment")).toBe(true);
+    expect(isRecordUnlocked(observatoryLevelFiveState, "protagonistFirstMemoryFragment")).toBe(true);
   });
 
   it("applies Mio's deep facility multiplier only to deep facilities", () => {
@@ -731,6 +813,34 @@ describe("game state and effects", () => {
 
     expect(getFacilityTomorusaPerSecond(productionState, "deepLayerObservatory")).toBeCloseTo(120 * 1.2 * 1.35 * 1.05);
     expect(getFacilityTomorusaPerSecond(productionState, "alleyStage")).toBeCloseTo(1 * 1.2 * 1.05);
+  });
+
+  it("applies Ch.7 reinforcement deep tag multipliers only to deep facilities", () => {
+    const baseState = createInitialState();
+    const purchasedDeepContentState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        alleyStage: { level: 10 },
+        restabilizationCore: { level: 3 },
+        deepLayerObservatory: { level: 2 }
+      },
+      items: {
+        ...baseState.items,
+        coverlessObservationLog: { purchased: true }
+      },
+      songs: {
+        ...baseState.songs,
+        deepLayerSilence: { purchased: true }
+      },
+      meguri: {
+        ...baseState.meguri,
+        count: 1
+      }
+    };
+
+    expect(getFacilityTomorusaPerSecond(purchasedDeepContentState, "deepLayerObservatory")).toBeCloseTo(120 * 1.2 * 1.12 * 1.25 * 1.05);
+    expect(getFacilityTomorusaPerSecond(purchasedDeepContentState, "alleyStage")).toBeCloseTo(1 * 1.2 * 1.05);
   });
 
   it("unlocks the Ch.8 engineering areas and Satsuki after the Ch.7 observatory", () => {
@@ -779,10 +889,40 @@ describe("game state and effects", () => {
     expect(isFacilityUnlocked(baseState, "engineeringArchive")).toBe(false);
     expect(isFacilityUnlocked(observatoryLevelFiveState, "engineeringArchive")).toBe(true);
     expect(isRecordUnlocked(archiveLevelTwoState, "prayerEngineeringRecordFragment")).toBe(true);
+    expect(isItemUnlocked(archiveLevelTwoState, "sortedEngineeringFragment")).toBe(true);
+    expect(isSongUnlocked(archiveLevelTwoState, "fragmentMelody")).toBe(false);
     expect(isIdolUnlocked(archiveLevelTwoState, "nanashiroSatsuki")).toBe(false);
     expect(isIdolUnlocked(archiveLevelThreeState, "nanashiroSatsuki")).toBe(true);
+    expect(isSongUnlocked(archiveLevelThreeState, "fragmentMelody")).toBe(true);
+    expect(isRecordUnlocked(archiveLevelThreeState, "oldCouncilRecordFragment")).toBe(false);
+    expect(isRecordUnlocked(archiveLevelFiveState, "oldCouncilRecordFragment")).toBe(true);
+    expect(isRecordUnlocked(archiveLevelFiveState, "sealedMemoryFragment")).toBe(true);
     expect(isFacilityUnlocked(archiveLevelFiveState, "prayerEngineeringRuins")).toBe(true);
     expect(isRecordUnlocked(ruinsLevelOneState, "experimentalRuinsFieldReport")).toBe(true);
+  });
+
+  it("marks only the records_draft consolidation records as the latest record content", () => {
+    const latestRecordIds = [
+      "binderSealedLetterFirstLine",
+      "postMeguriAlleySubtleChange",
+      "secondMeguriRecord",
+      "deepDistrictBlueprintDiscrepancy",
+      "cognitiveFixationRateChangeLog",
+      "observerThresholdFragment",
+      "protagonistFirstMemoryFragment",
+      "meguriMemoryRelation"
+    ] as const;
+
+    latestRecordIds.forEach((recordId) => {
+      expect(RECORDS[recordId].introducedAtVersion).toBe(RECORD_CONTENT_VERSION);
+    });
+
+    expect(RECORDS.coverlessObservationLogFragment.introducedAtVersion).toBeLessThan(RECORD_CONTENT_VERSION);
+    expect(RECORDS.deepLayerSilenceMeasurement.introducedAtVersion).toBeLessThan(RECORD_CONTENT_VERSION);
+    expect(RECORDS.oldCouncilRecordFragment.introducedAtVersion).toBeLessThan(RECORD_CONTENT_VERSION);
+    expect(RECORDS.sealedMemoryFragment.introducedAtVersion).toBeLessThan(RECORD_CONTENT_VERSION);
+    expect(RECORDS.binderSealedLetterFullText.introducedAtVersion).toBeLessThan(RECORD_CONTENT_VERSION);
+    expect(RECORDS.unnamedTheaterResidualPerformance.introducedAtVersion).toBeLessThan(RECORD_CONTENT_VERSION);
   });
 
   it("applies Satsuki's song and item cost multipliers after she joins", () => {
@@ -802,6 +942,24 @@ describe("game state and effects", () => {
 
     expect(getSongCost(satsukiJoinedState, "rojiuraIntro")).toBe(68);
     expect(getItemCost(satsukiJoinedState, "oldNeonTube")).toBe(85);
+  });
+
+  it("applies the Ch.8 reinforcement song and item cost multipliers after purchase", () => {
+    const baseState = createInitialState();
+    const purchasedFragmentState = {
+      ...baseState,
+      items: {
+        ...baseState.items,
+        sortedEngineeringFragment: { purchased: true }
+      },
+      songs: {
+        ...baseState.songs,
+        fragmentMelody: { purchased: true }
+      }
+    };
+
+    expect(getSongCost(purchasedFragmentState, "rojiuraIntro")).toBe(54);
+    expect(getItemCost(purchasedFragmentState, "oldNeonTube")).toBe(80);
   });
 
   it("unlocks the Ch.9 facilities and Rin only after the second meguri", () => {
@@ -899,6 +1057,16 @@ describe("game state and effects", () => {
         theLastName: { purchased: true }
       }
     };
+    const rinBondState = {
+      ...songPurchasedState,
+      idols: {
+        ...songPurchasedState.idols,
+        shiragiriRin: {
+          ...songPurchasedState.idols.shiragiriRin,
+          bond: 5
+        }
+      }
+    };
 
     expect(isSongUnlocked(meguriOneTheaterState, "theLastName")).toBe(false);
     expect(isSongUnlocked(meguriTwoTheaterState, "theLastName")).toBe(false);
@@ -906,6 +1074,8 @@ describe("game state and effects", () => {
     expect(isRecordUnlocked(meguriTwoTheaterJoinedState, "binderSealedLetterFullText")).toBe(false);
     expect(isRecordUnlocked(songPurchasedState, "binderSealedLetterFullText")).toBe(true);
     expect(isRecordUnlocked(songPurchasedState, "unnamedTheaterResidualPerformance")).toBe(true);
+    expect(isRecordUnlocked(songPurchasedState, "meguriMemoryRelation")).toBe(false);
+    expect(isRecordUnlocked(rinBondState, "meguriMemoryRelation")).toBe(true);
     expect(isCh9OpenEndReached(songPurchasedState)).toBe(true);
   });
 
@@ -1282,6 +1452,143 @@ describe("game state and effects", () => {
       expect(isIdolEventUnlocked(unlockedState, eventId)).toBe(true);
       expect(isIdolEventRead(readState, eventId)).toBe(true);
       expect(readState.idols[idolId].eventIdsRead).toEqual([eventId]);
+      expect(getResourceAmount(readState, TOMORUSA_RESOURCE_ID)).toBe(getResourceAmount(unlockedState, TOMORUSA_RESOURCE_ID));
+      expect(getTomorusaPerSecond(readState)).toBe(getTomorusaPerSecond(unlockedState));
+    });
+  });
+
+  it("unlocks Mio's Ch.7 second event only from observatory conditions and bond 20", () => {
+    const baseState = createInitialState();
+    const noMeguriState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        deepLayerObservatory: { level: 3 }
+      },
+      idols: {
+        ...baseState.idols,
+        kasumiyamaMio: {
+          ...baseState.idols.kasumiyamaMio,
+          joined: true,
+          bond: 20
+        }
+      }
+    };
+    const observatoryLevelTwoState = {
+      ...noMeguriState,
+      facilities: {
+        ...noMeguriState.facilities,
+        deepLayerObservatory: { level: 2 }
+      },
+      meguri: {
+        ...noMeguriState.meguri,
+        count: 1
+      }
+    };
+    const almostUnlockedState = {
+      ...noMeguriState,
+      idols: {
+        ...noMeguriState.idols,
+        kasumiyamaMio: {
+          ...noMeguriState.idols.kasumiyamaMio,
+          bond: 19
+        }
+      },
+      meguri: {
+        ...noMeguriState.meguri,
+        count: 1
+      }
+    };
+    const unlockedState = {
+      ...almostUnlockedState,
+      idols: {
+        ...almostUnlockedState.idols,
+        kasumiyamaMio: {
+          ...almostUnlockedState.idols.kasumiyamaMio,
+          bond: 20
+        }
+      }
+    };
+    const readState = readIdolEvent(unlockedState, "kasumiyamaMio.oneSongPerDay");
+
+    expect(isIdolEventUnlocked(noMeguriState, "kasumiyamaMio.oneSongPerDay")).toBe(false);
+    expect(isIdolEventUnlocked(observatoryLevelTwoState, "kasumiyamaMio.oneSongPerDay")).toBe(false);
+    expect(isIdolEventUnlocked(almostUnlockedState, "kasumiyamaMio.oneSongPerDay")).toBe(false);
+    expect(isIdolEventUnlocked(unlockedState, "kasumiyamaMio.oneSongPerDay")).toBe(true);
+    expect(isIdolEventRead(readState, "kasumiyamaMio.oneSongPerDay")).toBe(true);
+    expect(readState.idols.kasumiyamaMio.eventIdsRead).toEqual(["kasumiyamaMio.oneSongPerDay"]);
+    expect(getIdolBond(readState, "kasumiyamaMio")).toBe(getIdolBond(unlockedState, "kasumiyamaMio"));
+    expect(getResourceAmount(readState, TOMORUSA_RESOURCE_ID)).toBe(getResourceAmount(unlockedState, TOMORUSA_RESOURCE_ID));
+    expect(getTomorusaPerSecond(readState)).toBe(getTomorusaPerSecond(unlockedState));
+  });
+
+  it("unlocks the Ch.8 connection idol events only from deep conditions and bond 20", () => {
+    const baseState = createInitialState();
+    const eventCases = [
+      {
+        idolId: "kasumiyamaMio",
+        eventId: "kasumiyamaMio.knownMachine",
+        facilities: {
+          prayerEngineeringRuins: { level: 1 }
+        }
+      },
+      {
+        idolId: "nanashiroSatsuki",
+        eventId: "nanashiroSatsuki.translationEcho",
+        facilities: {
+          engineeringArchive: { level: 5 }
+        }
+      }
+    ] as const;
+
+    eventCases.forEach(({ idolId, eventId, facilities }) => {
+      const noMeguriState = {
+        ...baseState,
+        facilities: {
+          ...baseState.facilities,
+          ...facilities
+        },
+        idols: {
+          ...baseState.idols,
+          [idolId]: {
+            ...baseState.idols[idolId],
+            joined: true,
+            bond: 20
+          }
+        }
+      };
+      const almostUnlockedState = {
+        ...noMeguriState,
+        idols: {
+          ...noMeguriState.idols,
+          [idolId]: {
+            ...noMeguriState.idols[idolId],
+            bond: 19
+          }
+        },
+        meguri: {
+          ...noMeguriState.meguri,
+          count: 1
+        }
+      };
+      const unlockedState = {
+        ...almostUnlockedState,
+        idols: {
+          ...almostUnlockedState.idols,
+          [idolId]: {
+            ...almostUnlockedState.idols[idolId],
+            bond: 20
+          }
+        }
+      };
+      const readState = readIdolEvent(unlockedState, eventId);
+
+      expect(isIdolEventUnlocked(noMeguriState, eventId)).toBe(false);
+      expect(isIdolEventUnlocked(almostUnlockedState, eventId)).toBe(false);
+      expect(isIdolEventUnlocked(unlockedState, eventId)).toBe(true);
+      expect(isIdolEventRead(readState, eventId)).toBe(true);
+      expect(readState.idols[idolId].eventIdsRead).toEqual([eventId]);
+      expect(getIdolBond(readState, idolId)).toBe(getIdolBond(unlockedState, idolId));
       expect(getResourceAmount(readState, TOMORUSA_RESOURCE_ID)).toBe(getResourceAmount(unlockedState, TOMORUSA_RESOURCE_ID));
       expect(getTomorusaPerSecond(readState)).toBe(getTomorusaPerSecond(unlockedState));
     });

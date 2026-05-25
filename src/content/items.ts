@@ -234,6 +234,45 @@ export const ITEM_DEFINITIONS = defineContent([
         }
       ]
     }
+  },
+  {
+    id: "coverlessObservationLog",
+    name: "観測記録用の表紙のない日誌",
+    description:
+      "澪が使っている観測日誌。表紙がない。最初からないのか、取れたのか分からない。日付の書き方は、何日目ではなく何周目・何日目という形式になっている。",
+    cost: 200000,
+    effectDescription: "深層施設の灯るさ生産 x1.12",
+    effects: [
+      {
+        type: "facility.production.multiplier.tag",
+        tag: "deep",
+        multiplier: 1.12
+      }
+    ],
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "deepLayerObservatory",
+      level: 2
+    }
+  },
+  {
+    id: "sortedEngineeringFragment",
+    name: "工学文書の断片（整理済み）",
+    description:
+      "皐月が翻訳・整理した工学文書の断片。難解な用語は残されているが、文脈は少しだけ追いやすくなっている。",
+    cost: 500000,
+    effectDescription: "歌取得コスト x0.85",
+    effects: [
+      {
+        type: "song.cost.multiplier",
+        multiplier: 0.85
+      }
+    ],
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "engineeringArchive",
+      level: 2
+    }
   }
 ] as const satisfies readonly ItemDefinition[]);
 

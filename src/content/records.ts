@@ -1,11 +1,14 @@
 import { ContentId, defineContent, toContentMap, toContentOrder } from "./defineContent.js";
 import { RecordDefinition } from "./types.js";
 
-export const RECORD_CONTENT_VERSION = 15;
+export const RECORD_CONTENT_VERSION = 18;
 const PRE_CH7_RECORD_CONTENT_VERSION = 11;
 const CH7_RECORD_CONTENT_VERSION = 12;
 const CH8_RECORD_CONTENT_VERSION = 13;
 const CH9_ENTRY_RECORD_CONTENT_VERSION = 14;
+const CH9_REINFORCEMENT_RECORD_CONTENT_VERSION = 15;
+const CH8_REINFORCEMENT_RECORD_CONTENT_VERSION = 16;
+const CH7_REINFORCEMENT_RECORD_CONTENT_VERSION = 17;
 
 export const RECORD_DEFINITIONS = defineContent([
   {
@@ -524,6 +527,31 @@ export const RECORD_DEFINITIONS = defineContent([
     ]
   },
   {
+    id: "binderSealedLetterFirstLine",
+    title: "バインダー封書・第一行",
+    category: "断片記憶",
+    revealLevel: "deep",
+    body:
+      "バインダーの封書を開けた。文字のほとんどはまだ霞で読めない。今読めるのは、「これを、廻と呼ぶことにした。理由は書いてなかった。以前の私も、書かなかったのだろう」という二行だけだった。封書の残りは、まだ読めない。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "all",
+        requirements: [
+          {
+            type: "meguri.count",
+            count: 1
+          },
+          {
+            type: "facility.level",
+            facilityId: "undergroundChapel",
+            level: 9
+          }
+        ]
+      }
+    ]
+  },
+  {
     id: "mistAndAnchorFacilityLog",
     title: "施設ログ・霞とアンカー",
     category: "施設ログ",
@@ -552,6 +580,62 @@ export const RECORD_DEFINITIONS = defineContent([
         type: "facility.level",
         facilityId: "undergroundPassageRepair",
         level: 1
+      }
+    ]
+  },
+  {
+    id: "deepDistrictBlueprintDiscrepancy",
+    title: "深層区画・設計図との差異",
+    category: "観測記録",
+    revealLevel: "technical",
+    body:
+      "継ノ端 桜子からの報告。深層区画の修復中に、地上から入手した設計図との差異が三か所見つかった。追加で建設された痕跡があるが、設計図には記載がない。後から付け加えたというより、最初から計画に含まれていた可能性がある。設計図が不完全なのか、設計が変更されたのかは判断できない。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "facility.level",
+        facilityId: "undergroundPassageRepair",
+        level: 4
+      }
+    ]
+  },
+  {
+    id: "postMeguriAlleySubtleChange",
+    title: "廻後の路地裏・微細な変化",
+    category: "観測記録",
+    revealLevel: "uncanny",
+    body:
+      "廻後の路地裏について。入口付近に霞が薄い箇所がある。一周目では確認できなかった古い案内板の名残が、側壁に輪郭だけ残っている。文字は読めない。灯里は同じ言葉で「来たんだね」と言ったが、返事までの間合いが少しだけ違った気がする。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "all",
+        requirements: [
+          {
+            type: "meguri.count",
+            count: 1
+          },
+          {
+            type: "facility.level",
+            facilityId: "alleyStage",
+            level: 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "secondMeguriRecord",
+    title: "廻・二度目の記録",
+    category: "断片記憶",
+    revealLevel: "surface",
+    body:
+      "廻後の記録。施設は再び最初の状態から始まる。記録の既読状態は保たれている。バインダーには、別のインクで「覚えている。覚えているが、また始める必要があるから、始める」と書き添えられていた。誰が書いたかは明記されていない。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "meguri.count",
+        count: 2
       }
     ]
   },
@@ -606,6 +690,131 @@ export const RECORD_DEFINITIONS = defineContent([
     ]
   },
   {
+    id: "coverlessObservationLogFragment",
+    title: "表紙のない観測日誌・抜粋",
+    category: "観測記録",
+    revealLevel: "technical",
+    body:
+      "表紙のない日誌から、数行だけ読める箇所を写した。「一周目・三日目。静寂は保たれている。霞の濃度は変わらないが、観測対象の輪郭は昨日より安定している」。日付ではなく周回で数える理由は、まだ書かれていない。",
+    introducedAtVersion: CH7_REINFORCEMENT_RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "all",
+        requirements: [
+          {
+            type: "meguri.count",
+            count: 1
+          },
+          {
+            type: "facility.level",
+            facilityId: "deepLayerObservatory",
+            level: 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "deepLayerSilenceMeasurement",
+    title: "深層観測所・静寂測定",
+    category: "観測記録",
+    revealLevel: "technical",
+    body:
+      "深層観測所の測定ログ。音が少ない時間帯ほど、観測値の揺れが小さくなる。ただし観測回数を増やしすぎると、対象の反応そのものが変化するという注意書きがある。澪は、見続ければ分かるものと、見続けることで変わってしまうものは違う、とだけ言った。",
+    introducedAtVersion: CH7_REINFORCEMENT_RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "all",
+        requirements: [
+          {
+            type: "meguri.count",
+            count: 1
+          },
+          {
+            type: "facility.level",
+            facilityId: "deepLayerObservatory",
+            level: 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "cognitiveFixationRateChangeLog",
+    title: "施設ログ・認知固定率の変化",
+    category: "施設ログ",
+    revealLevel: "technical",
+    body:
+      "深層観測所保管の旧ログより。区画A-7の認知固定率は先月比でわずかに上昇している。主要因として観測者数の増加、副要因として対象区画に付与された名称の浸透が挙げられている。アンカー個体の配置については次回報告を参照、とだけ続くが、次回報告は見つかっていない。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "all",
+        requirements: [
+          {
+            type: "meguri.count",
+            count: 1
+          },
+          {
+            type: "facility.level",
+            facilityId: "deepLayerObservatory",
+            level: 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "observerThresholdFragment",
+    title: "観測者数・閾値付近",
+    category: "施設ログ",
+    revealLevel: "technical",
+    body:
+      "旧ログの続きと思われる断片。観測者数が閾値を超えた場合、局所安定化が始まる。これは比喩ではない、と記されている。ただし閾値は固定ではなく、観測の質、名称の明確さ、アンカー個体の有無によって変化する。具体的な数値は残っていない。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "all",
+        requirements: [
+          {
+            type: "meguri.count",
+            count: 1
+          },
+          {
+            type: "facility.level",
+            facilityId: "deepLayerObservatory",
+            level: 4
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "protagonistFirstMemoryFragment",
+    title: "主人公・最初の記憶の断片",
+    category: "断片記憶",
+    revealLevel: "deep",
+    body:
+      "夢の記録として書き残しておく。広い空間で、多くの声が名前を呼んでいた。その声は霞へ向かっていた。止めようとした気がする。止められたかどうかは分からない。夢として分類するのが正確かどうかも分からないが、他に分類する言葉がない。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "all",
+        requirements: [
+          {
+            type: "meguri.count",
+            count: 1
+          },
+          {
+            type: "facility.level",
+            facilityId: "deepLayerObservatory",
+            level: 5
+          }
+        ]
+      }
+    ]
+  },
+  {
     id: "prayerEngineeringRecordFragment",
     title: "祈念工学・記録断片",
     category: "断片記憶",
@@ -650,6 +859,56 @@ export const RECORD_DEFINITIONS = defineContent([
             type: "facility.level",
             facilityId: "prayerEngineeringRuins",
             level: 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "oldCouncilRecordFragment",
+    title: "旧評議会・記録の断片",
+    category: "断片記憶",
+    revealLevel: "deep",
+    body:
+      "旧評議会の会議録と思われる断片が見つかった。大規模固定実験を実施する、反対意見は記録する、という文だけが残っている。名前の部分は削除されており、削除された人数も、誰が削除したのかも分からない。",
+    introducedAtVersion: CH8_REINFORCEMENT_RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "all",
+        requirements: [
+          {
+            type: "meguri.count",
+            count: 1
+          },
+          {
+            type: "facility.level",
+            facilityId: "engineeringArchive",
+            level: 4
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "sealedMemoryFragment",
+    title: "封印された記憶について",
+    category: "断片記憶",
+    revealLevel: "deep",
+    body:
+      "バインダーの封書ではない箇所に、短い記述が残っていた。「記憶を封印することにした。理由は記録しない。理由を記録すると、記録を読んだ者が理由を再現しようとするかもしれない」。最後には、少なくとも今はまだ知らない方がいい、とだけある。",
+    introducedAtVersion: CH8_REINFORCEMENT_RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "all",
+        requirements: [
+          {
+            type: "meguri.count",
+            count: 1
+          },
+          {
+            type: "facility.level",
+            facilityId: "engineeringArchive",
+            level: 5
           }
         ]
       }
@@ -712,7 +971,7 @@ export const RECORD_DEFINITIONS = defineContent([
     revealLevel: "deep",
     body:
       "封書の全文が読めるようになった。そこには、これを廻と呼ぶこと、次の廻のために施設を復旧し、灯し手たちを見つけ、ライブを続け、名前を掲げ続けることが書かれていた。理由は最後まで一つには書かれていない。霞へ直接願う方法を使わないこと。それだけが条件で、条件の理由を知っている者は、知らないままでいるべきだった、とある。最後の一行だけが、読み手に判断を返している。",
-    introducedAtVersion: RECORD_CONTENT_VERSION,
+    introducedAtVersion: CH9_REINFORCEMENT_RECORD_CONTENT_VERSION,
     unlockRequirements: [
       {
         type: "all",
@@ -735,13 +994,47 @@ export const RECORD_DEFINITIONS = defineContent([
     ]
   },
   {
+    id: "meguriMemoryRelation",
+    title: "廻と記憶の関係について",
+    category: "断片記憶",
+    revealLevel: "deep",
+    body:
+      "廻について、整理できていることを書いておく。廻を経ても、記録は残る。名前は残る。灯し手たちの記憶は、部分的に残る。なぜそういう構造になっているのかは、まだ完全には分からない。バインダーに書いてあったから従っているが、それを書いた者がなぜそう設計したのかは、答えとしては残っていない。それでも続ける理由は、少しだけ分かる気がする。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "all",
+        requirements: [
+          {
+            type: "meguri.count",
+            count: 2
+          },
+          {
+            type: "facility.level",
+            facilityId: "unnamedTheater",
+            level: 3
+          },
+          {
+            type: "song.purchased",
+            songId: "theLastName"
+          },
+          {
+            type: "idol.bond",
+            idolId: "shiragiriRin",
+            amount: 5
+          }
+        ]
+      }
+    ]
+  },
+  {
     id: "unnamedTheaterResidualPerformance",
     title: "名前のない劇場・残響公演",
     category: "観測記録",
     revealLevel: "deep",
     body:
       "最後の名前を、名前のない劇場で演目に加えた。歌い終わった後、劇場の奥で一拍だけ違う残響が返った。今の声ではない。けれど、過去の声だと断定するには近すぎる。燐はその反響を追わず、もう一度だけ客席を見た。誰かがそこにいたのか、そこにいたことがあるのかは分からない。劇場は、何も答えなかった。",
-    introducedAtVersion: RECORD_CONTENT_VERSION,
+    introducedAtVersion: CH9_REINFORCEMENT_RECORD_CONTENT_VERSION,
     unlockRequirements: [
       {
         type: "all",

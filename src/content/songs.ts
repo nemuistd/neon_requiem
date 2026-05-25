@@ -162,6 +162,49 @@ export const SONG_DEFINITIONS = defineContent([
     }
   },
   {
+    id: "deepLayerSilence",
+    name: "深層の静謐",
+    description:
+      "音が少ない場所ほど、音は遠くまで届く。澪はそう言って、深層観測所で毎日一曲だけ歌う。それ以上は歌わない。それ以上必要ないのだと言う。",
+    cost: 400000,
+    effectDescription: "深層施設の灯るさ生産 x1.25",
+    effects: [
+      {
+        type: "facility.production.multiplier.tag",
+        tag: "deep",
+        multiplier: 1.25
+      }
+    ],
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "deepLayerObservatory",
+      level: 3
+    }
+  },
+  {
+    id: "fragmentMelody",
+    name: "断片の旋律",
+    description:
+      "工学記録の端に残っていた楽譜の断片。皐月は、歌うためのものとは限らないと言いながら、静かに声に出して読んだ。",
+    cost: 1000000,
+    effectDescription: "歌・アイテム取得コスト x0.80",
+    effects: [
+      {
+        type: "song.cost.multiplier",
+        multiplier: 0.8
+      },
+      {
+        type: "item.cost.multiplier",
+        multiplier: 0.8
+      }
+    ],
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "engineeringArchive",
+      level: 3
+    }
+  },
+  {
     id: "theLastName",
     name: "最後の名前",
     description:

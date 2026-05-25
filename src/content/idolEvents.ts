@@ -87,6 +87,34 @@ export const IDOL_EVENT_DEFINITIONS = defineContent([
     introducedAtVersion: 14
   },
   {
+    id: "kasumiyamaMio.oneSongPerDay",
+    idolId: "kasumiyamaMio",
+    title: "澪・一日一曲",
+    revealLevel: "technical",
+    body:
+      "深層観測所の計測室で、澪は短い曲を一度だけ歌った。もう一度歌わないのかと訊くと、「一回で足りる。足りないと思って重ねると、音ではなく観測の方が変わる」と答えた。",
+    unlockRequirement: {
+      type: "all",
+      requirements: [
+        {
+          type: "meguri.count",
+          count: 1
+        },
+        {
+          type: "facility.level",
+          facilityId: "deepLayerObservatory",
+          level: 3
+        },
+        {
+          type: "idol.bond",
+          idolId: "kasumiyamaMio",
+          amount: 20
+        }
+      ]
+    },
+    introducedAtVersion: 17
+  },
+  {
     id: "nanashiroSatsuki.readableUnknown",
     idolId: "nanashiroSatsuki",
     title: "皐月・読める、でも分からない",
@@ -99,6 +127,62 @@ export const IDOL_EVENT_DEFINITIONS = defineContent([
       amount: 5
     },
     introducedAtVersion: 15
+  },
+  {
+    id: "kasumiyamaMio.knownMachine",
+    idolId: "kasumiyamaMio",
+    title: "澪・知っている機材",
+    revealLevel: "deep",
+    body:
+      "実験跡地の中央に残った機材の前で、澪は少しだけ黙った。「どこで知ったのかは分からない。でも、これが霞につながるものだということは知っている」それ以上は話さなかった。",
+    unlockRequirement: {
+      type: "all",
+      requirements: [
+        {
+          type: "meguri.count",
+          count: 1
+        },
+        {
+          type: "facility.level",
+          facilityId: "prayerEngineeringRuins",
+          level: 1
+        },
+        {
+          type: "idol.bond",
+          idolId: "kasumiyamaMio",
+          amount: 20
+        }
+      ]
+    },
+    introducedAtVersion: 16
+  },
+  {
+    id: "nanashiroSatsuki.translationEcho",
+    idolId: "nanashiroSatsuki",
+    title: "皐月・夢の言葉",
+    revealLevel: "deep",
+    body:
+      "皐月は翻訳中の断片から目を離さずに言った。「この文、あなたが前に夢で見たと言っていた言葉に似ています。記録が夢に出るのか、夢が記録を先に知っているのかは、まだ分かりません」",
+    unlockRequirement: {
+      type: "all",
+      requirements: [
+        {
+          type: "meguri.count",
+          count: 1
+        },
+        {
+          type: "facility.level",
+          facilityId: "engineeringArchive",
+          level: 5
+        },
+        {
+          type: "idol.bond",
+          idolId: "nanashiroSatsuki",
+          amount: 20
+        }
+      ]
+    },
+    introducedAtVersion: 16
   },
   {
     id: "shiragiriRin.notFirstMeeting",
