@@ -25,11 +25,15 @@ import { UI_TEXT } from "./data";
 import { MEGURI_BUFFS, RECORDS } from "./definitions";
 import { renderMeguriPanel } from "./ui/renderMeguri";
 import { renderRecordCards } from "./ui/renderRecords";
-import { getUnreadRecordNotificationCount } from "./ui/renderTabs";
+import {
+  getUnreadRecordAnnotationNotificationCount,
+  getUnreadRecordBodyNotificationCount,
+  getUnreadRecordNotificationCount
+} from "./ui/renderTabs";
 import { loadGame, SAVE_KEY } from "./storage";
 
 describe("meguri state and requirements", () => {
-  it("creates v11 state with memory fragments and empty meguri progress", () => {
+  it("creates current save state with memory fragments and empty meguri progress", () => {
     const state = createInitialState(1234);
 
     expect(state.saveVersion).toBe(SAVE_VERSION);
@@ -233,7 +237,8 @@ describe("meguri economy", () => {
         lightResponseObservation: {
           unlocked: true,
           read: true,
-          annotationRead: false
+          annotationRead: false,
+          annotationSeen: false
         }
       },
       meguri: {
@@ -276,7 +281,8 @@ describe("meguri economy", () => {
         lightResponseObservation: {
           unlocked: true,
           read: true,
-          annotationRead: false
+          annotationRead: false,
+          annotationSeen: false
         }
       },
       meguri: {
@@ -344,7 +350,8 @@ describe("meguri economy", () => {
         lightResponseObservation: {
           unlocked: true,
           read: true,
-          annotationRead: false
+          annotationRead: false,
+          annotationSeen: false
         }
       },
       meguri: {
@@ -377,7 +384,8 @@ describe("meguri economy", () => {
         lightResponseObservation: {
           unlocked: true,
           read: true,
-          annotationRead: true
+          annotationRead: true,
+          annotationSeen: true
         }
       }
     });
@@ -418,7 +426,8 @@ describe("meguri reset and record annotations", () => {
         alleyStageRestorationMemo: {
           unlocked: true,
           read: true,
-          annotationRead: true
+          annotationRead: true,
+          annotationSeen: true
         }
       },
       meguri: {
@@ -444,7 +453,12 @@ describe("meguri reset and record annotations", () => {
     expect(result.state.items.oldNeonTube.purchased).toBe(false);
     expect(result.state.idols.otowaAkari.bond).toBe(0);
     expect(result.state.idols.otowaAkari.joined).toBe(true);
-    expect(result.state.records.alleyStageRestorationMemo).toEqual({ unlocked: true, read: true, annotationRead: true });
+    expect(result.state.records.alleyStageRestorationMemo).toEqual({
+      unlocked: true,
+      read: true,
+      annotationRead: true,
+      annotationSeen: true
+    });
     expect(result.state.meguri.buffs.leftWorkMemo.purchased).toBe(true);
     expect(result.state.meguri.idolRecognition.otowaAkari).toBe(true);
     expect(result.state.meguri.count).toBe(1);
@@ -464,7 +478,8 @@ describe("meguri reset and record annotations", () => {
         lightResponseObservation: {
           unlocked: true,
           read: true,
-          annotationRead: false
+          annotationRead: false,
+          annotationSeen: false
         }
       },
       meguri: {
@@ -484,11 +499,12 @@ describe("meguri reset and record annotations", () => {
     expect(readState.records.lightResponseObservation).toEqual({
       unlocked: true,
       read: true,
-      annotationRead: true
+      annotationRead: true,
+      annotationSeen: true
     });
   });
 
-  it("notifies record tab for unread annotations without resetting all carried records after meguri", () => {
+  it("separates record and annotation notifications and clears annotation badges after opening records", () => {
     const baseState = createMeguriReadyState({
       ...createInitialState(),
       recordTabLastSeenContentVersion: 11,
@@ -498,12 +514,14 @@ describe("meguri reset and record annotations", () => {
         alleyStageRestorationMemo: {
           unlocked: true,
           read: true,
-          annotationRead: false
+          annotationRead: false,
+          annotationSeen: false
         },
         lightResponseObservation: {
           unlocked: true,
           read: true,
-          annotationRead: false
+          annotationRead: false,
+          annotationSeen: false
         }
       }
     });
@@ -515,6 +533,8 @@ describe("meguri reset and record annotations", () => {
       return;
     }
 
+    expect(getUnreadRecordBodyNotificationCount(meguriResult.state, "restoration")).toBe(0);
+    expect(getUnreadRecordAnnotationNotificationCount(meguriResult.state, "restoration")).toBe(0);
     expect(getUnreadRecordNotificationCount(meguriResult.state, "restoration")).toBe(0);
 
     const buffResult = purchaseMeguriBuff({
@@ -531,7 +551,14 @@ describe("meguri reset and record annotations", () => {
       return;
     }
 
+    expect(getUnreadRecordBodyNotificationCount(buffResult.state, "restoration")).toBe(0);
+    expect(getUnreadRecordAnnotationNotificationCount(buffResult.state, "restoration")).toBe(1);
     expect(getUnreadRecordNotificationCount(buffResult.state, "restoration")).toBe(1);
+
+    const seenState = markRecordTabSeen(buffResult.state);
+    expect(seenState.records.lightResponseObservation.annotationRead).toBe(false);
+    expect(seenState.records.lightResponseObservation.annotationSeen).toBe(true);
+    expect(getUnreadRecordAnnotationNotificationCount(seenState, "restoration")).toBe(0);
 
     const readState = readRecord(buffResult.state, "lightResponseObservation");
     expect(getUnreadRecordNotificationCount(readState, "restoration")).toBe(0);
@@ -542,7 +569,7 @@ describe("meguri reset and record annotations", () => {
 
     expect(seenState.records.alleyStageRestorationMemo.unlocked).toBe(true);
     expect(seenState.records.firstAudienceNote.unlocked).toBe(false);
-    expect(getUnreadRecordNotificationCount(seenState, "restoration")).toBe(0);
+    expect(getUnreadRecordBodyNotificationCount(seenState, "restoration")).toBe(0);
 
     const progressedState = {
       ...seenState,
@@ -552,17 +579,18 @@ describe("meguri reset and record annotations", () => {
       }
     };
 
-    expect(getUnreadRecordNotificationCount(progressedState, "restoration")).toBe(1);
+    expect(getUnreadRecordBodyNotificationCount(progressedState, "restoration")).toBe(1);
+    expect(getUnreadRecordAnnotationNotificationCount(progressedState, "restoration")).toBe(0);
 
     const seenAgainState = markRecordTabSeen(progressedState);
 
     expect(seenAgainState.records.firstAudienceNote.unlocked).toBe(true);
-    expect(getUnreadRecordNotificationCount(seenAgainState, "restoration")).toBe(0);
+    expect(getUnreadRecordBodyNotificationCount(seenAgainState, "restoration")).toBe(0);
   });
 });
 
 describe("meguri save migration", () => {
-  it("migrates older saves to v11 with estimated total tomorusa and meguri defaults", () => {
+  it("migrates older saves to the current version with estimated total tomorusa and meguri defaults", () => {
     setupLocalStorage({
       [SAVE_KEY]: JSON.stringify({
         saveVersion: 9,
@@ -586,7 +614,8 @@ describe("meguri save migration", () => {
     expect(result.state.records.alleyStageRestorationMemo).toEqual({
       unlocked: true,
       read: true,
-      annotationRead: false
+      annotationRead: false,
+      annotationSeen: false
     });
     expect(result.state.totalTomorusaEarned).toBeGreaterThanOrEqual(121);
   });

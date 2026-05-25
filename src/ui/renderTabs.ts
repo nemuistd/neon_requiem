@@ -5,11 +5,11 @@ import {
 } from "../definitions";
 import {
   GameState,
-  hasUnreadRecordContent,
   isItemPurchased,
   isItemUnlocked,
   isMeguriTabUnlocked,
   isRecordAnnotationRead,
+  isRecordAnnotationSeen,
   isRecordAnnotationUnlocked,
   isRecordRead,
   isRecordUnlocked,
@@ -37,7 +37,8 @@ export function renderTabs(elements: UiElements, state: GameState, activeTabId: 
   const songButton = elements.root.querySelector<HTMLButtonElement>('[data-tab-id="song"]');
   const itemUnlockCount = getUnlockableItemCount(state, activeTabId);
   const itemButton = elements.root.querySelector<HTMLButtonElement>('[data-tab-id="item"]');
-  const recordUnreadCount = getUnreadRecordNotificationCount(state, activeTabId);
+  const recordUnreadCount = getUnreadRecordBodyNotificationCount(state, activeTabId);
+  const recordAnnotationUnreadCount = getUnreadRecordAnnotationNotificationCount(state, activeTabId);
   const recordButton = elements.root.querySelector<HTMLButtonElement>('[data-tab-id="record"]');
   const meguriButton = elements.root.querySelector<HTMLButtonElement>('[data-tab-id="meguri"]');
 
@@ -62,6 +63,12 @@ export function renderTabs(elements: UiElements, state: GameState, activeTabId: 
       recordButton.removeAttribute("data-record-unread-count");
     } else {
       recordButton.dataset.recordUnreadCount = String(recordUnreadCount);
+    }
+
+    if (activeTabId === "record" || recordAnnotationUnreadCount <= 0) {
+      recordButton.removeAttribute("data-record-annotation-unread-count");
+    } else {
+      recordButton.dataset.recordAnnotationUnreadCount = String(recordAnnotationUnreadCount);
     }
   }
 
@@ -91,6 +98,10 @@ function getUnlockableSongCount(state: GameState, activeTabId: ActiveTabId): num
 }
 
 export function getUnreadRecordNotificationCount(state: GameState, activeTabId: ActiveTabId): number {
+  return getUnreadRecordBodyNotificationCount(state, activeTabId) + getUnreadRecordAnnotationNotificationCount(state, activeTabId);
+}
+
+export function getUnreadRecordBodyNotificationCount(state: GameState, activeTabId: ActiveTabId): number {
   if (activeTabId === "record") {
     return 0;
   }
@@ -100,8 +111,22 @@ export function getUnreadRecordNotificationCount(state: GameState, activeTabId: 
       isRecordUnlocked(state, recordId) &&
       !isRecordRead(state, recordId) &&
       !state.records[recordId]?.unlocked;
-    const hasUnreadAnnotation = isRecordAnnotationUnlocked(state, recordId) && !isRecordAnnotationRead(state, recordId);
 
-    return count + ((hasUnreadBody || hasUnreadAnnotation) && hasUnreadRecordContent(state, recordId) ? 1 : 0);
+    return count + (hasUnreadBody ? 1 : 0);
+  }, 0);
+}
+
+export function getUnreadRecordAnnotationNotificationCount(state: GameState, activeTabId: ActiveTabId): number {
+  if (activeTabId === "record") {
+    return 0;
+  }
+
+  return RECORD_ORDER.reduce((count, recordId) => {
+    const hasUnreadAnnotation =
+      isRecordAnnotationUnlocked(state, recordId) &&
+      !isRecordAnnotationRead(state, recordId) &&
+      !isRecordAnnotationSeen(state, recordId);
+
+    return count + (hasUnreadAnnotation ? 1 : 0);
   }, 0);
 }

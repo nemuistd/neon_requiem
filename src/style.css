@@ -657,6 +657,11 @@ h2 {
   padding-right: 34px;
 }
 
+.tab-button[data-tab-id="record"][data-record-unread-count][data-record-annotation-unread-count] {
+  padding-right: 68px;
+}
+
+.tab-button[data-tab-id="record"]::before,
 .tab-button[data-tab-id="record"]::after {
   position: absolute;
   top: 50%;
@@ -669,13 +674,27 @@ h2 {
   font-size: 0.72rem;
   font-weight: 900;
   line-height: 1;
-  background: linear-gradient(180deg, #8df4ff, #5ed8ff);
-  box-shadow: 0 0 14px rgba(141, 244, 255, 0.18);
-  content: attr(data-record-unread-count);
   transform: translateY(-50%);
 }
 
-.tab-button[data-tab-id="record"][data-record-unread-count]::after {
+.tab-button[data-tab-id="record"]::after {
+  background: linear-gradient(180deg, #8df4ff, #5ed8ff);
+  box-shadow: 0 0 14px rgba(141, 244, 255, 0.18);
+  content: attr(data-record-unread-count);
+}
+
+.tab-button[data-tab-id="record"]::before {
+  background: linear-gradient(180deg, #ffe073, #ffd24d);
+  box-shadow: 0 0 14px rgba(255, 224, 115, 0.18);
+  content: attr(data-record-annotation-unread-count);
+}
+
+.tab-button[data-tab-id="record"][data-record-unread-count][data-record-annotation-unread-count]::after {
+  right: 44px;
+}
+
+.tab-button[data-tab-id="record"][data-record-unread-count]::after,
+.tab-button[data-tab-id="record"][data-record-annotation-unread-count]::before {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1005,9 +1024,9 @@ h2 {
 }
 
 .record-state.read {
-  color: #8df4ff;
-  border-color: rgba(127, 233, 255, 0.26);
-  background: rgba(12, 21, 34, 0.88);
+  color: #cbbdde;
+  border-color: rgba(203, 189, 222, 0.24);
+  background: rgba(28, 24, 38, 0.88);
 }
 
 .record-state.unread {
@@ -1062,11 +1081,11 @@ h2 {
 }
 
 .read-record-card {
-  border-color: rgba(127, 233, 255, 0.28);
+  border-color: rgba(203, 189, 222, 0.22);
 }
 
 .read-record-card .record-state {
-  color: #8df4ff;
+  color: #cbbdde;
 }
 
 .unread-record-card {

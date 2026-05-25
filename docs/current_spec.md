@@ -320,13 +320,14 @@ surface の記録に、祈念工学、アンカー、聖歌、祈念負荷を出
 ## 保存
 
 - 保存キー: `neon-requiem-save-v1`
-- セーブバージョン: `11`
+- セーブバージョン: `12`
 - 保存形式: `resources.tomorusa`, `resources.memoryFragment`, `totalTomorusaEarned`, `facilities`, `idols`, `items`, `songs`, `records`, `meguri`, `activeIdolId`, `recordTabLastSeenContentVersion`, `lastSavedAt`
 - アイドル個別状態として `idols[id].bond`, `idols[id].eventIdsRead`, `idols[id].joined` を保存する。
 - `records[id].annotationRead` で追記既読状態を保存する。
+- `records[id].annotationSeen` で追記通知を記録タブで確認済みかを保存する。追記本文の既読とは分けて扱う。
 - `meguri` は `count`, `totalMemoryFragmentsEarned`, `buffs`, `idolRecognition`, `pendingSettlement` を保存する。
 
-v1〜v10 の旧セーブは可能な範囲で正規化する。`idols` がない旧セーブでは、全アイドルに `bond: 0`, `eventIdsRead: []`, `joined` を補完する。v10 以前で解放済みだったアイドルは加入済みとして移行する。`meguri` がない旧セーブでは初期値を補完し、壊れたセーブでアプリがクラッシュしないようにする。
+v1〜v11 の旧セーブは可能な範囲で正規化する。`idols` がない旧セーブでは、全アイドルに `bond: 0`, `eventIdsRead: []`, `joined` を補完する。v10 以前で解放済みだったアイドルは加入済みとして移行する。`meguri` がない旧セーブでは初期値を補完し、壊れたセーブでアプリがクラッシュしないようにする。
 
 ## UI
 
@@ -351,6 +352,7 @@ v1〜v10 の旧セーブは可能な範囲で正規化する。`idols` がない
 未解放コンテンツのネタバレを避けるため、ロック表示は以下の最小ルールに従う。
 
 - 記録タブでは、未解放記録のタイトルと解放条件を表示しない。
+- 記録タブの通知は、本文の新着と追記の新着を別バッジで表示する。追記通知は記録タブを開いた時点で消えるが、追記本文は読むまで未読のまま残る。
 - 復興区画タブでは、未解放施設を全件表示せず、次の未解放施設だけを「未確認区画」として表示する。
 - 廻後コンテンツは、関連施設だけでなく `meguri.count` などの廻条件も満たすまでカード自体を表示しない。
 - 歌 / アイテム / アイドルは、関連施設や廻条件がまだ正式に解放されていない場合はカード自体を表示しない。関連条件が解放済みで、対象が未解放の場合は汎用名で表示する。アイドルは解放条件達成後に名前と加入操作を表示し、左側の注目アイドル枠からも加入できる。加入済みになるまで効果や注目切替を有効化しない。

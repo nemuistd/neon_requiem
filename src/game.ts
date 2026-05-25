@@ -37,7 +37,7 @@ import {
 } from "./engine/effects";
 import { areRequirementsMet, isRequirementMet } from "./engine/requirements";
 
-export const SAVE_VERSION = 11;
+export const SAVE_VERSION = 12;
 export const INITIAL_ACTIVE_IDOL_ID: IdolId = "otowaAkari";
 export const MAX_OFFLINE_SECONDS = 12 * 60 * 60;
 export const BASE_OFFLINE_REWARD_RATE = 0.5;
@@ -62,6 +62,7 @@ export type RecordState = {
   unlocked: boolean;
   read: boolean;
   annotationRead: boolean;
+  annotationSeen: boolean;
 };
 
 export type IdolState = {
@@ -236,7 +237,7 @@ export function createInitialRecords(): Record<RecordId, RecordState> {
   return RECORD_ORDER.reduce(
     (records, recordId) => ({
       ...records,
-      [recordId]: { unlocked: false, read: false, annotationRead: false }
+      [recordId]: { unlocked: false, read: false, annotationRead: false, annotationSeen: false }
     }),
     {} as Record<RecordId, RecordState>
   );
@@ -319,6 +320,10 @@ export function isRecordAnnotationUnlocked(state: GameState, recordId: RecordId)
 
 export function isRecordAnnotationRead(state: GameState, recordId: RecordId): boolean {
   return state.records[recordId]?.annotationRead ?? false;
+}
+
+export function isRecordAnnotationSeen(state: GameState, recordId: RecordId): boolean {
+  return state.records[recordId]?.annotationSeen ?? false;
 }
 
 export function hasUnreadRecordContent(state: GameState, recordId: RecordId): boolean {
@@ -444,7 +449,8 @@ export function markRecordTabSeen(state: GameState): GameState {
       ...seenRecords,
       [recordId]: {
         ...seenRecords[recordId],
-        unlocked: seenRecords[recordId].unlocked || isRecordUnlocked(state, recordId)
+        unlocked: seenRecords[recordId].unlocked || isRecordUnlocked(state, recordId),
+        annotationSeen: seenRecords[recordId].annotationSeen || isRecordAnnotationUnlocked(state, recordId)
       }
     }),
     state.records
@@ -727,7 +733,8 @@ export function readRecord(state: GameState, recordId: RecordId): GameState {
       [recordId]: {
         ...state.records[recordId],
         read: true,
-        annotationRead: annotationUnlocked ? true : state.records[recordId]?.annotationRead ?? false
+        annotationRead: annotationUnlocked ? true : state.records[recordId]?.annotationRead ?? false,
+        annotationSeen: annotationUnlocked ? true : state.records[recordId]?.annotationSeen ?? false
       }
     }
   };

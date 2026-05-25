@@ -1,6 +1,6 @@
 # NEON REQUIEM 次ゲーム内容拡張案
 
-> historical: この文書は、v0.2基盤後に「アイドル交流MVP」を検討した当時の設計メモである。現在は `bond`、`idolEvents`、アイドル詳細パネル、通常交流イベント、薄明の記憶イベントの基盤が実装済みで、`SAVE_VERSION` は 11 である。現行仕様は [current_spec.md](current_spec.md)、現在の優先タスクは [product/40_task_backlog.md](product/40_task_backlog.md) を優先する。
+> historical: この文書は、v0.2基盤後に「アイドル交流MVP」を検討した当時の設計メモである。現在は `bond`、`idolEvents`、アイドル詳細パネル、通常交流イベント、薄明の記憶イベントの基盤が実装済みで、`SAVE_VERSION` は 12 である。現行仕様は [current_spec.md](current_spec.md)、現在の優先タスクは [product/40_task_backlog.md](product/40_task_backlog.md) を優先する。
 
 ## 位置づけ
 
@@ -54,7 +54,7 @@ idols: Record<IdolId, {
 
 当時想定していたセーブ影響:
 
-- `SAVE_VERSION` は当時 9 へ更新する想定だった。現在の現行値は 11。
+- `SAVE_VERSION` は当時 9 へ更新する想定だった。現在の現行値は 12。
 - 旧セーブ読み込み時は、全アイドルの `bond: 0`, `eventIdsRead: []` を補完する。
 - 壊れたセーブでクラッシュしない方針は維持する。
 - `window.__NEON_DEBUG__` と設定画面のセーブ削除は維持する。

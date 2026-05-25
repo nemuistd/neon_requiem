@@ -136,6 +136,7 @@ function parseSave(rawSave: string, now: number): GameState | null {
       saveVersion === 8 ||
       saveVersion === 9 ||
       saveVersion === 10 ||
+      saveVersion === 11 ||
       saveVersion === SAVE_VERSION ||
       saveVersion === null
     ) {
@@ -282,7 +283,8 @@ function normalizeRecords(records: unknown): Record<RecordId, RecordState> {
       [recordId]: {
         unlocked: getSavedRecordUnlocked(records, recordId),
         read: getSavedRecordRead(records, recordId),
-        annotationRead: getSavedRecordAnnotationRead(records, recordId)
+        annotationRead: getSavedRecordAnnotationRead(records, recordId),
+        annotationSeen: getSavedRecordAnnotationSeen(records, recordId)
       }
     }),
     createInitialRecords()
@@ -425,6 +427,16 @@ function getSavedRecordAnnotationRead(records: unknown, recordId: RecordId): boo
   const record = (records as Partial<Record<RecordId, { annotationRead?: unknown }>>)[recordId];
 
   return record?.annotationRead === true;
+}
+
+function getSavedRecordAnnotationSeen(records: unknown, recordId: RecordId): boolean {
+  if (!isRecord(records)) {
+    return false;
+  }
+
+  const record = (records as Partial<Record<RecordId, { annotationRead?: unknown; annotationSeen?: unknown }>>)[recordId];
+
+  return record?.annotationSeen === true || record?.annotationRead === true;
 }
 
 function getSavedItemPurchased(items: unknown, itemId: ItemId): boolean {
