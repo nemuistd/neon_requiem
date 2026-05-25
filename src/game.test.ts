@@ -14,6 +14,7 @@ import {
   getItemCost,
   getJoinedIdolPassiveEffects,
   getManualTomorusaGain,
+  getMeguriSettlementPreview,
   getOfflineRewardMultiplier,
   getOfflineTomorusa,
   getResourceAmount,
@@ -153,6 +154,8 @@ describe("game state and effects", () => {
     expect(state.facilities.deepLayerObservatory.level).toBe(0);
     expect(state.facilities.engineeringArchive.level).toBe(0);
     expect(state.facilities.prayerEngineeringRuins.level).toBe(0);
+    expect(state.facilities.reobservationBase.level).toBe(0);
+    expect(state.facilities.unnamedTheater.level).toBe(0);
     expect(state.items.oldNeonTube.purchased).toBe(false);
     expect(state.items.ticketStubBundle.purchased).toBe(false);
     expect(state.items.oldRadioTowerDebris.purchased).toBe(false);
@@ -167,6 +170,7 @@ describe("game state and effects", () => {
     expect(state.idols.tsuginohataSakurako.bond).toBe(0);
     expect(state.idols.kasumiyamaMio.bond).toBe(0);
     expect(state.idols.nanashiroSatsuki.bond).toBe(0);
+    expect(state.idols.shiragiriRin.bond).toBe(0);
     expect(state.idols.otowaAkari.eventIdsRead).toEqual([]);
     expect(state.songs.rojiuraIntro.purchased).toBe(false);
     expect(state.songs.prebroadcastAcapella.purchased).toBe(false);
@@ -784,6 +788,73 @@ describe("game state and effects", () => {
     expect(getItemCost(satsukiJoinedState, "oldNeonTube")).toBe(85);
   });
 
+  it("unlocks the Ch.9 facilities and Rin only after the second meguri", () => {
+    const baseState = createInitialState();
+    const ruinsLevelThreeMeguriOneState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        prayerEngineeringRuins: { level: 3 }
+      },
+      meguri: {
+        ...baseState.meguri,
+        count: 1
+      }
+    };
+    const reobservationState = {
+      ...ruinsLevelThreeMeguriOneState,
+      meguri: {
+        ...ruinsLevelThreeMeguriOneState.meguri,
+        count: 2
+      }
+    };
+    const unnamedTheaterReadyState = {
+      ...reobservationState,
+      facilities: {
+        ...reobservationState.facilities,
+        reobservationBase: { level: 3 }
+      }
+    };
+    const rinReadyState = {
+      ...unnamedTheaterReadyState,
+      facilities: {
+        ...unnamedTheaterReadyState.facilities,
+        unnamedTheater: { level: 1 }
+      }
+    };
+
+    expect(isFacilityUnlocked(ruinsLevelThreeMeguriOneState, "reobservationBase")).toBe(false);
+    expect(isFacilityUnlocked(reobservationState, "reobservationBase")).toBe(true);
+    expect(isFacilityUnlocked(unnamedTheaterReadyState, "unnamedTheater")).toBe(true);
+    expect(isIdolUnlocked(unnamedTheaterReadyState, "shiragiriRin")).toBe(false);
+    expect(isIdolUnlocked(rinReadyState, "shiragiriRin")).toBe(true);
+    expect(isRecordUnlocked(rinReadyState, "unnamedTheaterEchoRecord")).toBe(true);
+    expect(isRecordUnlocked(rinReadyState, "rinFirstWords")).toBe(true);
+  });
+
+  it("applies Rin's rebirth and memory fragment effects after she joins", () => {
+    const baseState = createInitialState();
+    const rinJoinedState = withJoinedIdols({
+      ...baseState,
+      totalTomorusaEarned: 200000,
+      facilities: {
+        ...baseState.facilities,
+        prayerEngineeringRuins: { level: 3 },
+        reobservationBase: { level: 1 },
+        unnamedTheater: { level: 1 }
+      },
+      meguri: {
+        ...baseState.meguri,
+        count: 2
+      }
+    }, ["shiragiriRin"]);
+    const preview = getMeguriSettlementPreview(rinJoinedState);
+
+    expect(getFacilityTomorusaPerSecond(rinJoinedState, "reobservationBase")).toBeCloseTo(400 * 1.2 * 1.1 * 1.15);
+    expect(preview.memoryFragmentMultiplier).toBeCloseTo(1.3);
+    expect(preview.totalEligibleMemoryFragments).toBe(4);
+  });
+
   it("applies production and caps offline reward at 12 hours", () => {
     const baseState = createInitialState();
     const state = {
@@ -1082,16 +1153,33 @@ describe("game state and effects", () => {
       {
         idolId: "nanashiroSatsuki",
         eventId: "nanashiroSatsuki.readableUnknown"
+      },
+      {
+        idolId: "shiragiriRin",
+        eventId: "shiragiriRin.notFirstMeeting"
       }
     ] as const;
 
     eventCases.forEach(({ idolId, eventId }) => {
+      const eventBaseState = idolId === "shiragiriRin"
+        ? {
+            ...baseState,
+            facilities: {
+              ...baseState.facilities,
+              unnamedTheater: { level: 1 }
+            },
+            meguri: {
+              ...baseState.meguri,
+              count: 2
+            }
+          }
+        : baseState;
       const almostUnlockedState = {
-        ...baseState,
+        ...eventBaseState,
         idols: {
-          ...baseState.idols,
+          ...eventBaseState.idols,
           [idolId]: {
-            ...baseState.idols[idolId],
+            ...eventBaseState.idols[idolId],
             joined: true,
             bond: 4
           }

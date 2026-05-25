@@ -70,6 +70,37 @@ describe("locked content visibility", () => {
     expect(renderIdolTabCards(archiveVisibleState)).toContain("七城 皐月");
   });
 
+  it("reveals Ch.9 content only after the second meguri", () => {
+    const baseState = createInitialState();
+    const ch9HiddenState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        prayerEngineeringRuins: { level: 3 },
+        reobservationBase: { level: 3 },
+        unnamedTheater: { level: 1 }
+      },
+      meguri: {
+        ...baseState.meguri,
+        count: 1
+      }
+    };
+    const ch9VisibleState = {
+      ...ch9HiddenState,
+      meguri: {
+        ...ch9HiddenState.meguri,
+        count: 2
+      }
+    };
+
+    expect(renderFacilityCards(ch9HiddenState)).not.toContain("再観測拠点");
+    expect(renderFacilityCards(ch9HiddenState)).not.toContain("名前のない劇場");
+    expect(renderIdolTabCards(ch9HiddenState)).not.toContain("白霧 燐");
+    expect(renderFacilityCards(ch9VisibleState)).toContain("再観測拠点");
+    expect(renderFacilityCards(ch9VisibleState)).toContain("名前のない劇場");
+    expect(renderIdolTabCards(ch9VisibleState)).toContain("白霧 燐");
+  });
+
   it("hides locked record titles and requirements", () => {
     const html = renderRecordCards(createInitialState());
 

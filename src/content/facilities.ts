@@ -268,6 +268,53 @@ export const FACILITY_DEFINITIONS = defineContent([
         }
       ]
     }
+  },
+  {
+    id: "reobservationBase",
+    name: "再観測拠点",
+    description:
+      "廻の後に整備された新しい拠点。前の廻では存在しなかったはずなのに、バインダーの端にはここの方角を示す短い印が残っていた。ここから先は、復興というより再び観測し直すための場所に近い。",
+    tags: ["infra"],
+    baseCost: 5000000,
+    costMultiplier: 1.35,
+    productionPerLevel: 400,
+    unlockRequirement: {
+      type: "all",
+      requirements: [
+        {
+          type: "meguri.count",
+          count: 2
+        },
+        {
+          type: "facility.level",
+          facilityId: "prayerEngineeringRuins",
+          level: 3
+        }
+      ]
+    }
+  },
+  {
+    id: "unnamedTheater",
+    name: "名前のない劇場",
+    description:
+      "名前を持たない場所は、ここにだけある。だからここは消えない。そういう記録が、読めるようになった行の外側に残っている。誰かがここで歌った気配だけが、まだ客席の奥に反響している。",
+    baseCost: 10000000,
+    costMultiplier: 1.4,
+    productionPerLevel: 600,
+    unlockRequirement: {
+      type: "all",
+      requirements: [
+        {
+          type: "meguri.count",
+          count: 2
+        },
+        {
+          type: "facility.level",
+          facilityId: "reobservationBase",
+          level: 3
+        }
+      ]
+    }
   }
 ] as const satisfies readonly FacilityDefinition[]);
 

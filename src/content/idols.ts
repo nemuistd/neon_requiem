@@ -217,6 +217,39 @@ export const IDOL_DEFINITIONS = defineContent([
         }
       ]
     }
+  },
+  {
+    id: "shiragiriRin",
+    name: "白霧 燐",
+    reading: "しらぎり りん",
+    title: "灯し直しの残響",
+    description:
+      "廻2のCh.9で初めて声と姿を持つ。以前もここに来たようなことを言うが、それを記憶だとは断定しない。確信と感触の間に立ち、繰り返しについての答えをいつも途中で止める。",
+    passiveDescription: "廻後の施設生産倍率 x1.15 / 記憶断片の獲得見込み +30%",
+    passiveEffects: [
+      {
+        type: "rebirth.bonus.multiplier",
+        multiplier: 1.15
+      },
+      {
+        type: "memory.fragment.production.add",
+        ratio: 0.3
+      }
+    ],
+    unlockRequirement: {
+      type: "all",
+      requirements: [
+        {
+          type: "meguri.count",
+          count: 2
+        },
+        {
+          type: "facility.level",
+          facilityId: "unnamedTheater",
+          level: 1
+        }
+      ]
+    }
   }
 ] as const satisfies readonly IdolDefinition[]);
 

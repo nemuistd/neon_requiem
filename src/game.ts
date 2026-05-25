@@ -571,11 +571,11 @@ export function getMeguriFacilityProductionMultiplier(state: GameState): number 
   }
 
   const baseMultiplier = 1 + 0.05 * state.meguri.count;
-  return baseMultiplier * getRebirthBonusMultiplierFromEffects(getPurchasedMeguriBuffEffects(state));
+  return baseMultiplier * getRebirthBonusMultiplierFromEffects(getGameplayEffects(state));
 }
 
 export function getMemoryFragmentMultiplier(state: GameState): number {
-  return getMemoryFragmentMultiplierFromEffects(getPurchasedMeguriBuffEffects(state));
+  return getMemoryFragmentMultiplierFromEffects(getGameplayEffects(state));
 }
 
 function getPurchasedSongEffects(state: GameState): Effect[] {

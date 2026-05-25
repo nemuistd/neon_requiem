@@ -1,9 +1,10 @@
 import { ContentId, defineContent, toContentMap, toContentOrder } from "./defineContent.js";
 import { RecordDefinition } from "./types.js";
 
-export const RECORD_CONTENT_VERSION = 13;
+export const RECORD_CONTENT_VERSION = 14;
 const PRE_CH7_RECORD_CONTENT_VERSION = 11;
 const CH7_RECORD_CONTENT_VERSION = 12;
+const CH8_RECORD_CONTENT_VERSION = 13;
 
 export const RECORD_DEFINITIONS = defineContent([
   {
@@ -610,7 +611,7 @@ export const RECORD_DEFINITIONS = defineContent([
     revealLevel: "deep",
     body:
       "皐月が翻訳した断片の要約。祈念工学とは、人々の願い、祈り、期待、注目を束ね、現実を望ましい形へ固定または改変しようとした技術体系である、と記されている。制御は完全ではなく、霞を介して外部の応答を招く方法だったという評価も残る。皐月は、読めるが完全には理解できていない、と余白に書き添えた。",
-    introducedAtVersion: RECORD_CONTENT_VERSION,
+    introducedAtVersion: CH8_RECORD_CONTENT_VERSION,
     unlockRequirements: [
       {
         type: "all",
@@ -635,7 +636,7 @@ export const RECORD_DEFINITIONS = defineContent([
     revealLevel: "deep",
     body:
       "祈念工学実験跡地の調査を行った。建物の構造は残っている。機材の一部も残っているが、ほとんどは使用不能。焼けたのではなく、急速に使われなくなった形跡がある。部屋の中央に大きな機材が残っているが、接続先がない。澪は一度だけその機材を見て「知っている」と言った。どこで知ったかは聞かなかった。",
-    introducedAtVersion: RECORD_CONTENT_VERSION,
+    introducedAtVersion: CH8_RECORD_CONTENT_VERSION,
     unlockRequirements: [
       {
         type: "all",
@@ -647,6 +648,56 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "prayerEngineeringRuins",
+            level: 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "unnamedTheaterEchoRecord",
+    title: "名前のない劇場・残響記録",
+    category: "観測記録",
+    revealLevel: "deep",
+    body:
+      "名前のない劇場でライブを行った。席は整っていて、誰かが最近使った形跡があるが、誰かは分からない。ライブ中、音響が奇妙だった。歌が終わった後も、余韻が通常より長く続き、反響の形が今歌った歌とわずかに違う。以前にここで誰かが歌ったのか。あるいは別の廻で。どちらも確認できない。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "all",
+        requirements: [
+          {
+            type: "meguri.count",
+            count: 2
+          },
+          {
+            type: "facility.level",
+            facilityId: "unnamedTheater",
+            level: 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "rinFirstWords",
+    title: "燐・最初の言葉",
+    category: "交流メモ",
+    revealLevel: "deep",
+    body:
+      "白霧 燐と最初に話した。「初めまして」と言うと、燐は「そうかな」と言った。確信ではなく、疑問として。それから「以前もここに来たね」と続けた。覚えているのかと訊くと、「覚えているというより、感じている」と答えた。言い方が正確かどうかは分からない。でも、その感覚は少しだけ分かった。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "all",
+        requirements: [
+          {
+            type: "meguri.count",
+            count: 2
+          },
+          {
+            type: "facility.level",
+            facilityId: "unnamedTheater",
             level: 1
           }
         ]

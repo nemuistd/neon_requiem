@@ -101,6 +101,34 @@ export const IDOL_EVENT_DEFINITIONS = defineContent([
     introducedAtVersion: 15
   },
   {
+    id: "shiragiriRin.notFirstMeeting",
+    idolId: "shiragiriRin",
+    title: "燐・初めての出会い、ではない",
+    revealLevel: "deep",
+    body:
+      "初めまして、と言うと、燐は少しだけ首を傾げた。「そうかな」そう感じるのかと訊くと、「確かじゃない。でも、初めてじゃない気がする」と答えた。覚えているのかと重ねると、「覚えているというより、感じている」とだけ言った。",
+    unlockRequirement: {
+      type: "all",
+      requirements: [
+        {
+          type: "meguri.count",
+          count: 2
+        },
+        {
+          type: "facility.level",
+          facilityId: "unnamedTheater",
+          level: 1
+        },
+        {
+          type: "idol.bond",
+          idolId: "shiragiriRin",
+          amount: 5
+        }
+      ]
+    },
+    introducedAtVersion: 16
+  },
+  {
     id: "otowaAkari.twilightFirstPause",
     idolId: "otowaAkari",
     title: "灯里・一拍遅い返事",
