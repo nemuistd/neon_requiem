@@ -67,6 +67,18 @@ export function getIdolJoinIdFromEvent(event: Event): IdolId | null {
   return null;
 }
 
+export function isIdolJoinFromSwitcher(event: Event): boolean {
+  const target = event.target;
+
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  const button = target.closest<HTMLButtonElement>("[data-idol-join-id]");
+
+  return button?.dataset.idolJoinSource === "switcher";
+}
+
 export function getIdolEventIdFromEvent(event: Event): IdolEventId | null {
   const target = event.target;
 

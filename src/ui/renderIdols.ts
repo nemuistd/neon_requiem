@@ -139,6 +139,7 @@ function renderIdolSwitcher(state: GameState, activeIdolId: IdolId): string {
         class="idol-switch ${isActive ? "active" : ""} ${isJoined ? "unlocked" : isUnlocked ? "joinable" : "locked"}"
         type="button"
         ${isJoined ? `data-idol-id="${idolId}"` : isUnlocked ? `data-idol-join-id="${idolId}"` : ""}
+        ${!isJoined && isUnlocked ? 'data-idol-join-source="switcher"' : ""}
         ${isJoined || isUnlocked ? "" : "disabled"}
         ${isActive ? 'aria-current="true"' : ""}
         aria-pressed="${isActive ? "true" : "false"}"

@@ -3,7 +3,7 @@ import { createFacilityUpgradeMessage, createIdolEventReadMessage, createIdolJoi
 import { FACILITIES, IDOL_EVENTS, IDOLS, ITEMS, MEGURI_BUFFS, SONGS } from "./definitions";
 import { applyProduction, closeMeguriSettlement, GameState, isMeguriTabUnlocked, joinIdol, markRecordTabSeen, performManualLive, performMeguri, purchaseItem, purchaseMeguriBuff, purchaseSong, readIdolEvent, readRecord, resolveActiveIdolId, SAVE_VERSION, selectActiveIdol, upgradeFacility } from "./game";
 import { loadGame, saveGame, SAVE_KEY } from "./storage";
-import { getFacilityIdFromEvent, getIdolDetailActionFromEvent, getIdolEventIdFromEvent, getIdolIdFromEvent, getIdolJoinIdFromEvent, getItemIdFromEvent, getMeguriActionFromEvent, getMeguriBuffIdFromEvent, getRecordIdFromEvent, getSongIdFromEvent, getTabIdFromEvent } from "./ui/events";
+import { getFacilityIdFromEvent, getIdolDetailActionFromEvent, getIdolEventIdFromEvent, getIdolIdFromEvent, getIdolJoinIdFromEvent, getItemIdFromEvent, getMeguriActionFromEvent, getMeguriBuffIdFromEvent, getRecordIdFromEvent, getSongIdFromEvent, getTabIdFromEvent, isIdolJoinFromSwitcher } from "./ui/events";
 import { formatAmount, formatWholeAmount } from "./ui/format";
 import { renderLiveValues } from "./ui/liveValues";
 import { renderState, setMessage } from "./ui/renderState";
@@ -258,7 +258,9 @@ elements.root.addEventListener("click", (event) => {
     }
 
     state = saveGame(result.state);
-    activeTabId = "idol";
+    if (!isIdolJoinFromSwitcher(event)) {
+      activeTabId = "idol";
+    }
     renderGameState();
     setMessage(elements, createIdolJoinMessage(IDOLS[result.idolId].name, IDOLS[result.idolId].passiveDescription));
     return;
