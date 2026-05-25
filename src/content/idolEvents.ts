@@ -17,6 +17,62 @@ export const IDOL_EVENT_DEFINITIONS = defineContent([
     introducedAtVersion: 12
   },
   {
+    id: "asagiriYui.twilightStreetGuide",
+    idolId: "asagiriYui",
+    title: "結・薄明通りの案内",
+    revealLevel: "surface",
+    body:
+      "霞で読めなくなった案内板の前で、結は迷わず横道を指した。「足が覚えてるんです。来たことは、たぶんないんですけど」",
+    unlockRequirement: {
+      type: "idol.bond",
+      idolId: "asagiriYui",
+      amount: 5
+    },
+    introducedAtVersion: 13
+  },
+  {
+    id: "mizukiShino.storageShelf",
+    idolId: "mizukiShino",
+    title: "詩乃・出所不明の冊子",
+    revealLevel: "surface",
+    body:
+      "保管棚の端で、詩乃は著者不明の薄い冊子をそっと置いた。「出所が分からないものほど、なくしたら戻せません」",
+    unlockRequirement: {
+      type: "idol.bond",
+      idolId: "mizukiShino",
+      amount: 5
+    },
+    introducedAtVersion: 13
+  },
+  {
+    id: "hibikiTooko.preBroadcastCheck",
+    idolId: "hibikiTooko",
+    title: "遠子・配信前の確認",
+    revealLevel: "surface",
+    body:
+      "配信前の機材チェック中、遠子はスイッチを一つずつ確認してから言った。「いないと決めつけると声が変わる気がするから、いる前提で話します」",
+    unlockRequirement: {
+      type: "idol.bond",
+      idolId: "hibikiTooko",
+      amount: 5
+    },
+    introducedAtVersion: 13
+  },
+  {
+    id: "kaminoMeguri.unknownAuthorProof",
+    idolId: "kaminoMeguri",
+    title: "巡・著者不明の証明",
+    revealLevel: "surface",
+    body:
+      "著者不明の記録を棚に戻しながら、巡は背表紙を指で押さえた。「名前がなくても、残っていることには意味があります。著者不明は、ここにあるという証明です」",
+    unlockRequirement: {
+      type: "idol.bond",
+      idolId: "kaminoMeguri",
+      amount: 5
+    },
+    introducedAtVersion: 13
+  },
+  {
     id: "otowaAkari.twilightFirstPause",
     idolId: "otowaAkari",
     title: "灯里・一拍遅い返事",

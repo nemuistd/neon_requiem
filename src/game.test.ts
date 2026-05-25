@@ -918,6 +918,60 @@ describe("game state and effects", () => {
     expect(getResourceAmount(readState, TOMORUSA_RESOURCE_ID)).toBe(getResourceAmount(unlockedState, TOMORUSA_RESOURCE_ID));
     expect(getTomorusaPerSecond(readState)).toBe(getTomorusaPerSecond(unlockedState));
   });
+
+  it("unlocks the first expanded normal idol events from joined idol bond", () => {
+    const baseState = createInitialState();
+    const eventCases = [
+      {
+        idolId: "asagiriYui",
+        eventId: "asagiriYui.twilightStreetGuide"
+      },
+      {
+        idolId: "mizukiShino",
+        eventId: "mizukiShino.storageShelf"
+      },
+      {
+        idolId: "hibikiTooko",
+        eventId: "hibikiTooko.preBroadcastCheck"
+      },
+      {
+        idolId: "kaminoMeguri",
+        eventId: "kaminoMeguri.unknownAuthorProof"
+      }
+    ] as const;
+
+    eventCases.forEach(({ idolId, eventId }) => {
+      const almostUnlockedState = {
+        ...baseState,
+        idols: {
+          ...baseState.idols,
+          [idolId]: {
+            ...baseState.idols[idolId],
+            joined: true,
+            bond: 4
+          }
+        }
+      };
+      const unlockedState = {
+        ...almostUnlockedState,
+        idols: {
+          ...almostUnlockedState.idols,
+          [idolId]: {
+            ...almostUnlockedState.idols[idolId],
+            bond: 5
+          }
+        }
+      };
+      const readState = readIdolEvent(unlockedState, eventId);
+
+      expect(isIdolEventUnlocked(almostUnlockedState, eventId)).toBe(false);
+      expect(isIdolEventUnlocked(unlockedState, eventId)).toBe(true);
+      expect(isIdolEventRead(readState, eventId)).toBe(true);
+      expect(readState.idols[idolId].eventIdsRead).toEqual([eventId]);
+      expect(getResourceAmount(readState, TOMORUSA_RESOURCE_ID)).toBe(getResourceAmount(unlockedState, TOMORUSA_RESOURCE_ID));
+      expect(getTomorusaPerSecond(readState)).toBe(getTomorusaPerSecond(unlockedState));
+    });
+  });
 });
 
 describe("save normalization", () => {

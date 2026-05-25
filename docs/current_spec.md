@@ -108,6 +108,10 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | id | 種別 | 対象アイドル | 解放条件 | 内容 |
 | --- | --- | --- | --- | --- |
 | `otowaAkari.firstSeat` | 交流イベント | 音羽 灯里 | 音羽 灯里 交流 5 | 最前列の壊れた椅子を直す短い場面 |
+| `asagiriYui.twilightStreetGuide` | 交流イベント | 朝霧 結 | 朝霧 結 交流 5 | 霞で読めない案内板の前で道を示す短い場面 |
+| `mizukiShino.storageShelf` | 交流イベント | 深月 詩乃 | 深月 詩乃 交流 5 | 出所不明の冊子を保管棚に残す短い場面 |
+| `hibikiTooko.preBroadcastCheck` | 交流イベント | 響木 遠子 | 響木 遠子 交流 5 | 配信前の機材確認で、いる前提で話す理由を聞く短い場面 |
+| `kaminoMeguri.unknownAuthorProof` | 交流イベント | 紙野 巡 | 紙野 巡 交流 5 | 著者不明というラベルを、残っている証明として扱う短い場面 |
 | `otowaAkari.twilightFirstPause` | 薄明の記憶 | 音羽 灯里 | 廻 1回以上、音羽 灯里の以前の廻の痕跡、音羽 灯里 交流 5 | 名前を呼ばれた時の返事の間合いが少し違う |
 
 効果エンジンは、追加アイドル・追加施設に備えて以下の効果タイプを扱える。

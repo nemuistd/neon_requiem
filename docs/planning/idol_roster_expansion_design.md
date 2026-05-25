@@ -413,9 +413,9 @@ UI名は「交流」または「親しさ」とする。
 3. `eventIdsRead` を使って既読保存を行う。（実装済み）
 4. アイドルタブに「交流イベント」表示領域を追加する。（実装済み）
 5. 初回読了時に数値を変えず、メッセージだけ更新する。（実装済み）
-6. 動作確認後、朝霧 結、深月 詩乃へ1件ずつ増やす。（未実装）
+6. 動作確認後、朝霧 結、響木 遠子、紙野 巡、深月 詩乃へ1件ずつ増やす。（実装済み）
 
-現在の実装では、`otowaAkari.firstSeat` を音羽 灯里 交流 5 で解放する。これは交流イベント基盤の最小確認用であり、初期実装済みアイドル全員のイベントを揃えた状態ではない。
+現在の実装では、`otowaAkari.firstSeat`、`asagiriYui.twilightStreetGuide`、`hibikiTooko.preBroadcastCheck`、`kaminoMeguri.unknownAuthorProof`、`mizukiShino.storageShelf` を、それぞれ対象アイドルの交流 5 で解放する。これは交流イベント基盤の横展開用であり、初期実装済みアイドル全員のイベントを揃えた状態ではない。
 
 ### 受け入れ条件
 
