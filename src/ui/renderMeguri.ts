@@ -293,13 +293,16 @@ function renderMeguriSettlementRecordNotes(state: GameState): string {
           <div class="meguri-settlement-record-list">
             ${recordIds.map((recordId) => renderMeguriSettlementRecordNote(recordId)).join("")}
           </div>
-          <button
-            class="secondary-action"
-            type="button"
-            data-meguri-action="openRecords"
-          >
-            ${UI_TEXT.meguriSettlementOpenRecordsButtonLabel}
-          </button>
+          <div class="meguri-settlement-records-footer">
+            <p>${UI_TEXT.meguriSettlementRecordNotesCloseText}</p>
+            <button
+              class="text-action meguri-settlement-records-action"
+              type="button"
+              data-meguri-action="openRecords"
+            >
+              ${UI_TEXT.meguriSettlementOpenRecordsButtonLabel}
+            </button>
+          </div>
         </div>
   `;
 }

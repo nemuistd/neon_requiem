@@ -206,6 +206,28 @@ h2 {
   transform: translateY(1px);
 }
 
+.text-action {
+  min-height: 36px;
+  padding: 6px 0;
+  border: 0;
+  color: #8df4ff;
+  background: transparent;
+  font: inherit;
+  font-weight: 900;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.text-action:hover {
+  color: #ffe073;
+}
+
+.text-action:active {
+  transform: translateY(1px);
+}
+
 .message-log {
   min-height: 58px;
   margin: 14px 0;
@@ -1537,6 +1559,22 @@ h2 {
 
 .meguri-settlement-record-note strong {
   color: #fff8ff;
+}
+
+.meguri-settlement-records-footer {
+  display: grid;
+  gap: 6px;
+  padding-top: 2px;
+}
+
+.meguri-settlement-records-footer p {
+  margin: 0;
+  color: #bdaecb;
+  font-size: 0.84rem;
+}
+
+.meguri-settlement-records-action {
+  justify-self: start;
 }
 
 .meguri-buff-list {

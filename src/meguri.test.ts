@@ -221,6 +221,7 @@ describe("meguri economy", () => {
     expect(html).toContain("廻後清算中");
     expect(html).toContain("通常進行へ戻る");
     expect(html).toContain('data-meguri-action="closeSettlement"');
+    expect(html).not.toContain('data-meguri-action="openRecords"');
   });
 
   it("shows records with unread annotations on the settlement screen", () => {
@@ -249,7 +250,12 @@ describe("meguri economy", () => {
     const html = renderMeguriPanel(settlementState);
 
     expect(html).toContain(UI_TEXT.meguriSettlementRecordNotesLabel);
+    expect(html).toContain(UI_TEXT.meguriSettlementRecordNotesCloseText);
+    expect(html).toContain(UI_TEXT.meguriSettlementOpenRecordsButtonLabel);
     expect(html).toContain("観測記録・灯り反応");
+    expect(html).toContain("meguri-settlement-records-action");
+    expect(html.match(/data-meguri-action="closeSettlement"/g)).toHaveLength(1);
+    expect(html.match(/data-meguri-action="openRecords"/g)).toHaveLength(1);
     expect(html).toContain('data-meguri-action="openRecords"');
   });
 
