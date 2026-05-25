@@ -139,7 +139,7 @@ export const SONG_DEFINITIONS = defineContent([
     name: "最後の名前",
     description:
       "名前のない劇場で、燐が一度だけ歌った曲。名前がないから消えない、という構造を知っていなければ、何が起きているのか分からない。",
-    cost: 5000000,
+    cost: 20000000,
     effectDescription: "施設の灯るさ生産 x1.30 / 記憶断片の獲得見込み +20%",
     effects: [
       {
