@@ -140,9 +140,9 @@ export const FACILITY_DEFINITIONS = defineContent([
     name: "地下礼拝堂",
     description:
       "崩れかけた柱と古い紋章が残る小さな礼拝堂。地下深くに閉ざされていた響きを、後の復興段階で少しずつ調べていく場所。",
-    baseCost: 18000,
-    costMultiplier: 1.2,
-    productionPerLevel: 5,
+    baseCost: 50000,
+    costMultiplier: 1.26,
+    productionPerLevel: 16,
     unlockRequirement: {
       type: "facility.level",
       facilityId: "nameRecordWall",

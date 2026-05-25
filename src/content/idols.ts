@@ -64,28 +64,6 @@ export const IDOL_DEFINITIONS = defineContent([
     }
   },
   {
-    id: "mizukiShino",
-    name: "深月 詩乃",
-    reading: "みづき しの",
-    title: "地下礼拝堂の保管係",
-    description:
-      "詩乃は、閉ざされた地下礼拝堂で失われた響きを守っていた。静かな声で、深い区画に残された記録と歌の断片をたぐり寄せる。",
-    imageUrl: new URL("../../assets/idol/ComfyUI_00022_.png", import.meta.url).href,
-    imagePosition: "center top",
-    passiveDescription: "全灯るさ生産 +10%",
-    passiveEffects: [
-      {
-        type: "facility.production.multiplier",
-        multiplier: 1.1
-      }
-    ],
-    unlockRequirement: {
-      type: "facility.level",
-      facilityId: "undergroundChapel",
-      level: 3
-    }
-  },
-  {
     id: "kaminoMeguri",
     name: "紙野 巡",
     reading: "かみの めぐり",
@@ -131,6 +109,28 @@ export const IDOL_DEFINITIONS = defineContent([
       type: "facility.level",
       facilityId: "undergroundPlaza",
       level: 1
+    }
+  },
+  {
+    id: "mizukiShino",
+    name: "深月 詩乃",
+    reading: "みづき しの",
+    title: "地下礼拝堂の保管係",
+    description:
+      "詩乃は、閉ざされた地下礼拝堂で失われた響きを守っていた。静かな声で、深い区画に残された記録と歌の断片をたぐり寄せる。",
+    imageUrl: new URL("../../assets/idol/ComfyUI_00022_.png", import.meta.url).href,
+    imagePosition: "center top",
+    passiveDescription: "全灯るさ生産 +10%",
+    passiveEffects: [
+      {
+        type: "facility.production.multiplier",
+        multiplier: 1.1
+      }
+    ],
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "undergroundChapel",
+      level: 3
     }
   },
   {

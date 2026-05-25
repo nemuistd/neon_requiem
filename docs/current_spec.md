@@ -71,7 +71,7 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `oldBroadcastRoom` | 古い放送室 | 録音保管庫 Lv2 | 26000 | 1.24 | 11 |
 | `undergroundPlaza` | 地下広場 | 記憶図書館 Lv3 / 古い放送室 Lv1 | 20000 | 1.25 | 10 |
 | `nameRecordWall` | 名前の記録壁 | 地下広場 Lv4 | 45000 | 1.26 | 14 |
-| `undergroundChapel` | 地下礼拝堂 | 名前の記録壁 Lv3 | 18000 | 1.20 | 5 |
+| `undergroundChapel` | 地下礼拝堂 | 名前の記録壁 Lv3 | 50000 | 1.26 | 16 |
 | `undergroundPassageRepair` | 地下通路修復区画 | 地下礼拝堂 Lv8 / 礼拝堂のハーモニー取得 | 60000 | 1.28 | 20 |
 | `restabilizationCore` | 再固定中枢 | 地下通路修復区画 Lv5 / 修復の仮歌取得 | 100000 | 1.30 | 25 |
 | `deepLayerObservatory` | 深層観測所 | 廻 1回以上 / 再固定中枢 Lv3 | 300000 | 1.30 | 60 |
@@ -92,9 +92,9 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `otowaAkari` | 音羽 灯里 | 初期 | 全灯るさ生産 x1.20 |
 | `asagiriYui` | 朝霧 結 | ネオン掲示板 Lv5 | 全灯るさ生産 x1.15 |
 | `hibikiTooko` | 響木 遠子 | 仮設配信ブース Lv3 | ライブ1回の灯るさ獲得に全施設合計の秒間灯るさ x0.05 を加算 |
-| `mizukiShino` | 深月 詩乃 | 地下礼拝堂 Lv3 | 全灯るさ生産 x1.10 |
 | `kaminoMeguri` | 紙野 巡 | 記憶図書館 Lv2 | 全アイドルの交流増加量 x1.25 |
 | `hinataKoharu` | 陽向 小春 | 地下広場 Lv1 | 全灯るさ生産 x1.08 / アイテム購入コスト x0.90 |
+| `mizukiShino` | 深月 詩乃 | 地下礼拝堂 Lv3 | 全灯るさ生産 x1.10 |
 | `tsuginohataSakurako` | 継ノ端 桜子 | 地下通路修復区画 Lv1 | オフライン灯るさ報酬 x1.15 |
 | `kasumiyamaMio` | 霞山 澪 | 廻 1回以上 / 深層観測所 Lv1 | deepタグ施設の灯るさ生産 x1.35 |
 | `nanashiroSatsuki` | 七城 皐月 | 廻 1回以上 / 工学記録保管区 Lv3 | 歌・アイテム取得コスト x0.85 |
@@ -167,8 +167,8 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `handwrittenPoster` | 手書きの告知ポスター | 路地裏ステージ Lv4 | 140 | ライブ1回の灯るさ +1 |
 | `ticketStubBundle` | 半券の束 | 路地裏ステージ Lv5 | 220 | ライブ1回の灯るさ +1 |
 | `portableSpotlight` | 携帯スポットライト | 路地裏ステージ Lv6 | 260 | 施設の灯るさ生産 x1.04 |
-| `recordedGreeting` | 録音済みの短い挨拶 | ネオン掲示板 Lv3 | 600 | 施設の灯るさ生産 x1.03 |
 | `shiftNoticeBoard` | 交代用連絡ボード | ネオン掲示板 Lv2 | 500 | オフライン灯るさ報酬 x1.10 |
+| `recordedGreeting` | 録音済みの短い挨拶 | ネオン掲示板 Lv3 | 600 | 施設の灯るさ生産 x1.03 |
 | `oldRadioTowerDebris` | 古い電波塔の残骸 | 仮設配信ブース Lv1 | 3000 | ライブ1回の灯るさ +5 |
 | `handwrittenListenerLog` | 手書きのリスナー名簿 | 仮設配信ブース Lv3 | 4000 | 施設の灯るさ生産 x1.06 |
 | `fadedBookLabel` | 色あせた書名ラベル | 記憶図書館 Lv2 | 10000 | 交流増加量 x1.10 |

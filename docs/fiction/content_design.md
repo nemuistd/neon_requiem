@@ -250,7 +250,7 @@
 
 | baseCost | costMultiplier | productionPerLevel |
 |---|---|---|
-| 18,000 | 1.20 | 5.0 |
+| 50,000 | 1.26 | 16.0 |
 
 ---
 

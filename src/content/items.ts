@@ -77,24 +77,6 @@ export const ITEM_DEFINITIONS = defineContent([
     }
   },
   {
-    id: "recordedGreeting",
-    name: "録音済みの短い挨拶",
-    description: "不在の時間にも、誰かがその声を思い出せるようにする短い録音。",
-    cost: 600,
-    effectDescription: "施設の灯るさ生産 x1.03",
-    effects: [
-      {
-        type: "facility.production.multiplier",
-        multiplier: 1.03
-      }
-    ],
-    unlockRequirement: {
-      type: "facility.level",
-      facilityId: "neonBoard",
-      level: 3
-    }
-  },
-  {
     id: "shiftNoticeBoard",
     name: "交代用連絡ボード",
     description: "片付けや見回りの予定を書き残すための小さなボード。不在の間も、できる作業が少しずつ進むようになる。",
@@ -110,6 +92,24 @@ export const ITEM_DEFINITIONS = defineContent([
       type: "facility.level",
       facilityId: "neonBoard",
       level: 2
+    }
+  },
+  {
+    id: "recordedGreeting",
+    name: "録音済みの短い挨拶",
+    description: "不在の時間にも、誰かがその声を思い出せるようにする短い録音。",
+    cost: 600,
+    effectDescription: "施設の灯るさ生産 x1.03",
+    effects: [
+      {
+        type: "facility.production.multiplier",
+        multiplier: 1.03
+      }
+    ],
+    unlockRequirement: {
+      type: "facility.level",
+      facilityId: "neonBoard",
+      level: 3
     }
   },
   {
