@@ -133,6 +133,38 @@ export const SONG_DEFINITIONS = defineContent([
       facilityId: "undergroundPassageRepair",
       level: 3
     }
+  },
+  {
+    id: "theLastName",
+    name: "最後の名前",
+    description:
+      "名前のない劇場で、燐が一度だけ歌った曲。名前がないから消えない、という構造を知っていなければ、何が起きているのか分からない。",
+    cost: 5000000,
+    effectDescription: "施設の灯るさ生産 x1.30 / 記憶断片の獲得見込み +20%",
+    effects: [
+      {
+        type: "facility.production.multiplier",
+        multiplier: 1.3
+      },
+      {
+        type: "memory.fragment.production.add",
+        ratio: 0.2
+      }
+    ],
+    unlockRequirement: {
+      type: "all",
+      requirements: [
+        {
+          type: "meguri.count",
+          count: 2
+        },
+        {
+          type: "facility.level",
+          facilityId: "unnamedTheater",
+          level: 1
+        }
+      ]
+    }
   }
 ] as const satisfies readonly SongDefinition[]);
 

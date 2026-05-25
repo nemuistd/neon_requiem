@@ -306,6 +306,31 @@ describe("meguri economy", () => {
     expect(postMeguriState.meguri).not.toHaveProperty("dashboard");
   });
 
+  it("shows the Ch.9 open-end guide after the final song is added", () => {
+    const initialState = createInitialState();
+    const ch9OpenState = createMeguriReadyState({
+      ...initialState,
+      facilities: {
+        ...initialState.facilities,
+        unnamedTheater: { level: 3 }
+      },
+      songs: {
+        ...initialState.songs,
+        theLastName: { purchased: true }
+      },
+      meguri: {
+        ...initialState.meguri,
+        count: 2
+      }
+    });
+    const html = renderMeguriPanel(ch9OpenState);
+
+    expect(html).toContain('data-ch9-open-end="true"');
+    expect(html).toContain(UI_TEXT.ch9OpenEndTitle);
+    expect(html).toContain('data-tab-id="restoration"');
+    expect(html.match(/data-meguri-action="perform"/g)).toHaveLength(2);
+  });
+
   it("shows a post-meguri annotation index without duplicating annotation body text", () => {
     const preMeguriHtml = renderMeguriPanel(createMeguriReadyState(createInitialState()));
     expect(preMeguriHtml).not.toContain('data-meguri-annotation-index="true"');

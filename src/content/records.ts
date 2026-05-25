@@ -1,10 +1,11 @@
 import { ContentId, defineContent, toContentMap, toContentOrder } from "./defineContent.js";
 import { RecordDefinition } from "./types.js";
 
-export const RECORD_CONTENT_VERSION = 14;
+export const RECORD_CONTENT_VERSION = 15;
 const PRE_CH7_RECORD_CONTENT_VERSION = 11;
 const CH7_RECORD_CONTENT_VERSION = 12;
 const CH8_RECORD_CONTENT_VERSION = 13;
+const CH9_ENTRY_RECORD_CONTENT_VERSION = 14;
 
 export const RECORD_DEFINITIONS = defineContent([
   {
@@ -661,7 +662,7 @@ export const RECORD_DEFINITIONS = defineContent([
     revealLevel: "deep",
     body:
       "名前のない劇場でライブを行った。席は整っていて、誰かが最近使った形跡があるが、誰かは分からない。ライブ中、音響が奇妙だった。歌が終わった後も、余韻が通常より長く続き、反響の形が今歌った歌とわずかに違う。以前にここで誰かが歌ったのか。あるいは別の廻で。どちらも確認できない。",
-    introducedAtVersion: RECORD_CONTENT_VERSION,
+    introducedAtVersion: CH9_ENTRY_RECORD_CONTENT_VERSION,
     unlockRequirements: [
       {
         type: "all",
@@ -686,6 +687,60 @@ export const RECORD_DEFINITIONS = defineContent([
     revealLevel: "deep",
     body:
       "白霧 燐と最初に話した。「初めまして」と言うと、燐は「そうかな」と言った。確信ではなく、疑問として。それから「以前もここに来たね」と続けた。覚えているのかと訊くと、「覚えているというより、感じている」と答えた。言い方が正確かどうかは分からない。でも、その感覚は少しだけ分かった。",
+    introducedAtVersion: CH9_ENTRY_RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "all",
+        requirements: [
+          {
+            type: "meguri.count",
+            count: 2
+          },
+          {
+            type: "facility.level",
+            facilityId: "unnamedTheater",
+            level: 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "binderSealedLetterFullText",
+    title: "バインダー封書・全文",
+    category: "断片記憶",
+    revealLevel: "deep",
+    body:
+      "封書の全文が読めるようになった。そこには、これを廻と呼ぶこと、次の廻のために施設を復旧し、灯し手たちを見つけ、ライブを続け、名前を掲げ続けることが書かれていた。理由は最後まで一つには書かれていない。霞へ直接願う方法を使わないこと。それだけが条件で、条件の理由を知っている者は、知らないままでいるべきだった、とある。最後の一行だけが、読み手に判断を返している。",
+    introducedAtVersion: RECORD_CONTENT_VERSION,
+    unlockRequirements: [
+      {
+        type: "all",
+        requirements: [
+          {
+            type: "meguri.count",
+            count: 2
+          },
+          {
+            type: "facility.level",
+            facilityId: "unnamedTheater",
+            level: 3
+          },
+          {
+            type: "song.purchased",
+            songId: "theLastName"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "unnamedTheaterResidualPerformance",
+    title: "名前のない劇場・残響公演",
+    category: "観測記録",
+    revealLevel: "deep",
+    body:
+      "最後の名前を、名前のない劇場で演目に加えた。歌い終わった後、劇場の奥で一拍だけ違う残響が返った。今の声ではない。けれど、過去の声だと断定するには近すぎる。燐はその反響を追わず、もう一度だけ客席を見た。誰かがそこにいたのか、そこにいたことがあるのかは分からない。劇場は、何も答えなかった。",
     introducedAtVersion: RECORD_CONTENT_VERSION,
     unlockRequirements: [
       {
@@ -699,6 +754,10 @@ export const RECORD_DEFINITIONS = defineContent([
             type: "facility.level",
             facilityId: "unnamedTheater",
             level: 1
+          },
+          {
+            type: "song.purchased",
+            songId: "theLastName"
           }
         ]
       }

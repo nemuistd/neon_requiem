@@ -7,7 +7,7 @@
 世界観・用語体系は [worldbuilding.md](worldbuilding.md) を正史とする。承認済みの物語・コンテンツ正史は [fiction/](fiction/) 配下を参照する。README とこの文書に差分が出た場合は、実装と README を確認して同期する。
 長期方針と未実装計画は [planning/](planning/) 配下を参照する。
 
-`docs/fiction/world_design.md` で定義された **廻（めぐり）** は正式システム名として扱う。現在の実装では、再固定中枢到達後に任意で廻を実行し、記憶断片を清算して廻後バフを購入し、記録の追記を表示できる。Ch.7 の深層観測所と霞山 澪、Ch.8 の工学記録保管区、祈念工学実験跡地、七城 皐月、Ch.9 起点の再観測拠点、名前のない劇場、白霧 燐は最小縦切りとして実装済み。Ch.9 収束、バインダー封書の全文解読は未実装であり、長期仕様は `docs/planning/meguri_system_spec.md` と `docs/fiction/meguri_after_design.md` を参照する。
+`docs/fiction/world_design.md` で定義された **廻（めぐり）** は正式システム名として扱う。現在の実装では、再固定中枢到達後に任意で廻を実行し、記憶断片を清算して廻後バフを購入し、記録の追記を表示できる。Ch.7 の深層観測所と霞山 澪、Ch.8 の工学記録保管区、祈念工学実験跡地、七城 皐月、Ch.9 起点の再観測拠点、名前のない劇場、白霧 燐、Ch.9 収束補強の最後の名前、バインダー封書・全文、オープンエンド導線は最小縦切りとして実装済み。主人公の正体、霞の意志、旧計画の全貌を単一の答えとして確定する演出は未実装であり、長期仕様は `docs/planning/meguri_system_spec.md` と `docs/fiction/meguri_after_design.md` を参照する。
 
 ## 技術構成
 
@@ -140,7 +140,7 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 - `memory.fragment.production.add`
 - `rebirth.bonus.multiplier`
 
-このうち、`record.unlock.cost.multiplier` は型・検証上の受け口のみで未使用。`memory.fragment.production.add` と `rebirth.bonus.multiplier` は廻後バフと白霧 燐の効果で使用する。
+このうち、`record.unlock.cost.multiplier` は型・検証上の受け口のみで未使用。`memory.fragment.production.add` と `rebirth.bonus.multiplier` は廻後バフ、白霧 燐、最後の名前の効果で使用する。
 
 ## 歌
 
@@ -153,9 +153,11 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `chapelHarmony` | 礼拝堂のハーモニー | 地下礼拝堂 Lv2 | 25000 | 施設の灯るさ生産 x1.10 |
 | `twilightChorus` | 薄明のコーラス | 地下礼拝堂 Lv8 | 90000 | 施設の灯るさ生産 x1.25 |
 | `restorationHumming` | 修復の仮歌 | 地下通路修復区画 Lv3 | 80000 | オフライン灯るさ報酬 x1.10 |
+| `theLastName` | 最後の名前 | 廻 2回以上 / 名前のない劇場 Lv1 | 5000000 | 施設の灯るさ生産 x1.30 / 記憶断片の獲得見込み +20% |
 
 「聖歌」は通常システム名にしない。
 「修復の仮歌」はオフライン報酬強化の歌であり、地下通路修復区画 Lv5 と合わせて再固定中枢の解放条件になる。
+「最後の名前」は Ch.9 収束補強の歌であり、廻2以降の名前のない劇場から、バインダー封書・全文とオープンエンド導線へ接続する。
 
 ## アイテム
 
@@ -238,6 +240,8 @@ ceil((nextEligibleFragments / memoryFragmentMultiplier) ** 2 * 20000)
 
 廻後バフの購入は、廻直後の `pendingSettlement` 中のみ可能。廻実行後は専用の清算画面へ遷移し、通常タブやライブ操作は清算終了まで抑制される。「通常進行へ戻る」を押すと清算フェーズが閉じ、以後は次の廻まで確認のみになる。清算中に追記が増えた記録がある場合は、清算画面に対象記録の控えを表示し、控えめな「記録タブで追記を読む」導線から清算を閉じて記録タブへ移れる。この記録導線も清算を終える操作であることを画面内に明記する。`pendingSettlement` は保存されるため、清算中にリロードした場合も清算画面へ戻る。
 
+Ch.9 収束補強では、廻2以降、名前のない劇場 Lv3 と「最後の名前」取得後に廻タブへ「再び灯るものへ」の導線を表示する。これは物語上の解決ではなく、復興を続けるか、もう一度廻るかを選べるオープンエンド表示として扱う。新しい保存フィールドは使わず、`meguri.count`、施設 Lv、歌取得状態から判定する。
+
 廻後の基礎加速として、施設生産に `1 + 0.05 * meguri.count` を適用する。`rebirth.bonus.multiplier` はこの廻後生産倍率に掛ける。
 
 ## 序盤30分の進行目安
@@ -294,6 +298,8 @@ ceil((nextEligibleFragments / memoryFragmentMultiplier) ** 2 * 20000)
 - 実験跡地・現地調査報告
 - 名前のない劇場・残響記録
 - 燐・最初の言葉
+- バインダー封書・全文
+- 名前のない劇場・残響公演
 
 現在の廻後追記:
 

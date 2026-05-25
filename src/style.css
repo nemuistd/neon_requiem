@@ -1289,7 +1289,8 @@ h2 {
 }
 
 .meguri-dashboard-card,
-.meguri-annotation-index-card {
+.meguri-annotation-index-card,
+.meguri-open-end-card {
   grid-column: 1 / -1;
   min-height: auto;
 }
@@ -1468,6 +1469,19 @@ h2 {
 
 .meguri-annotation-open-records {
   margin-top: 12px;
+}
+
+.meguri-open-end-card p {
+  margin: 12px 0 0;
+  max-width: 72ch;
+  color: #f1e8fa;
+}
+
+.meguri-open-end-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
 }
 
 .meguri-fragment-progress {

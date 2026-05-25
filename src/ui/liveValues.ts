@@ -101,16 +101,16 @@ export function updateItemLiveValues(elements: UiElements, state: GameState): vo
 }
 
 export function updateMeguriLiveValues(elements: UiElements, state: GameState): void {
-  const performButton = elements.contentList.querySelector<HTMLButtonElement>("[data-meguri-action='perform']");
+  const performButtons = elements.contentList.querySelectorAll<HTMLButtonElement>("[data-meguri-action='perform']");
   const memoryFragmentsElement = elements.contentList.querySelector<HTMLElement>("[data-meguri-memory-fragments]");
   const previewElement = elements.contentList.querySelector<HTMLElement>("[data-meguri-preview]");
   const nextFragmentElement = elements.contentList.querySelector<HTMLElement>("[data-meguri-next-fragment]");
   const nextFragmentCopyElement = elements.contentList.querySelector<HTMLElement>("[data-meguri-next-fragment-copy]");
   const progressBarElement = elements.contentList.querySelector<HTMLElement>(".meguri-progress-track span");
 
-  if (performButton) {
+  performButtons.forEach((performButton) => {
     performButton.disabled = state.meguri.pendingSettlement || !isMeguriAvailable(state);
-  }
+  });
 
   if (memoryFragmentsElement) {
     memoryFragmentsElement.textContent = formatWholeAmount(getResourceAmount(state, MEMORY_FRAGMENT_RESOURCE_ID));

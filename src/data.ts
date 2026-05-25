@@ -99,6 +99,13 @@ export const UI_TEXT = {
   meguriDashboardNextGoalReadAnnotations: "追記が増えた記録を読み直す",
   meguriDashboardNextGoalChooseBuff: "次の清算で未取得バフを選ぶ",
   meguriDashboardNextGoalContinueMeguri: "次の廻で断片と痕跡をもう少し増やす",
+  ch9OpenEndKicker: "Ch.9 収束",
+  ch9OpenEndStateLabel: "選択可能",
+  ch9OpenEndTitle: "再び灯るものへ",
+  ch9OpenEndText:
+    "封書は閉じきった答えではなく、次の判断だけを残している。街をこのまま復興し続けても、もう一度廻って痕跡を重ねてもよい。",
+  ch9OpenEndContinueButtonLabel: "復興を続ける",
+  ch9OpenEndMeguriButtonLabel: "もう一度廻る",
   meguriAnnotationIndexLabel: "追記索引",
   meguriAnnotationIndexEmptyLabel: "追記なし",
   meguriAnnotationIndexEmptyText: "廻後バフで追記が解放されると、ここに控えが残ります。",

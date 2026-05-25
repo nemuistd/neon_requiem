@@ -1,5 +1,7 @@
 # NEON REQUIEM 今後の実装 TODO ドラフト
 
+> historical: この文書は初期〜中期の TODO ドラフトであり、現在は実装済みになった項目も含む。現行仕様は [current_spec.md](current_spec.md)、現在の優先タスク候補は [product/40_task_backlog.md](product/40_task_backlog.md)、長期計画は [planning/](planning/) を優先する。
+
 ## この文書の位置づけ
 
 この文書は、NEON REQUIEM の今後の実装候補を整理するための TODO ドラフトである。

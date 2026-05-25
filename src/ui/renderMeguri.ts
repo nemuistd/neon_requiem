@@ -19,6 +19,7 @@ import {
   getMeguriFacilityProductionMultiplier,
   getMeguriSettlementPreview,
   getResourceAmount,
+  isCh9OpenEndReached,
   isRecordAnnotationRead,
   isRecordAnnotationUnlocked,
   isMeguriAvailable,
@@ -40,6 +41,7 @@ export function renderMeguriPanel(state: GameState): string {
     <section class="meguri-panel">
       ${renderMeguriDashboard(state)}
       ${renderMeguriAnnotationIndex(state)}
+      ${renderCh9OpenEndGuide(state, isAvailable)}
       <article class="card meguri-status-card">
         <div class="meguri-heading">
           <span class="card-kicker">${state.meguri.pendingSettlement ? UI_TEXT.meguriSettledLabel : UI_TEXT.meguriReadyLabel}</span>
@@ -103,6 +105,40 @@ export function renderMeguriPanel(state: GameState): string {
         </div>
       </article>
     </section>
+  `;
+}
+
+function renderCh9OpenEndGuide(state: GameState, isAvailable: boolean): string {
+  if (!isCh9OpenEndReached(state)) {
+    return "";
+  }
+
+  return `
+      <article class="card meguri-open-end-card" data-ch9-open-end="true">
+        <div class="meguri-heading">
+          <span class="card-kicker">${UI_TEXT.ch9OpenEndKicker}</span>
+          <span class="meguri-state open">${UI_TEXT.ch9OpenEndStateLabel}</span>
+        </div>
+        <h2>${UI_TEXT.ch9OpenEndTitle}</h2>
+        <p>${UI_TEXT.ch9OpenEndText}</p>
+        <div class="meguri-open-end-actions">
+          <button
+            class="secondary-action"
+            type="button"
+            data-tab-id="restoration"
+          >
+            ${UI_TEXT.ch9OpenEndContinueButtonLabel}
+          </button>
+          <button
+            class="primary-action"
+            type="button"
+            data-meguri-action="perform"
+            ${isAvailable ? "" : "disabled"}
+          >
+            ${UI_TEXT.ch9OpenEndMeguriButtonLabel}
+          </button>
+        </div>
+      </article>
   `;
 }
 

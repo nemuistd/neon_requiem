@@ -20,6 +20,7 @@ import {
   getResourceAmount,
   getSongCost,
   getTomorusaPerSecond,
+  isCh9OpenEndReached,
   isFacilityUnlocked,
   isIdolEventRead,
   isIdolEventUnlocked,
@@ -27,6 +28,7 @@ import {
   isIdolUnlocked,
   isRecordRead,
   isRecordUnlocked,
+  isSongUnlocked,
   joinIdol,
   performManualLive,
   purchaseItem,
@@ -853,6 +855,69 @@ describe("game state and effects", () => {
     expect(getFacilityTomorusaPerSecond(rinJoinedState, "reobservationBase")).toBeCloseTo(400 * 1.2 * 1.1 * 1.15);
     expect(preview.memoryFragmentMultiplier).toBeCloseTo(1.3);
     expect(preview.totalEligibleMemoryFragments).toBe(4);
+  });
+
+  it("unlocks the Ch.9 convergence song and records without exposing them in the first meguri", () => {
+    const baseState = createInitialState();
+    const meguriOneTheaterState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        unnamedTheater: { level: 3 }
+      },
+      meguri: {
+        ...baseState.meguri,
+        count: 1
+      }
+    };
+    const meguriTwoTheaterState = {
+      ...meguriOneTheaterState,
+      meguri: {
+        ...meguriOneTheaterState.meguri,
+        count: 2
+      }
+    };
+    const songPurchasedState = {
+      ...meguriTwoTheaterState,
+      songs: {
+        ...meguriTwoTheaterState.songs,
+        theLastName: { purchased: true }
+      }
+    };
+
+    expect(isSongUnlocked(meguriOneTheaterState, "theLastName")).toBe(false);
+    expect(isSongUnlocked(meguriTwoTheaterState, "theLastName")).toBe(true);
+    expect(isRecordUnlocked(meguriTwoTheaterState, "binderSealedLetterFullText")).toBe(false);
+    expect(isRecordUnlocked(songPurchasedState, "binderSealedLetterFullText")).toBe(true);
+    expect(isRecordUnlocked(songPurchasedState, "unnamedTheaterResidualPerformance")).toBe(true);
+    expect(isCh9OpenEndReached(songPurchasedState)).toBe(true);
+  });
+
+  it("applies The Last Name production and memory fragment effects after purchase", () => {
+    const baseState = createInitialState();
+    const songPurchasedState = {
+      ...baseState,
+      totalTomorusaEarned: 200000,
+      facilities: {
+        ...baseState.facilities,
+        prayerEngineeringRuins: { level: 3 },
+        reobservationBase: { level: 3 },
+        unnamedTheater: { level: 1 }
+      },
+      songs: {
+        ...baseState.songs,
+        theLastName: { purchased: true }
+      },
+      meguri: {
+        ...baseState.meguri,
+        count: 2
+      }
+    };
+    const preview = getMeguriSettlementPreview(songPurchasedState);
+
+    expect(getFacilityTomorusaPerSecond(songPurchasedState, "unnamedTheater")).toBeCloseTo(600 * 1.2 * 1.1 * 1.3);
+    expect(preview.memoryFragmentMultiplier).toBeCloseTo(1.2);
+    expect(preview.totalEligibleMemoryFragments).toBe(3);
   });
 
   it("applies production and caps offline reward at 12 hours", () => {

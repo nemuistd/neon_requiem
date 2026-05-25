@@ -186,7 +186,7 @@ Ch.7以降の後続施設は、後から承認された `docs/fiction/world_desi
 
 ## 今後この文書を使う場合
 
-廻前導線の最小実装は完了している。Ch.7〜Ch.9 起点の新施設・新アイドルも最小縦切りとして実装済み。次に進む場合は、`docs/current_spec.md`、`docs/fiction/`、`docs/planning/meguri_system_spec.md` を前提に、Ch.9 収束や追加補強を別タスクとして整理する。
+廻前導線の最小実装は完了している。Ch.7〜Ch.9 起点の新施設・新アイドルと Ch.9 収束補強も最小縦切りとして実装済み。次に進む場合は、`docs/current_spec.md`、`docs/fiction/`、`docs/planning/meguri_system_spec.md` を前提に、通しプレイ確認、Ch.7 / Ch.8 の体験補強、または廻後バランス調整を別タスクとして整理する。
 
 fiction 正史上の後続施設は次の順で扱う。
 

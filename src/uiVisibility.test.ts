@@ -96,9 +96,11 @@ describe("locked content visibility", () => {
     expect(renderFacilityCards(ch9HiddenState)).not.toContain("再観測拠点");
     expect(renderFacilityCards(ch9HiddenState)).not.toContain("名前のない劇場");
     expect(renderIdolTabCards(ch9HiddenState)).not.toContain("白霧 燐");
+    expect(renderSongCards(ch9HiddenState)).not.toContain("最後の名前");
     expect(renderFacilityCards(ch9VisibleState)).toContain("再観測拠点");
     expect(renderFacilityCards(ch9VisibleState)).toContain("名前のない劇場");
     expect(renderIdolTabCards(ch9VisibleState)).toContain("白霧 燐");
+    expect(renderSongCards(ch9VisibleState)).toContain("最後の名前");
   });
 
   it("hides locked record titles and requirements", () => {
