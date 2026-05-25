@@ -1,12 +1,14 @@
 import {
   FACILITIES,
   FACILITY_ORDER,
+  IDOLS,
   SONGS
 } from "../definitions";
 import type {
   FacilityId,
   Requirement
 } from "../definitions";
+import { isRequirementMet } from "../engine/requirements";
 import {
   GameState,
   isFacilityUnlocked
@@ -41,6 +43,12 @@ function isRequirementProgressVisible(state: GameState, requirement?: Requiremen
     const song = SONGS[requirement.songId as keyof typeof SONGS];
 
     return Boolean(song && isRequirementProgressVisible(state, song.unlockRequirement));
+  }
+
+  if (requirement.type === "idol.joined") {
+    const idol = IDOLS[requirement.idolId as keyof typeof IDOLS];
+
+    return Boolean(idol && isRequirementMet(state, idol.unlockRequirement));
   }
 
   if (requirement.type === "meguri.count") {

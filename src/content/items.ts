@@ -146,9 +146,18 @@ export const ITEM_DEFINITIONS = defineContent([
       }
     ],
     unlockRequirement: {
-      type: "facility.level",
-      facilityId: "temporaryBroadcastBooth",
-      level: 3
+      type: "all",
+      requirements: [
+        {
+          type: "idol.joined",
+          idolId: "hibikiTooko"
+        },
+        {
+          type: "facility.level",
+          facilityId: "temporaryBroadcastBooth",
+          level: 4
+        }
+      ]
     }
   },
   {
@@ -165,9 +174,18 @@ export const ITEM_DEFINITIONS = defineContent([
       }
     ],
     unlockRequirement: {
-      type: "facility.level",
-      facilityId: "memoryLibrary",
-      level: 2
+      type: "all",
+      requirements: [
+        {
+          type: "idol.joined",
+          idolId: "kaminoMeguri"
+        },
+        {
+          type: "facility.level",
+          facilityId: "memoryLibrary",
+          level: 3
+        }
+      ]
     }
   },
   {
@@ -203,9 +221,18 @@ export const ITEM_DEFINITIONS = defineContent([
       }
     ],
     unlockRequirement: {
-      type: "facility.level",
-      facilityId: "undergroundPassageRepair",
-      level: 1
+      type: "all",
+      requirements: [
+        {
+          type: "idol.joined",
+          idolId: "tsuginohataSakurako"
+        },
+        {
+          type: "facility.level",
+          facilityId: "undergroundPassageRepair",
+          level: 2
+        }
+      ]
     }
   }
 ] as const satisfies readonly ItemDefinition[]);

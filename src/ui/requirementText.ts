@@ -55,6 +55,14 @@ export function getUnlockRequirementTextFromRequirement(requirement: Requirement
     return `${IDOLS[requirement.idolId].name} ${UI_TEXT.bondLabel} ${requirement.amount}`;
   }
 
+  if (requirement.type === "idol.joined") {
+    if (!isIdolId(requirement.idolId)) {
+      return "不明なアイドル";
+    }
+
+    return `${IDOLS[requirement.idolId].name} ${UI_TEXT.joinedIdolLabel}`;
+  }
+
   if (requirement.type === "all") {
     return requirement.requirements.map(getUnlockRequirementTextFromRequirement).join(" / ");
   }

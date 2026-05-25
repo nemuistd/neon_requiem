@@ -148,12 +148,12 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | --- | --- | --- | ---: | --- |
 | `rojiuraIntro` | 路地裏のイントロ | 路地裏ステージ Lv5 | 80 | ライブ1回の灯るさ +1 |
 | `prebroadcastAcapella` | 配信前夜のアカペラ | 仮設配信ブース Lv2 | 6000 | ライブ1回の灯るさ +8 |
-| `songOfRecords` | 記録の歌 | 記憶図書館 Lv3 | 20000 | 施設の灯るさ生産 x1.15 |
-| `plazaAnthem` | 広場のアンセム | 地下広場 Lv3 | 30000 | ライブ1回の灯るさ獲得に全施設合計の灯るさ/秒 x0.08 を加算 |
+| `songOfRecords` | 記録の歌 | 紙野 巡 合流済み / 記憶図書館 Lv3 | 20000 | 施設の灯るさ生産 x1.15 |
+| `plazaAnthem` | 広場のアンセム | 陽向 小春 合流済み / 地下広場 Lv3 | 30000 | ライブ1回の灯るさ獲得に全施設合計の灯るさ/秒 x0.08 を加算 |
 | `chapelHarmony` | 礼拝堂のハーモニー | 地下礼拝堂 Lv2 | 25000 | 施設の灯るさ生産 x1.10 |
 | `twilightChorus` | 薄明のコーラス | 地下礼拝堂 Lv8 | 90000 | 施設の灯るさ生産 x1.25 |
-| `restorationHumming` | 修復の仮歌 | 地下通路修復区画 Lv3 | 80000 | オフライン灯るさ報酬 x1.10 |
-| `theLastName` | 最後の名前 | 廻 2回以上 / 名前のない劇場 Lv1 | 20000000 | 施設の灯るさ生産 x1.30 / 記憶断片の獲得見込み +20% |
+| `restorationHumming` | 修復の仮歌 | 継ノ端 桜子 合流済み / 地下通路修復区画 Lv3 | 80000 | オフライン灯るさ報酬 x1.10 |
+| `theLastName` | 最後の名前 | 廻 2回以上 / 白霧 燐 合流済み / 名前のない劇場 Lv2 | 20000000 | 施設の灯るさ生産 x1.30 / 記憶断片の獲得見込み +20% |
 
 「聖歌」は通常システム名にしない。
 「修復の仮歌」はオフライン報酬強化の歌であり、地下通路修復区画 Lv5 と合わせて再固定中枢の解放条件になる。
@@ -170,10 +170,10 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `shiftNoticeBoard` | 交代用連絡ボード | ネオン掲示板 Lv2 | 500 | オフライン灯るさ報酬 x1.10 |
 | `recordedGreeting` | 録音済みの短い挨拶 | ネオン掲示板 Lv3 | 600 | 施設の灯るさ生産 x1.03 |
 | `oldRadioTowerDebris` | 古い電波塔の残骸 | 仮設配信ブース Lv1 | 3000 | ライブ1回の灯るさ +5 |
-| `handwrittenListenerLog` | 手書きのリスナー名簿 | 仮設配信ブース Lv3 | 4000 | 施設の灯るさ生産 x1.06 |
-| `fadedBookLabel` | 色あせた書名ラベル | 記憶図書館 Lv2 | 10000 | 交流増加量 x1.10 |
+| `handwrittenListenerLog` | 手書きのリスナー名簿 | 響木 遠子 合流済み / 仮設配信ブース Lv4 | 4000 | 施設の灯るさ生産 x1.06 |
+| `fadedBookLabel` | 色あせた書名ラベル | 紙野 巡 合流済み / 記憶図書館 Lv3 | 10000 | 交流増加量 x1.10 |
 | `broadcastEquipmentManual` | 放送室の機材マニュアル | 録音保管庫 Lv2 | 15000 | オフライン灯るさ報酬 x1.10 |
-| `repairToolSet` | 修復用の工具一式 | 地下通路修復区画 Lv1 | 50000 | 施設の灯るさ生産 x1.08 |
+| `repairToolSet` | 修復用の工具一式 | 継ノ端 桜子 合流済み / 地下通路修復区画 Lv2 | 50000 | 施設の灯るさ生産 x1.08 |
 
 アイテムタブは実装済みで、購入済み状態は保存される。
 `交代用連絡ボード` 購入後の実効オフライン効率は `0.5 * 1.10 = 0.55` で、同じ時間のオンライン自然生産の55%になる。
@@ -357,6 +357,6 @@ v1〜v10 の旧セーブは可能な範囲で正規化する。`idols` がない
 
 ## Requirement
 
-現在の Requirement は `facility.level`, `song.purchased`, `resource.amount`, `idol.bond`, `meguri.count`, `meguri.idolRecognition`, `meguri.buff.purchased`, `all`, `any`, `not` を扱う。
-`idol.bond` は `state.idols[idolId]?.bond >= amount` で判定し、表示文は「アイドル名 交流 amount」を基本にする。
+現在の Requirement は `facility.level`, `song.purchased`, `resource.amount`, `idol.joined`, `idol.bond`, `meguri.count`, `meguri.idolRecognition`, `meguri.buff.purchased`, `all`, `any`, `not` を扱う。
+`idol.joined` は `state.idols[idolId]?.joined === true`、`idol.bond` は `state.idols[idolId]?.bond >= amount` で判定する。表示文は `idol.joined` が「アイドル名 合流済み」、`idol.bond` が「アイドル名 交流 amount」を基本にする。
 `meguri.count` は廻回数、`meguri.idolRecognition` は指定アイドルに以前の廻の痕跡が残っているか、`meguri.buff.purchased` は指定バフ購入済みで判定する。contentValidation は idolId、buffId、数値条件の妥当性を検証する。

@@ -55,9 +55,18 @@ export const SONG_DEFINITIONS = defineContent([
       }
     ],
     unlockRequirement: {
-      type: "facility.level",
-      facilityId: "memoryLibrary",
-      level: 3
+      type: "all",
+      requirements: [
+        {
+          type: "idol.joined",
+          idolId: "kaminoMeguri"
+        },
+        {
+          type: "facility.level",
+          facilityId: "memoryLibrary",
+          level: 3
+        }
+      ]
     }
   },
   {
@@ -74,9 +83,18 @@ export const SONG_DEFINITIONS = defineContent([
       }
     ],
     unlockRequirement: {
-      type: "facility.level",
-      facilityId: "undergroundPlaza",
-      level: 3
+      type: "all",
+      requirements: [
+        {
+          type: "idol.joined",
+          idolId: "hinataKoharu"
+        },
+        {
+          type: "facility.level",
+          facilityId: "undergroundPlaza",
+          level: 3
+        }
+      ]
     }
   },
   {
@@ -129,9 +147,18 @@ export const SONG_DEFINITIONS = defineContent([
       }
     ],
     unlockRequirement: {
-      type: "facility.level",
-      facilityId: "undergroundPassageRepair",
-      level: 3
+      type: "all",
+      requirements: [
+        {
+          type: "idol.joined",
+          idolId: "tsuginohataSakurako"
+        },
+        {
+          type: "facility.level",
+          facilityId: "undergroundPassageRepair",
+          level: 3
+        }
+      ]
     }
   },
   {
@@ -159,9 +186,13 @@ export const SONG_DEFINITIONS = defineContent([
           count: 2
         },
         {
+          type: "idol.joined",
+          idolId: "shiragiriRin"
+        },
+        {
           type: "facility.level",
           facilityId: "unnamedTheater",
-          level: 1
+          level: 2
         }
       ]
     }

@@ -370,6 +370,14 @@ export function validateRequirement(label: string, requirement: Requirement): st
     return errors;
   }
 
+  if (requirement.type === "idol.joined") {
+    if (!Object.prototype.hasOwnProperty.call(IDOLS, requirement.idolId)) {
+      return [`${label}: requirement references missing idol "${requirement.idolId}".`];
+    }
+
+    return [];
+  }
+
   if (requirement.type === "meguri.count") {
     const errors: string[] = [];
 
@@ -653,6 +661,10 @@ function isRequirementPotentiallyReachable(
 
   if (requirement.type === "idol.bond") {
     return Object.prototype.hasOwnProperty.call(IDOLS, requirement.idolId) && isPositiveFiniteNumber(requirement.amount);
+  }
+
+  if (requirement.type === "idol.joined") {
+    return Object.prototype.hasOwnProperty.call(IDOLS, requirement.idolId);
   }
 
   if (requirement.type === "meguri.count") {

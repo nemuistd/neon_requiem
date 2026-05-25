@@ -92,6 +92,20 @@ describe("locked content visibility", () => {
         count: 2
       }
     };
+    const ch9SongReadyState = {
+      ...ch9VisibleState,
+      facilities: {
+        ...ch9VisibleState.facilities,
+        unnamedTheater: { level: 2 }
+      },
+      idols: {
+        ...ch9VisibleState.idols,
+        shiragiriRin: {
+          ...ch9VisibleState.idols.shiragiriRin,
+          joined: true
+        }
+      }
+    };
 
     expect(renderFacilityCards(ch9HiddenState)).not.toContain("再観測拠点");
     expect(renderFacilityCards(ch9HiddenState)).not.toContain("名前のない劇場");
@@ -100,7 +114,9 @@ describe("locked content visibility", () => {
     expect(renderFacilityCards(ch9VisibleState)).toContain("再観測拠点");
     expect(renderFacilityCards(ch9VisibleState)).toContain("名前のない劇場");
     expect(renderIdolTabCards(ch9VisibleState)).toContain("白霧 燐");
-    expect(renderSongCards(ch9VisibleState)).toContain("最後の名前");
+    expect(renderSongCards(ch9VisibleState)).not.toContain("最後の名前");
+    expect(renderSongCards(ch9VisibleState)).toContain("未確認の歌");
+    expect(renderSongCards(ch9SongReadyState)).toContain("最後の名前");
   });
 
   it("hides locked record titles and requirements", () => {
@@ -128,6 +144,32 @@ describe("locked content visibility", () => {
     expect(renderItemCards(baseState)).not.toContain("古いネオン管");
     expect(renderIdolTabCards(chapelVisibleState)).toContain("未確認のアイドル");
     expect(renderIdolTabCards(chapelVisibleState)).not.toContain("深月 詩乃");
+  });
+
+  it("keeps idol-gated song and item requirements hidden until the idol can be met", () => {
+    const baseState = createInitialState();
+    const libraryRelatedState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        temporaryBroadcastBooth: { level: 5 },
+        memoryLibrary: { level: 1 }
+      }
+    };
+    const meguriVisibleState = {
+      ...libraryRelatedState,
+      facilities: {
+        ...libraryRelatedState.facilities,
+        memoryLibrary: { level: 2 }
+      }
+    };
+
+    expect(renderItemCards(libraryRelatedState)).not.toContain("紙野 巡");
+    expect(renderSongCards(libraryRelatedState)).not.toContain("紙野 巡");
+    expect(renderItemCards(meguriVisibleState)).toContain("未確認の備品");
+    expect(renderItemCards(meguriVisibleState)).toContain("紙野 巡 合流済み");
+    expect(renderSongCards(meguriVisibleState)).toContain("未確認の歌");
+    expect(renderSongCards(meguriVisibleState)).toContain("紙野 巡 合流済み");
   });
 
   it("shows unlocked idol events only after their bond requirement is met", () => {

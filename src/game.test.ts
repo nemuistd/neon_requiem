@@ -82,8 +82,8 @@ describe("requirement evaluation", () => {
       rojiuraIntro: { purchased: true }
     },
     idols: {
-      otowaAkari: { bond: 5 },
-      asagiriYui: { bond: 1 }
+      otowaAkari: { bond: 5, joined: true },
+      asagiriYui: { bond: 1, joined: false }
     }
   };
 
@@ -94,11 +94,14 @@ describe("requirement evaluation", () => {
     expect(isRequirementMet(state, { type: "resource.amount", resourceId: "tomorusa", amount: 100 })).toBe(true);
     expect(isRequirementMet(state, { type: "idol.bond", idolId: "otowaAkari", amount: 5 })).toBe(true);
     expect(isRequirementMet(state, { type: "idol.bond", idolId: "otowaAkari", amount: 6 })).toBe(false);
+    expect(isRequirementMet(state, { type: "idol.joined", idolId: "otowaAkari" })).toBe(true);
+    expect(isRequirementMet(state, { type: "idol.joined", idolId: "asagiriYui" })).toBe(false);
     expect(isRequirementMet(state, {
       type: "all",
       requirements: [
         { type: "facility.level", facilityId: "alleyStage", level: 5 },
         { type: "song.purchased", songId: "rojiuraIntro" },
+        { type: "idol.joined", idolId: "otowaAkari" },
         { type: "idol.bond", idolId: "otowaAkari", amount: 5 }
       ]
     })).toBe(true);
@@ -123,12 +126,15 @@ describe("requirement evaluation", () => {
 });
 
 describe("content validation", () => {
-  it("detects invalid idol bond requirement references", () => {
+  it("detects invalid idol requirement references", () => {
     expect(validateRequirement("test", { type: "idol.bond", idolId: "missingIdol", amount: 1 })).toContain(
       'test: requirement references missing idol "missingIdol".'
     );
     expect(validateRequirement("test", { type: "idol.bond", idolId: "otowaAkari", amount: 0 })).toContain(
       "test: requirement idol bond amount must be positive."
+    );
+    expect(validateRequirement("test", { type: "idol.joined", idolId: "missingIdol" })).toContain(
+      'test: requirement references missing idol "missingIdol".'
     );
   });
 });
@@ -425,9 +431,16 @@ describe("game state and effects", () => {
       facilities: {
         ...neonProgressState.facilities,
         twilightPathGuide: { level: 1 },
-        temporaryBroadcastBooth: { level: 3 }
+        temporaryBroadcastBooth: { level: 4 }
       }
     }, ["asagiriYui", "hibikiTooko"]);
+    const listenerTooEarlyState = {
+      ...guideProgressState,
+      facilities: {
+        ...guideProgressState.facilities,
+        temporaryBroadcastBooth: { level: 3 }
+      }
+    };
 
     expect(isFacilityUnlocked(neonProgressState, "twilightPathGuide")).toBe(true);
     expect(isFacilityUnlocked(neonProgressState, "temporaryBroadcastBooth")).toBe(false);
@@ -435,6 +448,7 @@ describe("game state and effects", () => {
     expect(isIdolUnlocked(guideProgressState, "hibikiTooko")).toBe(true);
     expect(getSongCost(guideProgressState, "prebroadcastAcapella")).toBe(6000);
     expect(getItemCost(guideProgressState, "oldRadioTowerDebris")).toBe(3000);
+    expect(purchaseItem(listenerTooEarlyState, "handwrittenListenerLog").purchased).toBe(false);
 
     const radioResult = purchaseItem(guideProgressState, "oldRadioTowerDebris");
     const listenerResult = purchaseItem(radioResult.state, "handwrittenListenerLog");
@@ -444,7 +458,7 @@ describe("game state and effects", () => {
     expect(listenerResult.purchased).toBe(true);
     expect(songResult.purchased).toBe(true);
     expect(getManualTomorusaGain(songResult.state)).toBeCloseTo(14 + getTomorusaPerSecond(songResult.state) * 0.05);
-    expect(getFacilityTomorusaPerSecond(listenerResult.state, "temporaryBroadcastBooth")).toBeCloseTo(12 * 1.2 * 1.15 * 1.06);
+    expect(getFacilityTomorusaPerSecond(listenerResult.state, "temporaryBroadcastBooth")).toBeCloseTo(16 * 1.2 * 1.15 * 1.06);
   });
 
   it("unlocks the memory library, Meguri, and the first Ch.4 bond and song effects", () => {
@@ -877,17 +891,19 @@ describe("game state and effects", () => {
         count: 2
       }
     };
+    const meguriTwoTheaterJoinedState = withJoinedIdols(meguriTwoTheaterState, ["shiragiriRin"]);
     const songPurchasedState = {
-      ...meguriTwoTheaterState,
+      ...meguriTwoTheaterJoinedState,
       songs: {
-        ...meguriTwoTheaterState.songs,
+        ...meguriTwoTheaterJoinedState.songs,
         theLastName: { purchased: true }
       }
     };
 
     expect(isSongUnlocked(meguriOneTheaterState, "theLastName")).toBe(false);
-    expect(isSongUnlocked(meguriTwoTheaterState, "theLastName")).toBe(true);
-    expect(isRecordUnlocked(meguriTwoTheaterState, "binderSealedLetterFullText")).toBe(false);
+    expect(isSongUnlocked(meguriTwoTheaterState, "theLastName")).toBe(false);
+    expect(isSongUnlocked(meguriTwoTheaterJoinedState, "theLastName")).toBe(true);
+    expect(isRecordUnlocked(meguriTwoTheaterJoinedState, "binderSealedLetterFullText")).toBe(false);
     expect(isRecordUnlocked(songPurchasedState, "binderSealedLetterFullText")).toBe(true);
     expect(isRecordUnlocked(songPurchasedState, "unnamedTheaterResidualPerformance")).toBe(true);
     expect(isCh9OpenEndReached(songPurchasedState)).toBe(true);
