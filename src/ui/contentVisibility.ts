@@ -17,39 +17,61 @@ export function shouldRenderFacilityCard(state: GameState, facilityId: FacilityI
 }
 
 export function isRelatedProgressVisible(state: GameState, requirement?: Requirement): boolean {
+  return isRequirementProgressVisible(state, requirement);
+}
+
+function getNextLockedFacilityId(state: GameState): FacilityId | undefined {
+  return FACILITY_ORDER.find((facilityId) => {
+    const facility = FACILITIES[facilityId];
+
+    return !isFacilityUnlocked(state, facilityId) && isRelatedProgressVisible(state, facility.unlockRequirement);
+  });
+}
+
+function isRequirementProgressVisible(state: GameState, requirement?: Requirement): boolean {
   if (!requirement) {
     return true;
   }
 
-  const facilityIds = getRequirementFacilityIds(requirement);
-
-  return facilityIds.length === 0 || facilityIds.every((facilityId) => isFacilityUnlocked(state, facilityId));
-}
-
-function getNextLockedFacilityId(state: GameState): FacilityId | undefined {
-  return FACILITY_ORDER.find((facilityId) => !isFacilityUnlocked(state, facilityId));
-}
-
-function getRequirementFacilityIds(requirement: Requirement): FacilityId[] {
   if (requirement.type === "facility.level") {
-    return isFacilityId(requirement.facilityId) ? [requirement.facilityId] : [];
+    return isFacilityId(requirement.facilityId) && isFacilityUnlocked(state, requirement.facilityId);
   }
 
   if (requirement.type === "song.purchased") {
     const song = SONGS[requirement.songId as keyof typeof SONGS];
 
-    return song ? getRequirementFacilityIds(song.unlockRequirement) : [];
+    return Boolean(song && isRequirementProgressVisible(state, song.unlockRequirement));
   }
 
-  if (requirement.type === "all" || requirement.type === "any") {
-    return requirement.requirements.flatMap(getRequirementFacilityIds);
+  if (requirement.type === "meguri.count") {
+    return (state.meguri?.count ?? 0) >= requirement.count;
+  }
+
+  if (requirement.type === "meguri.buff.purchased") {
+    const buffs = state.meguri?.buffs as Partial<Record<string, { purchased?: boolean }>> | undefined;
+
+    return Boolean(buffs?.[requirement.buffId]?.purchased);
+  }
+
+  if (requirement.type === "meguri.idolRecognition") {
+    const idolRecognition = state.meguri?.idolRecognition as Partial<Record<string, boolean>> | undefined;
+
+    return Boolean(idolRecognition?.[requirement.idolId]);
+  }
+
+  if (requirement.type === "all") {
+    return requirement.requirements.every((childRequirement) => isRequirementProgressVisible(state, childRequirement));
+  }
+
+  if (requirement.type === "any") {
+    return requirement.requirements.some((childRequirement) => isRequirementProgressVisible(state, childRequirement));
   }
 
   if (requirement.type === "not") {
-    return getRequirementFacilityIds(requirement.requirement);
+    return isRequirementProgressVisible(state, requirement.requirement);
   }
 
-  return [];
+  return true;
 }
 
 function isFacilityId(value: string): value is FacilityId {

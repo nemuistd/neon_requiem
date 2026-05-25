@@ -149,6 +149,8 @@ describe("game state and effects", () => {
     expect(state.facilities.nameRecordWall.level).toBe(0);
     expect(state.facilities.undergroundChapel.level).toBe(0);
     expect(state.facilities.undergroundPassageRepair.level).toBe(0);
+    expect(state.facilities.restabilizationCore.level).toBe(0);
+    expect(state.facilities.deepLayerObservatory.level).toBe(0);
     expect(state.items.oldNeonTube.purchased).toBe(false);
     expect(state.items.ticketStubBundle.purchased).toBe(false);
     expect(state.items.oldRadioTowerDebris.purchased).toBe(false);
@@ -161,6 +163,7 @@ describe("game state and effects", () => {
     expect(state.idols.kaminoMeguri.bond).toBe(0);
     expect(state.idols.hinataKoharu.bond).toBe(0);
     expect(state.idols.tsuginohataSakurako.bond).toBe(0);
+    expect(state.idols.kasumiyamaMio.bond).toBe(0);
     expect(state.idols.otowaAkari.eventIdsRead).toEqual([]);
     expect(state.songs.rojiuraIntro.purchased).toBe(false);
     expect(state.songs.prebroadcastAcapella.purchased).toBe(false);
@@ -647,6 +650,66 @@ describe("game state and effects", () => {
     expect(getOfflineRewardMultiplier(songResult.state)).toBeCloseTo(1.15 * 1.1);
   });
 
+  it("unlocks the Ch.7 observatory and Mio only after the first meguri", () => {
+    const baseState = createInitialState();
+    const coreLevelThreeState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        restabilizationCore: { level: 3 }
+      }
+    };
+    const postMeguriCoreState = {
+      ...coreLevelThreeState,
+      meguri: {
+        ...coreLevelThreeState.meguri,
+        count: 1
+      }
+    };
+    const observatoryLevelOneState = {
+      ...postMeguriCoreState,
+      facilities: {
+        ...postMeguriCoreState.facilities,
+        deepLayerObservatory: { level: 1 }
+      }
+    };
+    const observatoryLevelTwoState = {
+      ...observatoryLevelOneState,
+      facilities: {
+        ...observatoryLevelOneState.facilities,
+        deepLayerObservatory: { level: 2 }
+      }
+    };
+
+    expect(isFacilityUnlocked(coreLevelThreeState, "deepLayerObservatory")).toBe(false);
+    expect(isFacilityUnlocked(postMeguriCoreState, "deepLayerObservatory")).toBe(true);
+    expect(isIdolUnlocked(postMeguriCoreState, "kasumiyamaMio")).toBe(false);
+    expect(isIdolUnlocked(observatoryLevelOneState, "kasumiyamaMio")).toBe(true);
+    expect(isRecordUnlocked(observatoryLevelOneState, "deepLayerObservatoryAnteroomReport")).toBe(true);
+    expect(isRecordUnlocked(observatoryLevelOneState, "mioMistObservationLog")).toBe(false);
+    expect(isRecordUnlocked(observatoryLevelTwoState, "mioMistObservationLog")).toBe(true);
+  });
+
+  it("applies Mio's deep facility multiplier only to deep facilities", () => {
+    const baseState = createInitialState();
+    const productionState = withJoinedIdols({
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        alleyStage: { level: 10 },
+        restabilizationCore: { level: 3 },
+        deepLayerObservatory: { level: 2 }
+      },
+      meguri: {
+        ...baseState.meguri,
+        count: 1
+      }
+    }, ["kasumiyamaMio"]);
+
+    expect(getFacilityTomorusaPerSecond(productionState, "deepLayerObservatory")).toBeCloseTo(120 * 1.2 * 1.35 * 1.05);
+    expect(getFacilityTomorusaPerSecond(productionState, "alleyStage")).toBeCloseTo(1 * 1.2 * 1.05);
+  });
+
   it("applies production and caps offline reward at 12 hours", () => {
     const baseState = createInitialState();
     const state = {
@@ -937,6 +1000,10 @@ describe("game state and effects", () => {
       {
         idolId: "kaminoMeguri",
         eventId: "kaminoMeguri.unknownAuthorProof"
+      },
+      {
+        idolId: "kasumiyamaMio",
+        eventId: "kasumiyamaMio.mistObservation"
       }
     ] as const;
 

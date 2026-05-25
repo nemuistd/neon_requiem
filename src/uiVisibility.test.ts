@@ -16,6 +16,36 @@ describe("locked content visibility", () => {
     expect(html).not.toContain("地下礼拝堂");
   });
 
+  it("hides post-meguri Ch.7 content before the first meguri", () => {
+    const baseState = createInitialState();
+    const coreReadyState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        undergroundPassageRepair: { level: 5 },
+        restabilizationCore: { level: 3 },
+        deepLayerObservatory: { level: 1 }
+      },
+      songs: {
+        ...baseState.songs,
+        restorationHumming: { purchased: true }
+      }
+    };
+    const postMeguriState = {
+      ...coreReadyState,
+      meguri: {
+        ...coreReadyState.meguri,
+        count: 1
+      }
+    };
+
+    expect(renderFacilityCards(coreReadyState)).not.toContain("deepLayerObservatory");
+    expect(renderFacilityCards(coreReadyState)).not.toContain("深層観測所");
+    expect(renderIdolTabCards(coreReadyState)).not.toContain("霞山 澪");
+    expect(renderFacilityCards(postMeguriState)).toContain("深層観測所");
+    expect(renderIdolTabCards(postMeguriState)).toContain("霞山 澪");
+  });
+
   it("hides locked record titles and requirements", () => {
     const html = renderRecordCards(createInitialState());
 

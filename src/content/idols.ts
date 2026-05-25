@@ -154,6 +154,36 @@ export const IDOL_DEFINITIONS = defineContent([
       facilityId: "undergroundPassageRepair",
       level: 1
     }
+  },
+  {
+    id: "kasumiyamaMio",
+    name: "霞山 澪",
+    reading: "かすみやま みお",
+    title: "深層観測所の番人",
+    description:
+      "深層観測所に、すでにいた形で現れる。霞の変化を感情のない観測記録のような言葉で残し、誰が呼んだのかを問われても、短く首をかしげるだけで済ませる。",
+    passiveDescription: "deep施設の灯るさ生産 x1.35",
+    passiveEffects: [
+      {
+        type: "facility.production.multiplier.tag",
+        tag: "deep",
+        multiplier: 1.35
+      }
+    ],
+    unlockRequirement: {
+      type: "all",
+      requirements: [
+        {
+          type: "meguri.count",
+          count: 1
+        },
+        {
+          type: "facility.level",
+          facilityId: "deepLayerObservatory",
+          level: 1
+        }
+      ]
+    }
   }
 ] as const satisfies readonly IdolDefinition[]);
 

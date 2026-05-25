@@ -16,6 +16,7 @@
 - `world_reveal_and_prestige_plan.md`: 世界観開示と廻の扱い。
 - `meguri_system_spec.md`: 廻本体の実装済み仕様と将来調整候補。
 - `chapter_progression_design.md`: 章進行と Ch.7 以降の正史配置。
+- `ch7_plus_implementation_plan.md`: Ch.7 以降の新施設・新アイドルを実装へ落とす優先計画。
 - `facility_progression_strategy.md`: 施設カテゴリと進行配置。
 - `idol_roster_expansion_design.md`: アイドル拡張、加入、交流、効果方針。
 - `next_facility_candidates.md`: 廻前施設候補の履歴と、今後の施設検討時の参考。

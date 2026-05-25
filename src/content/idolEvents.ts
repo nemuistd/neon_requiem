@@ -73,6 +73,20 @@ export const IDOL_EVENT_DEFINITIONS = defineContent([
     introducedAtVersion: 13
   },
   {
+    id: "kasumiyamaMio.mistObservation",
+    idolId: "kasumiyamaMio",
+    title: "澪・霞の観測",
+    revealLevel: "technical",
+    body:
+      "霞が濃い通路の前で、澪はしばらく黙っていた。「霞は観測対象だから」怖くないのかと訊くと、「怖いかどうかより、何をしているかを見ていたほうがいい」とだけ答えた。",
+    unlockRequirement: {
+      type: "idol.bond",
+      idolId: "kasumiyamaMio",
+      amount: 5
+    },
+    introducedAtVersion: 14
+  },
+  {
     id: "otowaAkari.twilightFirstPause",
     idolId: "otowaAkari",
     title: "灯里・一拍遅い返事",

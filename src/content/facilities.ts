@@ -196,6 +196,30 @@ export const FACILITY_DEFINITIONS = defineContent([
         }
       ]
     }
+  },
+  {
+    id: "deepLayerObservatory",
+    name: "深層観測所",
+    description:
+      "深層への降路の傍らに建てられた観測所。霞の濃度、発光周期、記録が消えるタイミングを淡々と記録するための前室が残っている。窓の外に何が見えているのかは、まだ分からない。",
+    tags: ["deep"],
+    baseCost: 300000,
+    costMultiplier: 1.3,
+    productionPerLevel: 60,
+    unlockRequirement: {
+      type: "all",
+      requirements: [
+        {
+          type: "meguri.count",
+          count: 1
+        },
+        {
+          type: "facility.level",
+          facilityId: "restabilizationCore",
+          level: 3
+        }
+      ]
+    }
   }
 ] as const satisfies readonly FacilityDefinition[]);
 
