@@ -47,10 +47,10 @@ export const IDOL_DEFINITIONS = defineContent([
     reading: "ひびき とおこ",
     title: "仮設配信ブースの届け手",
     description:
-      "どこまで届いているかを確認する方法はない。それでも遠子は今日も配信を続ける。声が届くかどうかより、続けることの方が仕事だからと言う。",
+      "どこまで届いているかを確認する方法はない。それでも遠子は今日も配信を続ける。曰く、続けていることこそが大事なのだという。",
     imageUrl: new URL("../../assets/idol/hibiki-tooko.png", import.meta.url).href,
     imagePosition: "center top",
-    passiveDescription: "ライブ1回の灯るさ獲得に、全施設合計の秒間灯るさ x0.05 を加算",
+    passiveDescription: "ライブ1回の灯るさ獲得に、秒間施設清算の 5% を加算",
     passiveEffects: [
       {
         type: "manual.gain.add.production.ratio",
@@ -162,6 +162,8 @@ export const IDOL_DEFINITIONS = defineContent([
     title: "深層観測所の番人",
     description:
       "深層観測所に、すでにいた形で現れる。霞の変化を感情のない観測記録のような言葉で残し、誰が呼んだのかを問われても、短く首をかしげるだけで済ませる。",
+    imageUrl: new URL("../../assets/idol/kasumiyama-mio.png", import.meta.url).href,
+    imagePosition: "center top",
     passiveDescription: "deep施設の灯るさ生産 x1.35",
     passiveEffects: [
       {
@@ -192,6 +194,8 @@ export const IDOL_DEFINITIONS = defineContent([
     title: "工学記録の解読者",
     description:
       "祈念工学の文書を読める数少ない人間。ただし、読めることと理解できることは別だと言い続ける。危険な知識を怖がるより、分からないまま丁寧に扱うことを選んでいる。",
+    imageUrl: new URL("../../assets/idol/nanashiro-satsuki.png", import.meta.url).href,
+    imagePosition: "center top",
     passiveDescription: "歌・アイテム取得コスト x0.85",
     passiveEffects: [
       {
@@ -225,6 +229,8 @@ export const IDOL_DEFINITIONS = defineContent([
     title: "灯し直しの残響",
     description:
       "廻2のCh.9で初めて声と姿を持つ。以前もここに来たようなことを言うが、それを記憶だとは断定しない。確信と感触の間に立ち、繰り返しについての答えをいつも途中で止める。",
+    imageUrl: new URL("../../assets/idol/shiragiri-rin.png", import.meta.url).href,
+    imagePosition: "center top",
     passiveDescription: "廻後の施設生産倍率 x1.15 / 記憶断片の獲得見込み +30%",
     passiveEffects: [
       {
