@@ -1,4 +1,8 @@
 import { describe, expect, it } from "vitest";
+import {
+  FACILITY_ORDER,
+  IDOL_ORDER
+} from "./definitions";
 import { createInitialState } from "./game";
 import { renderFacilityCards } from "./ui/renderFacilities";
 import { renderIdolCards, renderIdolTabCards } from "./ui/renderIdols";
@@ -22,9 +26,9 @@ describe("locked content visibility", () => {
       ...baseState,
       facilities: {
         ...baseState.facilities,
-        undergroundPassageRepair: { level: 5 },
-        restabilizationCore: { level: 3 },
-        deepLayerObservatory: { level: 1 }
+        undergroundPassageRepair: { level: 15 },
+        restabilizationCore: { level: 15 },
+        deepLayerObservatory: { level: 5 }
       },
       songs: {
         ...baseState.songs,
@@ -52,8 +56,8 @@ describe("locked content visibility", () => {
       ...baseState,
       facilities: {
         ...baseState.facilities,
-        deepLayerObservatory: { level: 5 },
-        engineeringArchive: { level: 3 }
+        deepLayerObservatory: { level: 15 },
+        engineeringArchive: { level: 5 }
       }
     };
     const archiveVisibleState = {
@@ -76,9 +80,9 @@ describe("locked content visibility", () => {
       ...baseState,
       facilities: {
         ...baseState.facilities,
-        prayerEngineeringRuins: { level: 3 },
-        reobservationBase: { level: 3 },
-        unnamedTheater: { level: 1 }
+        prayerEngineeringRuins: { level: 15 },
+        reobservationBase: { level: 15 },
+        unnamedTheater: { level: 5 }
       },
       meguri: {
         ...baseState.meguri,
@@ -96,7 +100,7 @@ describe("locked content visibility", () => {
       ...ch9VisibleState,
       facilities: {
         ...ch9VisibleState.facilities,
-        unnamedTheater: { level: 2 }
+        unnamedTheater: { level: 10 }
       },
       idols: {
         ...ch9VisibleState.idols,
@@ -133,7 +137,7 @@ describe("locked content visibility", () => {
       ...baseState,
       facilities: {
         ...baseState.facilities,
-        nameRecordWall: { level: 3 },
+        nameRecordWall: { level: 15 },
         undergroundChapel: { level: 1 }
       }
     };
@@ -152,15 +156,15 @@ describe("locked content visibility", () => {
       ...baseState,
       facilities: {
         ...baseState.facilities,
-        temporaryBroadcastBooth: { level: 5 },
-        memoryLibrary: { level: 1 }
+        temporaryBroadcastBooth: { level: 15 },
+        memoryLibrary: { level: 3 }
       }
     };
     const meguriVisibleState = {
       ...libraryRelatedState,
       facilities: {
         ...libraryRelatedState.facilities,
-        memoryLibrary: { level: 2 }
+        memoryLibrary: { level: 5 }
       }
     };
 
@@ -170,6 +174,82 @@ describe("locked content visibility", () => {
     expect(renderItemCards(meguriVisibleState)).toContain("紙野 巡 合流済み");
     expect(renderSongCards(meguriVisibleState)).toContain("未確認の歌");
     expect(renderSongCards(meguriVisibleState)).toContain("紙野 巡 合流済み");
+  });
+
+  it("does not show a bottom status while a locked candidate is already visible", () => {
+    const baseState = createInitialState();
+    const chapelVisibleState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        nameRecordWall: { level: 15 },
+        undergroundChapel: { level: 1 }
+      }
+    };
+
+    expect(renderFacilityCards(baseState)).toContain("未確認区画");
+    expect(renderFacilityCards(baseState)).not.toContain("data-progress-status");
+    expect(renderSongCards(baseState)).toContain("未確認の歌");
+    expect(renderSongCards(baseState)).not.toContain("data-progress-status");
+    expect(renderItemCards(baseState)).toContain("未確認の備品");
+    expect(renderItemCards(baseState)).not.toContain("data-progress-status");
+    expect(renderIdolTabCards(chapelVisibleState)).toContain("未確認のアイドル");
+    expect(renderIdolTabCards(chapelVisibleState)).not.toContain("data-progress-status");
+  });
+
+  it("shows a bottom hint when further implemented content is still hidden", () => {
+    const baseState = createInitialState();
+    const postCoreState = {
+      ...createAllProgressVisibleState(),
+      meguri: {
+        ...baseState.meguri,
+        count: 0
+      }
+    };
+    const firstSongVisibleState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        alleyStage: { level: 5 }
+      }
+    };
+    const earlyItemsVisibleState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        alleyStage: { level: 8 }
+      }
+    };
+    const yuiVisibleState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        alleyStage: { level: 10 },
+        neonBoard: { level: 5 }
+      }
+    };
+
+    expect(renderFacilityCards(postCoreState)).toContain("data-progress-status=\"hidden\"");
+    expect(renderFacilityCards(postCoreState)).toContain("まだ手がかりがあります");
+    expect(renderSongCards(firstSongVisibleState)).toContain("data-progress-status=\"hidden\"");
+    expect(renderSongCards(firstSongVisibleState)).toContain("まだ手がかりがあります");
+    expect(renderItemCards(earlyItemsVisibleState)).toContain("data-progress-status=\"hidden\"");
+    expect(renderItemCards(earlyItemsVisibleState)).toContain("まだ手がかりがあります");
+    expect(renderIdolTabCards(yuiVisibleState)).toContain("data-progress-status=\"hidden\"");
+    expect(renderIdolTabCards(yuiVisibleState)).toContain("まだ手がかりがあります");
+  });
+
+  it("shows a bottom completion status after all implemented candidates are visible", () => {
+    const allProgressVisibleState = createAllProgressVisibleState();
+
+    expect(renderFacilityCards(allProgressVisibleState)).toContain("data-progress-status=\"complete\"");
+    expect(renderFacilityCards(allProgressVisibleState)).toContain("現在確認できるものは以上です");
+    expect(renderSongCards(allProgressVisibleState)).toContain("data-progress-status=\"complete\"");
+    expect(renderSongCards(allProgressVisibleState)).toContain("現在確認できるものは以上です");
+    expect(renderItemCards(allProgressVisibleState)).toContain("data-progress-status=\"complete\"");
+    expect(renderItemCards(allProgressVisibleState)).toContain("現在確認できるものは以上です");
+    expect(renderIdolTabCards(allProgressVisibleState)).toContain("data-progress-status=\"complete\"");
+    expect(renderIdolTabCards(allProgressVisibleState)).toContain("現在確認できるものは以上です");
   });
 
   it("shows unlocked idol events only after their bond requirement is met", () => {
@@ -264,6 +344,40 @@ describe("locked content visibility", () => {
     expect(openHtml).toContain("data-record-id=\"idolBondAkariFirstVoice\"");
   });
 });
+
+function createAllProgressVisibleState(): ReturnType<typeof createInitialState> {
+  const baseState = createInitialState();
+
+  return {
+    ...baseState,
+    facilities: FACILITY_ORDER.reduce(
+      (facilities, facilityId) => ({
+        ...facilities,
+        [facilityId]: { level: 18 }
+      }),
+      baseState.facilities
+    ),
+    idols: IDOL_ORDER.reduce(
+      (idols, idolId) => ({
+        ...idols,
+        [idolId]: {
+          ...baseState.idols[idolId],
+          joined: true
+        }
+      }),
+      baseState.idols
+    ),
+    songs: {
+      ...baseState.songs,
+      chapelHarmony: { purchased: true },
+      restorationHumming: { purchased: true }
+    },
+    meguri: {
+      ...baseState.meguri,
+      count: 2
+    }
+  };
+}
 
 function getButtonHtml(html: string, text: string): string {
   return Array.from(html.matchAll(/<button[\s\S]*?<\/button>/g)).find((match) => match[0].includes(text))?.[0] ?? "";

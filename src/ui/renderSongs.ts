@@ -14,13 +14,19 @@ import {
 } from "../game";
 import { isRelatedProgressVisible } from "./contentVisibility";
 import { formatAmount } from "./format";
+import {
+  getSongProgressStatus,
+  renderProgressStatusCard
+} from "./progressStatus";
 import { getUnlockRequirementTextFromRequirement } from "./requirementText";
 
 export function renderSongCards(state: GameState): string {
-  return SONG_ORDER
+  const songCards = SONG_ORDER
     .filter((songId) => isRelatedProgressVisible(state, SONGS[songId].unlockRequirement))
     .map((songId) => renderSongCard(state, songId))
     .join("");
+
+  return `${songCards}${renderProgressStatusCard(getSongProgressStatus(state))}`;
 }
 
 function renderSongCard(state: GameState, songId: SongId): string {

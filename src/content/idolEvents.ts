@@ -103,7 +103,7 @@ export const IDOL_EVENT_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "deepLayerObservatory",
-          level: 3
+          level: 8
         },
         {
           type: "idol.bond",
@@ -145,7 +145,7 @@ export const IDOL_EVENT_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "prayerEngineeringRuins",
-          level: 1
+          level: 3
         },
         {
           type: "idol.bond",
@@ -173,7 +173,7 @@ export const IDOL_EVENT_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "engineeringArchive",
-          level: 5
+          level: 12
         },
         {
           type: "idol.bond",
@@ -201,7 +201,7 @@ export const IDOL_EVENT_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "unnamedTheater",
-          level: 1
+          level: 3
         },
         {
           type: "idol.bond",

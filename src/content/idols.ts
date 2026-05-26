@@ -60,7 +60,7 @@ export const IDOL_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "temporaryBroadcastBooth",
-      level: 3
+      level: 5
     }
   },
   {
@@ -82,7 +82,7 @@ export const IDOL_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "memoryLibrary",
-      level: 2
+      level: 5
     }
   },
   {
@@ -108,7 +108,7 @@ export const IDOL_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "undergroundPlaza",
-      level: 1
+      level: 5
     }
   },
   {
@@ -130,7 +130,7 @@ export const IDOL_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "undergroundChapel",
-      level: 3
+      level: 5
     }
   },
   {
@@ -152,7 +152,7 @@ export const IDOL_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "undergroundPassageRepair",
-      level: 1
+      level: 5
     }
   },
   {
@@ -182,7 +182,7 @@ export const IDOL_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "deepLayerObservatory",
-          level: 1
+          level: 5
         }
       ]
     }
@@ -217,7 +217,7 @@ export const IDOL_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "engineeringArchive",
-          level: 3
+          level: 5
         }
       ]
     }
@@ -252,7 +252,7 @@ export const IDOL_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "unnamedTheater",
-          level: 1
+          level: 5
         }
       ]
     }

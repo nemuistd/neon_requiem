@@ -778,7 +778,7 @@ export function isMeguriAvailable(state: GameState): boolean {
 }
 
 export function isCh9OpenEndReached(state: GameState): boolean {
-  return state.meguri.count >= 2 && getFacilityLevel(state, "unnamedTheater") >= 3 && isSongPurchased(state, "theLastName");
+  return state.meguri.count >= 2 && getFacilityLevel(state, "unnamedTheater") >= 15 && isSongPurchased(state, "theLastName");
 }
 
 export function calculateMeguriMemoryFragmentSettlement(

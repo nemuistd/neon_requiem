@@ -73,7 +73,7 @@ export const ITEM_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "alleyStage",
-      level: 6
+      level: 8
     }
   },
   {
@@ -91,7 +91,7 @@ export const ITEM_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "neonBoard",
-      level: 2
+      level: 5
     }
   },
   {
@@ -109,7 +109,7 @@ export const ITEM_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "neonBoard",
-      level: 3
+      level: 8
     }
   },
   {
@@ -129,7 +129,7 @@ export const ITEM_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "temporaryBroadcastBooth",
-      level: 1
+      level: 3
     }
   },
   {
@@ -155,7 +155,7 @@ export const ITEM_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "temporaryBroadcastBooth",
-          level: 4
+          level: 10
         }
       ]
     }
@@ -183,7 +183,7 @@ export const ITEM_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "memoryLibrary",
-          level: 3
+          level: 8
         }
       ]
     }
@@ -204,7 +204,7 @@ export const ITEM_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "recordingStorage",
-      level: 2
+      level: 5
     }
   },
   {
@@ -230,7 +230,7 @@ export const ITEM_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "undergroundPassageRepair",
-          level: 2
+          level: 8
         }
       ]
     }
@@ -252,7 +252,7 @@ export const ITEM_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "deepLayerObservatory",
-      level: 2
+      level: 8
     }
   },
   {
@@ -271,7 +271,7 @@ export const ITEM_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "engineeringArchive",
-      level: 2
+      level: 8
     }
   }
 ] as const satisfies readonly ItemDefinition[]);

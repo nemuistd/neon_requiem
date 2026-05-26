@@ -37,6 +37,7 @@ import {
   readIdolEvent,
   readRecord,
   SAVE_VERSION,
+  MAX_OFFLINE_SECONDS,
   selectActiveIdol,
   spendResource,
   TOMORUSA_RESOURCE_ID,
@@ -50,7 +51,7 @@ import {
   getSongCostMultiplierFromEffects
 } from "./engine/effects";
 import { areRequirementsMet, isRequirementMet } from "./engine/requirements";
-import { IDOL_ORDER, IdolId, RECORD_CONTENT_VERSION, RECORDS } from "./definitions";
+import { FACILITIES, FACILITY_ORDER, FacilityId, IDOL_ORDER, IdolId, RECORD_CONTENT_VERSION, RECORDS, SONGS, SongId } from "./definitions";
 import { validateRequirement } from "./contentValidation";
 import { loadGame, SAVE_KEY } from "./storage";
 
@@ -400,8 +401,8 @@ describe("game state and effects", () => {
       ...addResource(baseState, TOMORUSA_RESOURCE_ID, 1000),
       facilities: {
         ...baseState.facilities,
-        alleyStage: { level: 6 },
-        neonBoard: { level: 2 }
+        alleyStage: { level: 8 },
+        neonBoard: { level: 5 }
       }
     };
 
@@ -413,7 +414,7 @@ describe("game state and effects", () => {
     expect(spotlightResult.purchased).toBe(true);
     expect(noticeBoardResult.purchased).toBe(true);
     expect(getManualTomorusaGain(noticeBoardResult.state)).toBe(2);
-    expect(getFacilityTomorusaPerSecond(noticeBoardResult.state, "alleyStage")).toBeCloseTo(0.6 * 1.2 * 1.04);
+    expect(getFacilityTomorusaPerSecond(noticeBoardResult.state, "alleyStage")).toBeCloseTo(0.8 * 1.2 * 1.04);
     expect(getOfflineRewardMultiplier(noticeBoardResult.state)).toBeCloseTo(1.1);
   });
 
@@ -424,22 +425,22 @@ describe("game state and effects", () => {
       facilities: {
         ...baseState.facilities,
         alleyStage: { level: 10 },
-        neonBoard: { level: 5 }
+        neonBoard: { level: 15 }
       }
     };
     const guideProgressState = withJoinedIdols({
       ...neonProgressState,
       facilities: {
         ...neonProgressState.facilities,
-        twilightPathGuide: { level: 1 },
-        temporaryBroadcastBooth: { level: 4 }
+        twilightPathGuide: { level: 15 },
+        temporaryBroadcastBooth: { level: 10 }
       }
     }, ["asagiriYui", "hibikiTooko"]);
     const listenerTooEarlyState = {
       ...guideProgressState,
       facilities: {
         ...guideProgressState.facilities,
-        temporaryBroadcastBooth: { level: 3 }
+        temporaryBroadcastBooth: { level: 8 }
       }
     };
 
@@ -459,7 +460,7 @@ describe("game state and effects", () => {
     expect(listenerResult.purchased).toBe(true);
     expect(songResult.purchased).toBe(true);
     expect(getManualTomorusaGain(songResult.state)).toBeCloseTo(14 + getTomorusaPerSecond(songResult.state) * 0.05);
-    expect(getFacilityTomorusaPerSecond(listenerResult.state, "temporaryBroadcastBooth")).toBeCloseTo(16 * 1.2 * 1.15 * 1.06);
+    expect(getFacilityTomorusaPerSecond(listenerResult.state, "temporaryBroadcastBooth")).toBeCloseTo(40 * 1.2 * 1.15 * 1.06);
   });
 
   it("unlocks the memory library, Meguri, and the first Ch.4 bond and song effects", () => {
@@ -469,16 +470,16 @@ describe("game state and effects", () => {
       facilities: {
         ...baseState.facilities,
         alleyStage: { level: 10 },
-        neonBoard: { level: 5 },
-        twilightPathGuide: { level: 1 },
-        temporaryBroadcastBooth: { level: 5 }
+        neonBoard: { level: 15 },
+        twilightPathGuide: { level: 15 },
+        temporaryBroadcastBooth: { level: 15 }
       }
     };
     const libraryProgressState = withJoinedIdols({
       ...boothProgressState,
       facilities: {
         ...boothProgressState.facilities,
-        memoryLibrary: { level: 3 }
+        memoryLibrary: { level: 10 }
       }
     }, ["asagiriYui", "kaminoMeguri"]);
 
@@ -499,7 +500,7 @@ describe("game state and effects", () => {
     expect(songResult.purchased).toBe(true);
     expect(getBondGainAmount(labelResult.state)).toBeCloseTo(1.25 * 1.1);
     expect(getIdolBond(liveState, "kaminoMeguri")).toBeCloseTo(1.25 * 1.1);
-    expect(getFacilityTomorusaPerSecond(songResult.state, "memoryLibrary")).toBeCloseTo(24 * 1.2 * 1.15 * 1.15);
+    expect(getFacilityTomorusaPerSecond(songResult.state, "memoryLibrary")).toBeCloseTo(80 * 1.2 * 1.15 * 1.15);
   });
 
   it("unlocks recording storage, the old broadcast room, and applies the broadcast equipment manual", () => {
@@ -509,19 +510,19 @@ describe("game state and effects", () => {
       facilities: {
         ...baseState.facilities,
         alleyStage: { level: 10 },
-        neonBoard: { level: 5 },
-        twilightPathGuide: { level: 1 },
-        temporaryBroadcastBooth: { level: 5 },
-        memoryLibrary: { level: 2 },
-        recordingStorage: { level: 2 },
-        oldBroadcastRoom: { level: 1 }
+        neonBoard: { level: 15 },
+        twilightPathGuide: { level: 15 },
+        temporaryBroadcastBooth: { level: 15 },
+        memoryLibrary: { level: 15 },
+        recordingStorage: { level: 15 },
+        oldBroadcastRoom: { level: 5 }
       }
     }, ["asagiriYui"]);
 
     expect(isFacilityUnlocked(libraryState, "recordingStorage")).toBe(true);
     expect(isFacilityUnlocked(libraryState, "oldBroadcastRoom")).toBe(true);
-    expect(getFacilityTomorusaPerSecond(libraryState, "recordingStorage")).toBeCloseTo(12 * 1.2 * 1.15);
-    expect(getFacilityTomorusaPerSecond(libraryState, "oldBroadcastRoom")).toBeCloseTo(11 * 1.2 * 1.15);
+    expect(getFacilityTomorusaPerSecond(libraryState, "recordingStorage")).toBeCloseTo(90 * 1.2 * 1.15);
+    expect(getFacilityTomorusaPerSecond(libraryState, "oldBroadcastRoom")).toBeCloseTo(55 * 1.2 * 1.15);
     expect(getItemCost(libraryState, "broadcastEquipmentManual")).toBe(15000);
     expect(isRecordUnlocked(libraryState, "oldBroadcastRoomEquipmentCheck")).toBe(true);
 
@@ -538,13 +539,13 @@ describe("game state and effects", () => {
       facilities: {
         ...baseState.facilities,
         alleyStage: { level: 10 },
-        neonBoard: { level: 5 },
-        twilightPathGuide: { level: 1 },
-        temporaryBroadcastBooth: { level: 5 },
-        memoryLibrary: { level: 3 },
-        recordingStorage: { level: 2 },
-        oldBroadcastRoom: { level: 1 },
-        undergroundPlaza: { level: 4 }
+        neonBoard: { level: 15 },
+        twilightPathGuide: { level: 15 },
+        temporaryBroadcastBooth: { level: 15 },
+        memoryLibrary: { level: 18 },
+        recordingStorage: { level: 15 },
+        oldBroadcastRoom: { level: 15 },
+        undergroundPlaza: { level: 10 }
       }
     }, ["asagiriYui", "hibikiTooko", "hinataKoharu"]);
     const plazaBlockedState = {
@@ -562,7 +563,7 @@ describe("game state and effects", () => {
     expect(getSongCost(plazaState, "plazaAnthem")).toBe(30000);
     expect(isRecordUnlocked(plazaState, "undergroundPlazaFirstDay")).toBe(true);
     expect(isRecordUnlocked(plazaState, "koharuNameEffect")).toBe(true);
-    expect(getFacilityTomorusaPerSecond(plazaState, "undergroundPlaza")).toBeCloseTo(40 * 1.2 * 1.15 * 1.08);
+    expect(getFacilityTomorusaPerSecond(plazaState, "undergroundPlaza")).toBeCloseTo(100 * 1.2 * 1.15 * 1.08);
 
     const songResult = purchaseSong(plazaState, "plazaAnthem");
 
@@ -577,14 +578,14 @@ describe("game state and effects", () => {
       facilities: {
         ...baseState.facilities,
         alleyStage: { level: 10 },
-        neonBoard: { level: 5 },
-        twilightPathGuide: { level: 1 },
-        temporaryBroadcastBooth: { level: 5 },
-        memoryLibrary: { level: 3 },
-        recordingStorage: { level: 2 },
-        oldBroadcastRoom: { level: 1 },
-        undergroundPlaza: { level: 4 },
-        nameRecordWall: { level: 3 }
+        neonBoard: { level: 15 },
+        twilightPathGuide: { level: 15 },
+        temporaryBroadcastBooth: { level: 15 },
+        memoryLibrary: { level: 18 },
+        recordingStorage: { level: 15 },
+        oldBroadcastRoom: { level: 15 },
+        undergroundPlaza: { level: 15 },
+        nameRecordWall: { level: 8 }
       }
     }, ["asagiriYui", "hinataKoharu"]);
 
@@ -592,68 +593,68 @@ describe("game state and effects", () => {
     expect(isRecordUnlocked(wallState, "nameRecordWallOpeningLog")).toBe(true);
     expect(isRecordUnlocked(wallState, "wallNameStabilityLog")).toBe(true);
     expect(isRecordUnlocked(wallState, "nameFixationObservation")).toBe(true);
-    expect(getFacilityTomorusaPerSecond(wallState, "nameRecordWall")).toBeCloseTo(42 * 1.2 * 1.15 * 1.08);
+    expect(getFacilityTomorusaPerSecond(wallState, "nameRecordWall")).toBeCloseTo(112 * 1.2 * 1.15 * 1.08);
   });
 
   it("unlocks chapel records without entering the meguri system", () => {
     const baseState = createInitialState();
-    const chapelLevelTwoState = {
+    const chapelLevelFiveState = {
       ...baseState,
       facilities: {
         ...baseState.facilities,
-        undergroundChapel: { level: 2 }
-      }
-    };
-    const chapelLevelFourState = {
-      ...chapelLevelTwoState,
-      facilities: {
-        ...chapelLevelTwoState.facilities,
-        undergroundChapel: { level: 4 }
-      }
-    };
-    const chapelLevelFiveState = {
-      ...chapelLevelFourState,
-      facilities: {
-        ...chapelLevelFourState.facilities,
         undergroundChapel: { level: 5 }
       }
     };
-    const chapelLevelEightState = {
+    const chapelLevelTenState = {
       ...chapelLevelFiveState,
       facilities: {
         ...chapelLevelFiveState.facilities,
-        undergroundChapel: { level: 8 }
+        undergroundChapel: { level: 10 }
       }
     };
-    const chapelLevelNineMeguriState = {
-      ...chapelLevelEightState,
+    const chapelLevelTwelveState = {
+      ...chapelLevelTenState,
       facilities: {
-        ...chapelLevelEightState.facilities,
-        undergroundChapel: { level: 9 }
+        ...chapelLevelTenState.facilities,
+        undergroundChapel: { level: 12 }
+      }
+    };
+    const chapelLevelFifteenState = {
+      ...chapelLevelTwelveState,
+      facilities: {
+        ...chapelLevelTwelveState.facilities,
+        undergroundChapel: { level: 15 }
+      }
+    };
+    const chapelLevelEighteenMeguriState = {
+      ...chapelLevelFifteenState,
+      facilities: {
+        ...chapelLevelFifteenState.facilities,
+        undergroundChapel: { level: 18 }
       },
       meguri: {
-        ...chapelLevelEightState.meguri,
+        ...chapelLevelFifteenState.meguri,
         count: 1
       }
     };
     const chapelSongState = {
-      ...chapelLevelEightState,
+      ...chapelLevelFifteenState,
       songs: {
-        ...chapelLevelEightState.songs,
+        ...chapelLevelFifteenState.songs,
         chapelHarmony: { purchased: true }
       }
     };
 
-    expect(isRecordUnlocked(chapelLevelTwoState, "observerCountFragment")).toBe(true);
-    expect(isRecordUnlocked(chapelLevelTwoState, "chapelSecondShelfInvestigation")).toBe(true);
-    expect(isRecordUnlocked(chapelLevelTwoState, "shinoDeletedRecordTrace")).toBe(false);
-    expect(isRecordUnlocked(chapelLevelFourState, "shinoDeletedRecordTrace")).toBe(true);
-    expect(isRecordUnlocked(chapelLevelFiveState, "songAndHymnDistinction")).toBe(false);
+    expect(isRecordUnlocked(chapelLevelFiveState, "observerCountFragment")).toBe(true);
+    expect(isRecordUnlocked(chapelLevelFiveState, "chapelSecondShelfInvestigation")).toBe(true);
+    expect(isRecordUnlocked(chapelLevelFiveState, "shinoDeletedRecordTrace")).toBe(false);
+    expect(isRecordUnlocked(chapelLevelTenState, "shinoDeletedRecordTrace")).toBe(true);
+    expect(isRecordUnlocked(chapelLevelTwelveState, "songAndHymnDistinction")).toBe(false);
     expect(isRecordUnlocked(chapelSongState, "songAndHymnDistinction")).toBe(true);
-    expect(isRecordUnlocked(chapelLevelEightState, "binderSealedLetterOpening")).toBe(false);
+    expect(isRecordUnlocked(chapelLevelFifteenState, "binderSealedLetterOpening")).toBe(false);
     expect(isRecordUnlocked(chapelSongState, "binderSealedLetterOpening")).toBe(true);
-    expect(isRecordUnlocked(chapelLevelEightState, "binderSealedLetterFirstLine")).toBe(false);
-    expect(isRecordUnlocked(chapelLevelNineMeguriState, "binderSealedLetterFirstLine")).toBe(true);
+    expect(isRecordUnlocked(chapelLevelFifteenState, "binderSealedLetterFirstLine")).toBe(false);
+    expect(isRecordUnlocked(chapelLevelEighteenMeguriState, "binderSealedLetterFirstLine")).toBe(true);
   });
 
   it("unlocks the passage repair area and Sakurako before entering the meguri system", () => {
@@ -662,8 +663,8 @@ describe("game state and effects", () => {
       ...addResource(baseState, TOMORUSA_RESOURCE_ID, 200000),
       facilities: {
         ...baseState.facilities,
-        undergroundChapel: { level: 8 },
-        undergroundPassageRepair: { level: 3 }
+        undergroundChapel: { level: 18 },
+        undergroundPassageRepair: { level: 10 }
       },
       songs: {
         ...baseState.songs,
@@ -674,7 +675,7 @@ describe("game state and effects", () => {
     expect(isFacilityUnlocked(repairState, "undergroundPassageRepair")).toBe(true);
     expect(isIdolUnlocked(repairState, "tsuginohataSakurako")).toBe(true);
     expect(isRecordUnlocked(repairState, "sakurakoRemovedPartsReport")).toBe(true);
-    expect(isRecordUnlocked(repairState, "deepDistrictBlueprintDiscrepancy")).toBe(false);
+    expect(isRecordUnlocked(repairState, "deepDistrictBlueprintDiscrepancy")).toBe(true);
     expect(getOfflineRewardMultiplier(repairState)).toBeCloseTo(1.15);
     expect(getItemCost(repairState, "repairToolSet")).toBe(50000);
     expect(getSongCost(repairState, "restorationHumming")).toBe(80000);
@@ -688,10 +689,10 @@ describe("game state and effects", () => {
       ...repairState,
       facilities: {
         ...repairState.facilities,
-        undergroundPassageRepair: { level: 4 }
+        undergroundPassageRepair: { level: 8 }
       }
-    }, "deepDistrictBlueprintDiscrepancy")).toBe(true);
-    expect(getFacilityTomorusaPerSecond(itemResult.state, "undergroundPassageRepair")).toBeCloseTo(60 * 1.2 * 1.1 * 1.1 * 1.08);
+    }, "deepDistrictBlueprintDiscrepancy")).toBe(false);
+    expect(getFacilityTomorusaPerSecond(itemResult.state, "undergroundPassageRepair")).toBeCloseTo(200 * 1.2 * 1.1 * 1.1 * 1.08);
     expect(getOfflineRewardMultiplier(songResult.state)).toBeCloseTo(1.15 * 1.1);
   });
 
@@ -727,72 +728,72 @@ describe("game state and effects", () => {
 
   it("unlocks the Ch.7 observatory and Mio only after the first meguri", () => {
     const baseState = createInitialState();
-    const coreLevelThreeState = {
+    const coreLevelFifteenState = {
       ...baseState,
       facilities: {
         ...baseState.facilities,
-        restabilizationCore: { level: 3 }
+        restabilizationCore: { level: 15 }
       }
     };
     const postMeguriCoreState = {
-      ...coreLevelThreeState,
+      ...coreLevelFifteenState,
       meguri: {
-        ...coreLevelThreeState.meguri,
+        ...coreLevelFifteenState.meguri,
         count: 1
       }
     };
-    const observatoryLevelOneState = {
+    const observatoryLevelThreeState = {
       ...postMeguriCoreState,
       facilities: {
         ...postMeguriCoreState.facilities,
-        deepLayerObservatory: { level: 1 }
-      }
-    };
-    const observatoryLevelTwoState = {
-      ...observatoryLevelOneState,
-      facilities: {
-        ...observatoryLevelOneState.facilities,
-        deepLayerObservatory: { level: 2 }
-      }
-    };
-    const observatoryLevelThreeState = {
-      ...observatoryLevelTwoState,
-      facilities: {
-        ...observatoryLevelTwoState.facilities,
         deepLayerObservatory: { level: 3 }
       }
     };
-    const observatoryLevelFourState = {
+    const observatoryLevelFiveState = {
       ...observatoryLevelThreeState,
       facilities: {
         ...observatoryLevelThreeState.facilities,
-        deepLayerObservatory: { level: 4 }
-      }
-    };
-    const observatoryLevelFiveState = {
-      ...observatoryLevelFourState,
-      facilities: {
-        ...observatoryLevelFourState.facilities,
         deepLayerObservatory: { level: 5 }
       }
     };
+    const observatoryLevelEightState = {
+      ...observatoryLevelFiveState,
+      facilities: {
+        ...observatoryLevelFiveState.facilities,
+        deepLayerObservatory: { level: 8 }
+      }
+    };
+    const observatoryLevelTenState = {
+      ...observatoryLevelEightState,
+      facilities: {
+        ...observatoryLevelEightState.facilities,
+        deepLayerObservatory: { level: 10 }
+      }
+    };
+    const observatoryLevelTwelveState = {
+      ...observatoryLevelTenState,
+      facilities: {
+        ...observatoryLevelTenState.facilities,
+        deepLayerObservatory: { level: 12 }
+      }
+    };
 
-    expect(isFacilityUnlocked(coreLevelThreeState, "deepLayerObservatory")).toBe(false);
+    expect(isFacilityUnlocked(coreLevelFifteenState, "deepLayerObservatory")).toBe(false);
     expect(isFacilityUnlocked(postMeguriCoreState, "deepLayerObservatory")).toBe(true);
     expect(isIdolUnlocked(postMeguriCoreState, "kasumiyamaMio")).toBe(false);
-    expect(isIdolUnlocked(observatoryLevelOneState, "kasumiyamaMio")).toBe(true);
-    expect(isRecordUnlocked(observatoryLevelOneState, "deepLayerObservatoryAnteroomReport")).toBe(true);
-    expect(isRecordUnlocked(observatoryLevelOneState, "mioMistObservationLog")).toBe(false);
-    expect(isRecordUnlocked(observatoryLevelTwoState, "mioMistObservationLog")).toBe(true);
-    expect(isItemUnlocked(observatoryLevelTwoState, "coverlessObservationLog")).toBe(true);
-    expect(isRecordUnlocked(observatoryLevelTwoState, "coverlessObservationLogFragment")).toBe(true);
-    expect(isSongUnlocked(observatoryLevelTwoState, "deepLayerSilence")).toBe(false);
-    expect(isSongUnlocked(observatoryLevelThreeState, "deepLayerSilence")).toBe(true);
-    expect(isRecordUnlocked(observatoryLevelThreeState, "deepLayerSilenceMeasurement")).toBe(true);
-    expect(isRecordUnlocked(observatoryLevelTwoState, "cognitiveFixationRateChangeLog")).toBe(false);
-    expect(isRecordUnlocked(observatoryLevelThreeState, "cognitiveFixationRateChangeLog")).toBe(true);
-    expect(isRecordUnlocked(observatoryLevelFourState, "observerThresholdFragment")).toBe(true);
-    expect(isRecordUnlocked(observatoryLevelFiveState, "protagonistFirstMemoryFragment")).toBe(true);
+    expect(isIdolUnlocked(observatoryLevelFiveState, "kasumiyamaMio")).toBe(true);
+    expect(isRecordUnlocked(observatoryLevelThreeState, "deepLayerObservatoryAnteroomReport")).toBe(true);
+    expect(isRecordUnlocked(observatoryLevelThreeState, "mioMistObservationLog")).toBe(false);
+    expect(isRecordUnlocked(observatoryLevelFiveState, "mioMistObservationLog")).toBe(true);
+    expect(isItemUnlocked(observatoryLevelEightState, "coverlessObservationLog")).toBe(true);
+    expect(isRecordUnlocked(observatoryLevelFiveState, "coverlessObservationLogFragment")).toBe(true);
+    expect(isSongUnlocked(observatoryLevelEightState, "deepLayerSilence")).toBe(false);
+    expect(isSongUnlocked(observatoryLevelTenState, "deepLayerSilence")).toBe(true);
+    expect(isRecordUnlocked(observatoryLevelTenState, "deepLayerSilenceMeasurement")).toBe(true);
+    expect(isRecordUnlocked(observatoryLevelFiveState, "cognitiveFixationRateChangeLog")).toBe(false);
+    expect(isRecordUnlocked(observatoryLevelEightState, "cognitiveFixationRateChangeLog")).toBe(true);
+    expect(isRecordUnlocked(observatoryLevelTenState, "observerThresholdFragment")).toBe(true);
+    expect(isRecordUnlocked(observatoryLevelTwelveState, "protagonistFirstMemoryFragment")).toBe(true);
   });
 
   it("applies Mio's deep facility multiplier only to deep facilities", () => {
@@ -802,8 +803,8 @@ describe("game state and effects", () => {
       facilities: {
         ...baseState.facilities,
         alleyStage: { level: 10 },
-        restabilizationCore: { level: 3 },
-        deepLayerObservatory: { level: 2 }
+        restabilizationCore: { level: 15 },
+        deepLayerObservatory: { level: 5 }
       },
       meguri: {
         ...baseState.meguri,
@@ -811,7 +812,7 @@ describe("game state and effects", () => {
       }
     }, ["kasumiyamaMio"]);
 
-    expect(getFacilityTomorusaPerSecond(productionState, "deepLayerObservatory")).toBeCloseTo(120 * 1.2 * 1.35 * 1.05);
+    expect(getFacilityTomorusaPerSecond(productionState, "deepLayerObservatory")).toBeCloseTo(300 * 1.2 * 1.35 * 1.05);
     expect(getFacilityTomorusaPerSecond(productionState, "alleyStage")).toBeCloseTo(1 * 1.2 * 1.05);
   });
 
@@ -822,8 +823,8 @@ describe("game state and effects", () => {
       facilities: {
         ...baseState.facilities,
         alleyStage: { level: 10 },
-        restabilizationCore: { level: 3 },
-        deepLayerObservatory: { level: 2 }
+        restabilizationCore: { level: 15 },
+        deepLayerObservatory: { level: 10 }
       },
       items: {
         ...baseState.items,
@@ -839,65 +840,79 @@ describe("game state and effects", () => {
       }
     };
 
-    expect(getFacilityTomorusaPerSecond(purchasedDeepContentState, "deepLayerObservatory")).toBeCloseTo(120 * 1.2 * 1.12 * 1.25 * 1.05);
+    expect(getFacilityTomorusaPerSecond(purchasedDeepContentState, "deepLayerObservatory")).toBeCloseTo(600 * 1.2 * 1.12 * 1.25 * 1.05);
     expect(getFacilityTomorusaPerSecond(purchasedDeepContentState, "alleyStage")).toBeCloseTo(1 * 1.2 * 1.05);
   });
 
   it("unlocks the Ch.8 engineering areas and Satsuki after the Ch.7 observatory", () => {
     const baseState = createInitialState();
-    const observatoryLevelFiveState = {
+    const observatoryLevelFifteenState = {
       ...baseState,
       facilities: {
         ...baseState.facilities,
-        restabilizationCore: { level: 3 },
-        deepLayerObservatory: { level: 5 }
+        restabilizationCore: { level: 15 },
+        deepLayerObservatory: { level: 15 }
       },
       meguri: {
         ...baseState.meguri,
         count: 1
       }
     };
-    const archiveLevelTwoState = {
-      ...observatoryLevelFiveState,
-      facilities: {
-        ...observatoryLevelFiveState.facilities,
-        engineeringArchive: { level: 2 }
-      }
-    };
-    const archiveLevelThreeState = {
-      ...archiveLevelTwoState,
-      facilities: {
-        ...archiveLevelTwoState.facilities,
-        engineeringArchive: { level: 3 }
-      }
-    };
     const archiveLevelFiveState = {
-      ...archiveLevelThreeState,
+      ...observatoryLevelFifteenState,
       facilities: {
-        ...archiveLevelThreeState.facilities,
+        ...observatoryLevelFifteenState.facilities,
         engineeringArchive: { level: 5 }
       }
     };
-    const ruinsLevelOneState = {
+    const archiveLevelEightState = {
       ...archiveLevelFiveState,
       facilities: {
         ...archiveLevelFiveState.facilities,
-        prayerEngineeringRuins: { level: 1 }
+        engineeringArchive: { level: 8 }
+      }
+    };
+    const archiveLevelTenState = {
+      ...archiveLevelEightState,
+      facilities: {
+        ...archiveLevelEightState.facilities,
+        engineeringArchive: { level: 10 }
+      }
+    };
+    const archiveLevelTwelveState = {
+      ...archiveLevelTenState,
+      facilities: {
+        ...archiveLevelTenState.facilities,
+        engineeringArchive: { level: 12 }
+      }
+    };
+    const archiveLevelFifteenState = {
+      ...archiveLevelTwelveState,
+      facilities: {
+        ...archiveLevelTwelveState.facilities,
+        engineeringArchive: { level: 15 }
+      }
+    };
+    const ruinsLevelOneState = {
+      ...archiveLevelFifteenState,
+      facilities: {
+        ...archiveLevelFifteenState.facilities,
+        prayerEngineeringRuins: { level: 3 }
       }
     };
 
     expect(isFacilityUnlocked(baseState, "engineeringArchive")).toBe(false);
-    expect(isFacilityUnlocked(observatoryLevelFiveState, "engineeringArchive")).toBe(true);
-    expect(isRecordUnlocked(archiveLevelTwoState, "prayerEngineeringRecordFragment")).toBe(true);
-    expect(isItemUnlocked(archiveLevelTwoState, "sortedEngineeringFragment")).toBe(true);
-    expect(isSongUnlocked(archiveLevelTwoState, "fragmentMelody")).toBe(false);
-    expect(isIdolUnlocked(archiveLevelTwoState, "nanashiroSatsuki")).toBe(false);
-    expect(isIdolUnlocked(archiveLevelThreeState, "nanashiroSatsuki")).toBe(true);
-    expect(isSongUnlocked(archiveLevelThreeState, "fragmentMelody")).toBe(true);
-    expect(isRecordUnlocked(archiveLevelThreeState, "oldCouncilRecordFragment")).toBe(false);
-    expect(isRecordUnlocked(archiveLevelFiveState, "oldCouncilRecordFragment")).toBe(true);
-    expect(isRecordUnlocked(archiveLevelFiveState, "sealedMemoryFragment")).toBe(true);
-    expect(isFacilityUnlocked(archiveLevelFiveState, "prayerEngineeringRuins")).toBe(true);
+    expect(isFacilityUnlocked(observatoryLevelFifteenState, "engineeringArchive")).toBe(true);
+    expect(isRecordUnlocked(archiveLevelFiveState, "prayerEngineeringRecordFragment")).toBe(true);
+    expect(isItemUnlocked(archiveLevelFiveState, "sortedEngineeringFragment")).toBe(false);
+    expect(isItemUnlocked(archiveLevelEightState, "sortedEngineeringFragment")).toBe(true);
+    expect(isSongUnlocked(archiveLevelEightState, "fragmentMelody")).toBe(false);
+    expect(isIdolUnlocked(archiveLevelFiveState, "nanashiroSatsuki")).toBe(true);
+    expect(isSongUnlocked(archiveLevelTenState, "fragmentMelody")).toBe(true);
+    expect(isRecordUnlocked(archiveLevelFiveState, "oldCouncilRecordFragment")).toBe(false);
+    expect(isRecordUnlocked(archiveLevelTenState, "oldCouncilRecordFragment")).toBe(true);
+    expect(isRecordUnlocked(archiveLevelTwelveState, "sealedMemoryFragment")).toBe(true);
+    expect(isFacilityUnlocked(archiveLevelFifteenState, "prayerEngineeringRuins")).toBe(true);
     expect(isRecordUnlocked(ruinsLevelOneState, "experimentalRuinsFieldReport")).toBe(true);
   });
 
@@ -931,8 +946,8 @@ describe("game state and effects", () => {
       ...baseState,
       facilities: {
         ...baseState.facilities,
-        deepLayerObservatory: { level: 5 },
-        engineeringArchive: { level: 3 }
+        deepLayerObservatory: { level: 15 },
+        engineeringArchive: { level: 5 }
       },
       meguri: {
         ...baseState.meguri,
@@ -964,11 +979,11 @@ describe("game state and effects", () => {
 
   it("unlocks the Ch.9 facilities and Rin only after the second meguri", () => {
     const baseState = createInitialState();
-    const ruinsLevelThreeMeguriOneState = {
+    const ruinsLevelFifteenMeguriOneState = {
       ...baseState,
       facilities: {
         ...baseState.facilities,
-        prayerEngineeringRuins: { level: 3 }
+        prayerEngineeringRuins: { level: 15 }
       },
       meguri: {
         ...baseState.meguri,
@@ -976,9 +991,9 @@ describe("game state and effects", () => {
       }
     };
     const reobservationState = {
-      ...ruinsLevelThreeMeguriOneState,
+      ...ruinsLevelFifteenMeguriOneState,
       meguri: {
-        ...ruinsLevelThreeMeguriOneState.meguri,
+        ...ruinsLevelFifteenMeguriOneState.meguri,
         count: 2
       }
     };
@@ -986,18 +1001,18 @@ describe("game state and effects", () => {
       ...reobservationState,
       facilities: {
         ...reobservationState.facilities,
-        reobservationBase: { level: 3 }
+        reobservationBase: { level: 15 }
       }
     };
     const rinReadyState = {
       ...unnamedTheaterReadyState,
       facilities: {
         ...unnamedTheaterReadyState.facilities,
-        unnamedTheater: { level: 1 }
+        unnamedTheater: { level: 5 }
       }
     };
 
-    expect(isFacilityUnlocked(ruinsLevelThreeMeguriOneState, "reobservationBase")).toBe(false);
+    expect(isFacilityUnlocked(ruinsLevelFifteenMeguriOneState, "reobservationBase")).toBe(false);
     expect(isFacilityUnlocked(reobservationState, "reobservationBase")).toBe(true);
     expect(isFacilityUnlocked(unnamedTheaterReadyState, "unnamedTheater")).toBe(true);
     expect(isIdolUnlocked(unnamedTheaterReadyState, "shiragiriRin")).toBe(false);
@@ -1013,9 +1028,9 @@ describe("game state and effects", () => {
       totalTomorusaEarned: 200000,
       facilities: {
         ...baseState.facilities,
-        prayerEngineeringRuins: { level: 3 },
-        reobservationBase: { level: 1 },
-        unnamedTheater: { level: 1 }
+        prayerEngineeringRuins: { level: 15 },
+        reobservationBase: { level: 15 },
+        unnamedTheater: { level: 5 }
       },
       meguri: {
         ...baseState.meguri,
@@ -1024,7 +1039,7 @@ describe("game state and effects", () => {
     }, ["shiragiriRin"]);
     const preview = getMeguriSettlementPreview(rinJoinedState);
 
-    expect(getFacilityTomorusaPerSecond(rinJoinedState, "reobservationBase")).toBeCloseTo(400 * 1.2 * 1.1 * 1.15);
+    expect(getFacilityTomorusaPerSecond(rinJoinedState, "reobservationBase")).toBeCloseTo(6000 * 1.2 * 1.1 * 1.15);
     expect(preview.memoryFragmentMultiplier).toBeCloseTo(1.3);
     expect(preview.totalEligibleMemoryFragments).toBe(4);
   });
@@ -1035,7 +1050,7 @@ describe("game state and effects", () => {
       ...baseState,
       facilities: {
         ...baseState.facilities,
-        unnamedTheater: { level: 3 }
+        unnamedTheater: { level: 10 }
       },
       meguri: {
         ...baseState.meguri,
@@ -1067,6 +1082,13 @@ describe("game state and effects", () => {
         }
       }
     };
+    const ch9OpenState = {
+      ...songPurchasedState,
+      facilities: {
+        ...songPurchasedState.facilities,
+        unnamedTheater: { level: 15 }
+      }
+    };
 
     expect(isSongUnlocked(meguriOneTheaterState, "theLastName")).toBe(false);
     expect(isSongUnlocked(meguriTwoTheaterState, "theLastName")).toBe(false);
@@ -1076,7 +1098,8 @@ describe("game state and effects", () => {
     expect(isRecordUnlocked(songPurchasedState, "unnamedTheaterResidualPerformance")).toBe(true);
     expect(isRecordUnlocked(songPurchasedState, "meguriMemoryRelation")).toBe(false);
     expect(isRecordUnlocked(rinBondState, "meguriMemoryRelation")).toBe(true);
-    expect(isCh9OpenEndReached(songPurchasedState)).toBe(true);
+    expect(isCh9OpenEndReached(songPurchasedState)).toBe(false);
+    expect(isCh9OpenEndReached(ch9OpenState)).toBe(true);
   });
 
   it("applies The Last Name production and memory fragment effects after purchase", () => {
@@ -1086,9 +1109,9 @@ describe("game state and effects", () => {
       totalTomorusaEarned: 200000,
       facilities: {
         ...baseState.facilities,
-        prayerEngineeringRuins: { level: 3 },
-        reobservationBase: { level: 3 },
-        unnamedTheater: { level: 1 }
+        prayerEngineeringRuins: { level: 15 },
+        reobservationBase: { level: 15 },
+        unnamedTheater: { level: 10 }
       },
       songs: {
         ...baseState.songs,
@@ -1101,7 +1124,7 @@ describe("game state and effects", () => {
     };
     const preview = getMeguriSettlementPreview(songPurchasedState);
 
-    expect(getFacilityTomorusaPerSecond(songPurchasedState, "unnamedTheater")).toBeCloseTo(600 * 1.2 * 1.1 * 1.3);
+    expect(getFacilityTomorusaPerSecond(songPurchasedState, "unnamedTheater")).toBeCloseTo(6000 * 1.2 * 1.1 * 1.3);
     expect(preview.memoryFragmentMultiplier).toBeCloseTo(1.2);
     expect(preview.totalEligibleMemoryFragments).toBe(3);
   });
@@ -1184,7 +1207,20 @@ describe("game state and effects", () => {
       ...alleyProgressState,
       facilities: {
         ...alleyProgressState.facilities,
-        neonBoard: { level: 10 }
+        neonBoard: { level: 15 }
+      }
+    };
+    const ch5PathState = {
+      ...alleyProgressState,
+      facilities: {
+        ...alleyProgressState.facilities,
+        neonBoard: { level: 15 },
+        twilightPathGuide: { level: 15 },
+        temporaryBroadcastBooth: { level: 15 },
+        memoryLibrary: { level: 18 },
+        recordingStorage: { level: 15 },
+        oldBroadcastRoom: { level: 15 },
+        undergroundPlaza: { level: 15 }
       }
     };
 
@@ -1195,86 +1231,79 @@ describe("game state and effects", () => {
       ...alleyProgressState,
       facilities: {
         ...alleyProgressState.facilities,
-        neonBoard: { level: 5 }
+        neonBoard: { level: 15 }
       }
     }, "twilightPathGuide")).toBe(true);
     expect(isFacilityUnlocked({
       ...alleyProgressState,
       facilities: {
         ...alleyProgressState.facilities,
-        neonBoard: { level: 5 },
-        twilightPathGuide: { level: 1 },
-        temporaryBroadcastBooth: { level: 5 }
+        neonBoard: { level: 15 },
+        twilightPathGuide: { level: 15 },
+        temporaryBroadcastBooth: { level: 15 }
       }
     }, "memoryLibrary")).toBe(true);
     expect(isFacilityUnlocked({
       ...alleyProgressState,
       facilities: {
         ...alleyProgressState.facilities,
-        neonBoard: { level: 5 },
-        twilightPathGuide: { level: 1 },
-        temporaryBroadcastBooth: { level: 5 },
-        memoryLibrary: { level: 1 }
+        neonBoard: { level: 15 },
+        twilightPathGuide: { level: 15 },
+        temporaryBroadcastBooth: { level: 15 },
+        memoryLibrary: { level: 15 }
       }
     }, "recordingStorage")).toBe(true);
     expect(isFacilityUnlocked({
       ...alleyProgressState,
       facilities: {
         ...alleyProgressState.facilities,
-        neonBoard: { level: 5 },
-        twilightPathGuide: { level: 1 },
-        temporaryBroadcastBooth: { level: 5 },
-        memoryLibrary: { level: 1 },
-        recordingStorage: { level: 2 }
+        neonBoard: { level: 15 },
+        twilightPathGuide: { level: 15 },
+        temporaryBroadcastBooth: { level: 15 },
+        memoryLibrary: { level: 15 },
+        recordingStorage: { level: 15 }
       }
     }, "oldBroadcastRoom")).toBe(true);
     expect(isFacilityUnlocked({
       ...alleyProgressState,
       facilities: {
         ...alleyProgressState.facilities,
-        neonBoard: { level: 5 },
-        twilightPathGuide: { level: 1 },
-        temporaryBroadcastBooth: { level: 5 },
-        memoryLibrary: { level: 3 }
+        neonBoard: { level: 15 },
+        twilightPathGuide: { level: 15 },
+        temporaryBroadcastBooth: { level: 15 },
+        memoryLibrary: { level: 18 }
       }
     }, "undergroundPlaza")).toBe(false);
     expect(isFacilityUnlocked({
       ...alleyProgressState,
       facilities: {
         ...alleyProgressState.facilities,
-        neonBoard: { level: 5 },
-        twilightPathGuide: { level: 1 },
-        temporaryBroadcastBooth: { level: 5 },
-        memoryLibrary: { level: 3 },
-        recordingStorage: { level: 2 },
-        oldBroadcastRoom: { level: 1 }
+        neonBoard: { level: 15 },
+        twilightPathGuide: { level: 15 },
+        temporaryBroadcastBooth: { level: 15 },
+        memoryLibrary: { level: 18 },
+        recordingStorage: { level: 15 },
+        oldBroadcastRoom: { level: 15 }
       }
     }, "undergroundPlaza")).toBe(true);
     expect(isFacilityUnlocked({
       ...alleyProgressState,
       facilities: {
         ...alleyProgressState.facilities,
-        neonBoard: { level: 5 },
-        twilightPathGuide: { level: 1 },
-        temporaryBroadcastBooth: { level: 5 },
-        memoryLibrary: { level: 3 },
-        recordingStorage: { level: 2 },
-        oldBroadcastRoom: { level: 1 },
-        undergroundPlaza: { level: 4 }
+        neonBoard: { level: 15 },
+        twilightPathGuide: { level: 15 },
+        temporaryBroadcastBooth: { level: 15 },
+        memoryLibrary: { level: 18 },
+        recordingStorage: { level: 15 },
+        oldBroadcastRoom: { level: 15 },
+        undergroundPlaza: { level: 15 }
       }
     }, "nameRecordWall")).toBe(true);
     const chapelPathState = {
-      ...alleyProgressState,
+      ...ch5PathState,
       facilities: {
-        ...alleyProgressState.facilities,
-        neonBoard: { level: 5 },
-        twilightPathGuide: { level: 1 },
-        temporaryBroadcastBooth: { level: 5 },
-        memoryLibrary: { level: 3 },
-        recordingStorage: { level: 2 },
-        oldBroadcastRoom: { level: 1 },
-        undergroundPlaza: { level: 4 },
-        nameRecordWall: { level: 3 }
+        ...ch5PathState.facilities,
+        nameRecordWall: { level: 15 }
       }
     };
     const chapelOpenedState = {
@@ -1288,7 +1317,7 @@ describe("game state and effects", () => {
       ...chapelPathState,
       facilities: {
         ...chapelPathState.facilities,
-        undergroundChapel: { level: 8 }
+        undergroundChapel: { level: 18 }
       },
       songs: {
         ...chapelPathState.songs,
@@ -1299,7 +1328,7 @@ describe("game state and effects", () => {
       ...chapelExpandedState,
       facilities: {
         ...chapelExpandedState.facilities,
-        undergroundPassageRepair: { level: 1 }
+        undergroundPassageRepair: { level: 5 }
       }
     };
 
@@ -1309,9 +1338,47 @@ describe("game state and effects", () => {
     expect(isFacilityUnlocked(chapelExpandedState, "undergroundPassageRepair")).toBe(true);
     expect(isRecordUnlocked(alleyProgressState, "firstAudienceNote")).toBe(true);
     expect(isRecordUnlocked(chapelPathState, "undergroundChapelRestorationReport")).toBe(false);
-    expect(isRecordUnlocked(chapelOpenedState, "undergroundChapelRestorationReport")).toBe(true);
+    expect(isRecordUnlocked(chapelOpenedState, "undergroundChapelRestorationReport")).toBe(false);
+    expect(isRecordUnlocked({
+      ...chapelOpenedState,
+      facilities: {
+        ...chapelOpenedState.facilities,
+        undergroundChapel: { level: 3 }
+      }
+    }, "undergroundChapelRestorationReport")).toBe(true);
     expect(isRecordUnlocked(repairOpenedState, "sakurakoRemovedPartsReport")).toBe(true);
-    expect(getFacilityLevel(neonProgressState, "neonBoard")).toBe(10);
+    expect(getFacilityLevel(neonProgressState, "neonBoard")).toBe(15);
+  });
+
+  it("keeps one-day offline bulk facility progression within two new districts", () => {
+    const milestones = buildFacilityBalanceMilestones();
+
+    milestones.forEach((milestone, index) => {
+      const offlineTomorusa = milestone.productionPerSecond * MAX_OFFLINE_SECONDS * BASE_OFFLINE_REWARD_RATE;
+      const reachedIndex = getAffordableFacilityBalanceMilestoneIndex(milestones, index, offlineTomorusa);
+
+      expect(reachedIndex - index, milestone.label).toBeLessThanOrEqual(2);
+    });
+  });
+
+  it("lets short-interval reinvestment outpace a one-day offline bulk spend when the next step is reachable", () => {
+    const milestones = buildFacilityBalanceMilestones();
+    let strongerReinvestmentCases = 0;
+
+    milestones.forEach((milestone, index) => {
+      const offlineIndex = simulateFacilityBalanceReinvestment(milestones, index, 1, 12, BASE_OFFLINE_REWARD_RATE);
+      const activeIndex = simulateFacilityBalanceReinvestment(milestones, index, 24, 1, 1);
+
+      expect(milestones[activeIndex].productionPerSecond, milestone.label).toBeGreaterThanOrEqual(
+        milestones[offlineIndex].productionPerSecond
+      );
+
+      if (activeIndex > offlineIndex) {
+        strongerReinvestmentCases += 1;
+      }
+    });
+
+    expect(strongerReinvestmentCases).toBeGreaterThan(0);
   });
 
   it("unlocks initial bond records from idol bond and preserves read state", () => {
@@ -1417,7 +1484,7 @@ describe("game state and effects", () => {
             ...baseState,
             facilities: {
               ...baseState.facilities,
-              unnamedTheater: { level: 1 }
+              unnamedTheater: { level: 3 }
             },
             meguri: {
               ...baseState.meguri,
@@ -1463,7 +1530,7 @@ describe("game state and effects", () => {
       ...baseState,
       facilities: {
         ...baseState.facilities,
-        deepLayerObservatory: { level: 3 }
+        deepLayerObservatory: { level: 8 }
       },
       idols: {
         ...baseState.idols,
@@ -1478,7 +1545,7 @@ describe("game state and effects", () => {
       ...noMeguriState,
       facilities: {
         ...noMeguriState.facilities,
-        deepLayerObservatory: { level: 2 }
+        deepLayerObservatory: { level: 5 }
       },
       meguri: {
         ...noMeguriState.meguri,
@@ -1529,14 +1596,14 @@ describe("game state and effects", () => {
         idolId: "kasumiyamaMio",
         eventId: "kasumiyamaMio.knownMachine",
         facilities: {
-          prayerEngineeringRuins: { level: 1 }
+          prayerEngineeringRuins: { level: 3 }
         }
       },
       {
         idolId: "nanashiroSatsuki",
         eventId: "nanashiroSatsuki.translationEcho",
         facilities: {
-          engineeringArchive: { level: 5 }
+          engineeringArchive: { level: 12 }
         }
       }
     ] as const;
@@ -1738,6 +1805,346 @@ describe("save normalization", () => {
     expect(result.offlineTomorusa).toBe(0);
   });
 });
+
+type FacilityBalanceMilestoneConfig = {
+  label: string;
+  levels: Partial<Record<FacilityId, number>>;
+  requiredSongs?: SongId[];
+};
+
+type FacilityBalanceMilestone = FacilityBalanceMilestoneConfig & {
+  cumulativeInvestment: number;
+  productionPerSecond: number;
+};
+
+const FACILITY_BALANCE_MILESTONE_CONFIGS: FacilityBalanceMilestoneConfig[] = [
+  {
+    label: "neonBoard gate",
+    levels: { alleyStage: 10 }
+  },
+  {
+    label: "twilightPathGuide gate",
+    levels: { alleyStage: 10, neonBoard: 15 }
+  },
+  {
+    label: "temporaryBroadcastBooth gate",
+    levels: { alleyStage: 10, neonBoard: 15, twilightPathGuide: 15 }
+  },
+  {
+    label: "memoryLibrary gate",
+    levels: { alleyStage: 10, neonBoard: 15, twilightPathGuide: 15, temporaryBroadcastBooth: 15 }
+  },
+  {
+    label: "recordingStorage gate",
+    levels: { alleyStage: 10, neonBoard: 15, twilightPathGuide: 15, temporaryBroadcastBooth: 15, memoryLibrary: 15 }
+  },
+  {
+    label: "oldBroadcastRoom gate",
+    levels: {
+      alleyStage: 10,
+      neonBoard: 15,
+      twilightPathGuide: 15,
+      temporaryBroadcastBooth: 15,
+      memoryLibrary: 15,
+      recordingStorage: 15
+    }
+  },
+  {
+    label: "undergroundPlaza gate",
+    levels: {
+      alleyStage: 10,
+      neonBoard: 15,
+      twilightPathGuide: 15,
+      temporaryBroadcastBooth: 15,
+      memoryLibrary: 18,
+      recordingStorage: 15,
+      oldBroadcastRoom: 15
+    }
+  },
+  {
+    label: "nameRecordWall gate",
+    levels: {
+      alleyStage: 10,
+      neonBoard: 15,
+      twilightPathGuide: 15,
+      temporaryBroadcastBooth: 15,
+      memoryLibrary: 18,
+      recordingStorage: 15,
+      oldBroadcastRoom: 15,
+      undergroundPlaza: 15
+    }
+  },
+  {
+    label: "undergroundChapel gate",
+    levels: {
+      alleyStage: 10,
+      neonBoard: 15,
+      twilightPathGuide: 15,
+      temporaryBroadcastBooth: 15,
+      memoryLibrary: 18,
+      recordingStorage: 15,
+      oldBroadcastRoom: 15,
+      undergroundPlaza: 15,
+      nameRecordWall: 15
+    }
+  },
+  {
+    label: "undergroundPassageRepair gate",
+    levels: {
+      alleyStage: 10,
+      neonBoard: 15,
+      twilightPathGuide: 15,
+      temporaryBroadcastBooth: 15,
+      memoryLibrary: 18,
+      recordingStorage: 15,
+      oldBroadcastRoom: 15,
+      undergroundPlaza: 15,
+      nameRecordWall: 15,
+      undergroundChapel: 18
+    },
+    requiredSongs: ["chapelHarmony"]
+  },
+  {
+    label: "restabilizationCore gate",
+    levels: {
+      alleyStage: 10,
+      neonBoard: 15,
+      twilightPathGuide: 15,
+      temporaryBroadcastBooth: 15,
+      memoryLibrary: 18,
+      recordingStorage: 15,
+      oldBroadcastRoom: 15,
+      undergroundPlaza: 15,
+      nameRecordWall: 15,
+      undergroundChapel: 18,
+      undergroundPassageRepair: 15
+    },
+    requiredSongs: ["chapelHarmony", "restorationHumming"]
+  },
+  {
+    label: "deepLayerObservatory gate",
+    levels: {
+      alleyStage: 10,
+      neonBoard: 15,
+      twilightPathGuide: 15,
+      temporaryBroadcastBooth: 15,
+      memoryLibrary: 18,
+      recordingStorage: 15,
+      oldBroadcastRoom: 15,
+      undergroundPlaza: 15,
+      nameRecordWall: 15,
+      undergroundChapel: 18,
+      undergroundPassageRepair: 15,
+      restabilizationCore: 15
+    },
+    requiredSongs: ["chapelHarmony", "restorationHumming"]
+  },
+  {
+    label: "engineeringArchive gate",
+    levels: {
+      alleyStage: 10,
+      neonBoard: 15,
+      twilightPathGuide: 15,
+      temporaryBroadcastBooth: 15,
+      memoryLibrary: 18,
+      recordingStorage: 15,
+      oldBroadcastRoom: 15,
+      undergroundPlaza: 15,
+      nameRecordWall: 15,
+      undergroundChapel: 18,
+      undergroundPassageRepair: 15,
+      restabilizationCore: 15,
+      deepLayerObservatory: 15
+    },
+    requiredSongs: ["chapelHarmony", "restorationHumming"]
+  },
+  {
+    label: "prayerEngineeringRuins gate",
+    levels: {
+      alleyStage: 10,
+      neonBoard: 15,
+      twilightPathGuide: 15,
+      temporaryBroadcastBooth: 15,
+      memoryLibrary: 18,
+      recordingStorage: 15,
+      oldBroadcastRoom: 15,
+      undergroundPlaza: 15,
+      nameRecordWall: 15,
+      undergroundChapel: 18,
+      undergroundPassageRepair: 15,
+      restabilizationCore: 15,
+      deepLayerObservatory: 15,
+      engineeringArchive: 15
+    },
+    requiredSongs: ["chapelHarmony", "restorationHumming"]
+  },
+  {
+    label: "reobservationBase gate",
+    levels: {
+      alleyStage: 10,
+      neonBoard: 15,
+      twilightPathGuide: 15,
+      temporaryBroadcastBooth: 15,
+      memoryLibrary: 18,
+      recordingStorage: 15,
+      oldBroadcastRoom: 15,
+      undergroundPlaza: 15,
+      nameRecordWall: 15,
+      undergroundChapel: 18,
+      undergroundPassageRepair: 15,
+      restabilizationCore: 15,
+      deepLayerObservatory: 15,
+      engineeringArchive: 15,
+      prayerEngineeringRuins: 15
+    },
+    requiredSongs: ["chapelHarmony", "restorationHumming"]
+  },
+  {
+    label: "unnamedTheater gate",
+    levels: {
+      alleyStage: 10,
+      neonBoard: 15,
+      twilightPathGuide: 15,
+      temporaryBroadcastBooth: 15,
+      memoryLibrary: 18,
+      recordingStorage: 15,
+      oldBroadcastRoom: 15,
+      undergroundPlaza: 15,
+      nameRecordWall: 15,
+      undergroundChapel: 18,
+      undergroundPassageRepair: 15,
+      restabilizationCore: 15,
+      deepLayerObservatory: 15,
+      engineeringArchive: 15,
+      prayerEngineeringRuins: 15,
+      reobservationBase: 15
+    },
+    requiredSongs: ["chapelHarmony", "restorationHumming"]
+  },
+  {
+    label: "current end gate",
+    levels: {
+      alleyStage: 10,
+      neonBoard: 15,
+      twilightPathGuide: 15,
+      temporaryBroadcastBooth: 15,
+      memoryLibrary: 18,
+      recordingStorage: 15,
+      oldBroadcastRoom: 15,
+      undergroundPlaza: 15,
+      nameRecordWall: 15,
+      undergroundChapel: 18,
+      undergroundPassageRepair: 15,
+      restabilizationCore: 15,
+      deepLayerObservatory: 15,
+      engineeringArchive: 15,
+      prayerEngineeringRuins: 15,
+      reobservationBase: 15,
+      unnamedTheater: 15
+    },
+    requiredSongs: ["chapelHarmony", "restorationHumming"]
+  }
+];
+
+function buildFacilityBalanceMilestones(): FacilityBalanceMilestone[] {
+  return FACILITY_BALANCE_MILESTONE_CONFIGS.map((config) => ({
+    ...config,
+    cumulativeInvestment: getCumulativeFacilityInvestment(config.levels) + getRequiredSongInvestment(config.requiredSongs ?? []),
+    productionPerSecond: getBaseFacilityProduction(config.levels)
+  }));
+}
+
+function getCumulativeFacilityInvestment(levels: Partial<Record<FacilityId, number>>): number {
+  return FACILITY_ORDER.reduce((total, facilityId) => {
+    const level = levels[facilityId] ?? 0;
+    const facility = FACILITIES[facilityId];
+    let facilityInvestment = 0;
+
+    for (let currentLevel = 0; currentLevel < level; currentLevel += 1) {
+      facilityInvestment += Math.floor(facility.baseCost * facility.costMultiplier ** currentLevel);
+    }
+
+    return total + facilityInvestment;
+  }, 0);
+}
+
+function getRequiredSongInvestment(songIds: SongId[]): number {
+  return songIds.reduce((total, songId) => {
+    const song = SONGS[songId];
+
+    if (!song) {
+      throw new Error(`Missing song balance definition for ${songId}.`);
+    }
+
+    return total + song.cost;
+  }, 0);
+}
+
+function getBaseFacilityProduction(levels: Partial<Record<FacilityId, number>>): number {
+  return FACILITY_ORDER.reduce((total, facilityId) => {
+    const facility = FACILITIES[facilityId];
+
+    if (!facility) {
+      throw new Error(`Missing facility balance definition for ${facilityId}.`);
+    }
+
+    return total + (levels[facilityId] ?? 0) * (facility.productionPerLevel ?? 0);
+  }, 0);
+}
+
+function getAffordableFacilityBalanceMilestoneIndex(
+  milestones: FacilityBalanceMilestone[],
+  startIndex: number,
+  tomorusaBudget: number
+): number {
+  let reachedIndex = startIndex;
+  const startMilestone = milestones[startIndex];
+
+  if (!startMilestone) {
+    throw new Error(`Missing facility balance milestone at index ${startIndex}.`);
+  }
+
+  const affordableInvestment = startMilestone.cumulativeInvestment + tomorusaBudget;
+
+  for (let index = startIndex + 1; index < milestones.length; index += 1) {
+    if (milestones[index].cumulativeInvestment <= affordableInvestment) {
+      reachedIndex = index;
+    }
+  }
+
+  return reachedIndex;
+}
+
+function simulateFacilityBalanceReinvestment(
+  milestones: FacilityBalanceMilestone[],
+  startIndex: number,
+  intervalHours: number,
+  intervalCount: number,
+  productionRate: number
+): number {
+  let currentIndex = startIndex;
+  let bankedTomorusa = 0;
+  let currentInvestment = milestones[startIndex].cumulativeInvestment;
+
+  for (let interval = 0; interval < intervalCount; interval += 1) {
+    bankedTomorusa += milestones[currentIndex].productionPerSecond * intervalHours * 60 * 60 * productionRate;
+
+    while (currentIndex + 1 < milestones.length) {
+      const nextInvestment = milestones[currentIndex + 1].cumulativeInvestment;
+      const requiredInvestment = nextInvestment - currentInvestment;
+
+      if (bankedTomorusa < requiredInvestment) {
+        break;
+      }
+
+      bankedTomorusa -= requiredInvestment;
+      currentInvestment = nextInvestment;
+      currentIndex += 1;
+    }
+  }
+
+  return currentIndex;
+}
 
 function setupLocalStorage(entries: Record<string, string>): void {
   const store = new Map(Object.entries(entries));

@@ -15,13 +15,19 @@ import {
 } from "../game";
 import { formatAmount, formatRate } from "./format";
 import { shouldRenderFacilityCard } from "./contentVisibility";
+import {
+  getFacilityProgressStatus,
+  renderProgressStatusCard
+} from "./progressStatus";
 import { getUnlockRequirementText } from "./requirementText";
 
 export function renderFacilityCards(state: GameState): string {
-  return FACILITY_ORDER
+  const facilityCards = FACILITY_ORDER
     .filter((facilityId) => shouldRenderFacilityCard(state, facilityId))
     .map((facilityId) => renderFacilityCard(state, facilityId))
     .join("");
+
+  return `${facilityCards}${renderProgressStatusCard(getFacilityProgressStatus(state))}`;
 }
 
 function renderFacilityCard(state: GameState, facilityId: FacilityId): string {

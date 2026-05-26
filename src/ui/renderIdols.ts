@@ -30,6 +30,10 @@ import {
 } from "../game";
 import { isRelatedProgressVisible } from "./contentVisibility";
 import { formatBond } from "./format";
+import {
+  getIdolProgressStatus,
+  renderProgressStatusCard
+} from "./progressStatus";
 import { getIdolUnlockRequirementText } from "./requirementText";
 
 export function renderIdolCards(state: GameState, activeIdolId: IdolId, isDetailOpen = false): string {
@@ -121,10 +125,12 @@ function renderActiveIdolDetailPanel(state: GameState, idolId: IdolId): string {
 }
 
 export function renderIdolTabCards(state: GameState): string {
-  return IDOL_ORDER
+  const idolCards = IDOL_ORDER
     .filter((idolId) => isRelatedProgressVisible(state, IDOLS[idolId].unlockRequirement))
     .map((idolId) => renderIdolTabCard(state, idolId))
     .join("");
+
+  return `${idolCards}${renderProgressStatusCard(getIdolProgressStatus(state))}`;
 }
 
 function renderIdolSwitcher(state: GameState, activeIdolId: IdolId): string {

@@ -38,7 +38,7 @@ export const SONG_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "temporaryBroadcastBooth",
-      level: 2
+      level: 8
     }
   },
   {
@@ -64,7 +64,7 @@ export const SONG_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "memoryLibrary",
-          level: 3
+          level: 10
         }
       ]
     }
@@ -92,7 +92,7 @@ export const SONG_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "undergroundPlaza",
-          level: 3
+          level: 10
         }
       ]
     }
@@ -112,7 +112,7 @@ export const SONG_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "undergroundChapel",
-      level: 2
+      level: 8
     }
   },
   {
@@ -130,7 +130,7 @@ export const SONG_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "undergroundChapel",
-      level: 8
+      level: 15
     }
   },
   {
@@ -156,7 +156,7 @@ export const SONG_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "undergroundPassageRepair",
-          level: 3
+          level: 10
         }
       ]
     }
@@ -178,7 +178,7 @@ export const SONG_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "deepLayerObservatory",
-      level: 3
+      level: 10
     }
   },
   {
@@ -201,7 +201,7 @@ export const SONG_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "engineeringArchive",
-      level: 3
+      level: 10
     }
   },
   {
@@ -235,7 +235,7 @@ export const SONG_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "unnamedTheater",
-          level: 2
+          level: 10
         }
       ]
     }

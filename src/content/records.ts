@@ -118,7 +118,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "neonBoard",
-        level: 1
+        level: 3
       }
     ]
   },
@@ -150,7 +150,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "neonBoard",
-        level: 3
+        level: 8
       }
     ]
   },
@@ -166,7 +166,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "twilightPathGuide",
-        level: 1
+        level: 3
       }
     ]
   },
@@ -188,7 +188,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "twilightPathGuide",
-        level: 3
+        level: 8
       }
     ]
   },
@@ -204,7 +204,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "twilightPathGuide",
-        level: 5
+        level: 12
       }
     ]
   },
@@ -220,7 +220,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "temporaryBroadcastBooth",
-        level: 3
+        level: 8
       }
     ]
   },
@@ -236,7 +236,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "temporaryBroadcastBooth",
-        level: 3
+        level: 8
       }
     ]
   },
@@ -252,7 +252,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "memoryLibrary",
-        level: 1
+        level: 3
       }
     ]
   },
@@ -274,7 +274,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "memoryLibrary",
-        level: 3
+        level: 8
       }
     ]
   },
@@ -290,7 +290,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "oldBroadcastRoom",
-        level: 1
+        level: 3
       }
     ]
   },
@@ -306,7 +306,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "undergroundPlaza",
-        level: 1
+        level: 3
       }
     ]
   },
@@ -322,7 +322,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "undergroundPlaza",
-        level: 4
+        level: 10
       }
     ]
   },
@@ -338,7 +338,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "nameRecordWall",
-        level: 1
+        level: 3
       }
     ]
   },
@@ -354,7 +354,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "nameRecordWall",
-        level: 3
+        level: 8
       }
     ]
   },
@@ -370,7 +370,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "nameRecordWall",
-        level: 2
+        level: 5
       }
     ]
   },
@@ -386,7 +386,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "undergroundChapel",
-        level: 1
+        level: 3
       }
     ]
   },
@@ -418,7 +418,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "undergroundChapel",
-        level: 1
+        level: 3
       }
     ]
   },
@@ -434,7 +434,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "undergroundChapel",
-        level: 2
+        level: 5
       }
     ]
   },
@@ -450,7 +450,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "undergroundChapel",
-        level: 2
+        level: 5
       }
     ]
   },
@@ -466,7 +466,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "undergroundChapel",
-        level: 4
+        level: 10
       }
     ]
   },
@@ -485,7 +485,7 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "undergroundChapel",
-            level: 5
+            level: 12
           },
           {
             type: "song.purchased",
@@ -516,7 +516,7 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "undergroundChapel",
-            level: 8
+            level: 15
           },
           {
             type: "song.purchased",
@@ -545,7 +545,7 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "undergroundChapel",
-            level: 9
+            level: 18
           }
         ]
       }
@@ -563,7 +563,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "undergroundChapel",
-        level: 3
+        level: 8
       }
     ]
   },
@@ -579,7 +579,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "undergroundPassageRepair",
-        level: 1
+        level: 3
       }
     ]
   },
@@ -595,7 +595,7 @@ export const RECORD_DEFINITIONS = defineContent([
       {
         type: "facility.level",
         facilityId: "undergroundPassageRepair",
-        level: 4
+        level: 10
       }
     ]
   },
@@ -658,7 +658,7 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "deepLayerObservatory",
-            level: 1
+            level: 3
           }
         ]
       }
@@ -683,7 +683,7 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "deepLayerObservatory",
-            level: 2
+            level: 5
           }
         ]
       }
@@ -708,7 +708,7 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "deepLayerObservatory",
-            level: 2
+            level: 5
           }
         ]
       }
@@ -733,7 +733,7 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "deepLayerObservatory",
-            level: 3
+            level: 8
           }
         ]
       }
@@ -758,7 +758,7 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "deepLayerObservatory",
-            level: 3
+            level: 8
           }
         ]
       }
@@ -783,7 +783,7 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "deepLayerObservatory",
-            level: 4
+            level: 10
           }
         ]
       }
@@ -808,7 +808,7 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "deepLayerObservatory",
-            level: 5
+            level: 12
           }
         ]
       }
@@ -833,7 +833,7 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "engineeringArchive",
-            level: 2
+            level: 5
           }
         ]
       }
@@ -858,7 +858,7 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "prayerEngineeringRuins",
-            level: 1
+            level: 3
           }
         ]
       }
@@ -883,7 +883,7 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "engineeringArchive",
-            level: 4
+            level: 10
           }
         ]
       }
@@ -908,7 +908,7 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "engineeringArchive",
-            level: 5
+            level: 12
           }
         ]
       }
@@ -933,7 +933,7 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "unnamedTheater",
-            level: 1
+            level: 3
           }
         ]
       }
@@ -958,7 +958,7 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "unnamedTheater",
-            level: 1
+            level: 3
           }
         ]
       }
@@ -983,7 +983,7 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "unnamedTheater",
-            level: 3
+            level: 8
           },
           {
             type: "song.purchased",
@@ -1012,7 +1012,7 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "unnamedTheater",
-            level: 3
+            level: 8
           },
           {
             type: "song.purchased",
@@ -1046,7 +1046,7 @@ export const RECORD_DEFINITIONS = defineContent([
           {
             type: "facility.level",
             facilityId: "unnamedTheater",
-            level: 1
+            level: 3
           },
           {
             type: "song.purchased",

@@ -14,13 +14,19 @@ import {
 } from "../game";
 import { isRelatedProgressVisible } from "./contentVisibility";
 import { formatAmount } from "./format";
+import {
+  getItemProgressStatus,
+  renderProgressStatusCard
+} from "./progressStatus";
 import { getUnlockRequirementTextFromRequirement } from "./requirementText";
 
 export function renderItemCards(state: GameState): string {
-  return ITEM_ORDER
+  const itemCards = ITEM_ORDER
     .filter((itemId) => isRelatedProgressVisible(state, ITEMS[itemId].unlockRequirement))
     .map((itemId) => renderItemCard(state, itemId))
     .join("");
+
+  return `${itemCards}${renderProgressStatusCard(getItemProgressStatus(state))}`;
 }
 
 function renderItemCard(state: GameState, itemId: ItemId): string {

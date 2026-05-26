@@ -832,6 +832,43 @@ h2 {
   border-color: rgba(160, 143, 172, 0.2);
 }
 
+.progress-status-card {
+  grid-column: 1 / -1;
+  display: grid;
+  min-height: 94px;
+  align-content: center;
+  gap: 6px;
+}
+
+.progress-status-card h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.progress-status-card p {
+  margin: 0;
+  color: #c9c0d4;
+}
+
+.progress-status-card[data-progress-status="hidden"] {
+  border-color: rgba(127, 233, 255, 0.24);
+  background:
+    linear-gradient(180deg, rgba(127, 233, 255, 0.06), transparent),
+    rgba(15, 13, 26, 0.86);
+}
+
+.progress-status-card[data-progress-status="hidden"]::before {
+  background: linear-gradient(180deg, #7fe9ff, #5c8296);
+}
+
+.progress-status-card[data-progress-status="complete"] {
+  border-color: rgba(160, 143, 172, 0.22);
+}
+
+.progress-status-card[data-progress-status="complete"]::before {
+  background: linear-gradient(180deg, #a59ab2, #4f4659);
+}
+
 .idol-tab-header {
   display: flex;
   align-items: start;

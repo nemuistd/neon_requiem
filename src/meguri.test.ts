@@ -319,7 +319,7 @@ describe("meguri economy", () => {
       ...initialState,
       facilities: {
         ...initialState.facilities,
-        unnamedTheater: { level: 3 }
+        unnamedTheater: { level: 15 }
       },
       songs: {
         ...initialState.songs,
@@ -660,8 +660,8 @@ function createMeguriReadyState<T extends ReturnType<typeof createInitialState>>
     ...state,
     facilities: {
       ...state.facilities,
-      undergroundPassageRepair: { level: 5 },
-      restabilizationCore: { level: 1 }
+      undergroundPassageRepair: { level: 15 },
+      restabilizationCore: { level: 15 }
     },
     songs: {
       ...state.songs,

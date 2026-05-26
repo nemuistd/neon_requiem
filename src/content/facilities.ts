@@ -37,7 +37,7 @@ export const FACILITY_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "neonBoard",
-      level: 5
+      level: 15
     }
   },
   {
@@ -51,7 +51,7 @@ export const FACILITY_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "twilightPathGuide",
-      level: 1
+      level: 15
     }
   },
   {
@@ -65,7 +65,7 @@ export const FACILITY_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "temporaryBroadcastBooth",
-      level: 5
+      level: 15
     }
   },
   {
@@ -79,7 +79,7 @@ export const FACILITY_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "memoryLibrary",
-      level: 1
+      level: 15
     }
   },
   {
@@ -93,7 +93,7 @@ export const FACILITY_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "recordingStorage",
-      level: 2
+      level: 15
     }
   },
   {
@@ -110,12 +110,12 @@ export const FACILITY_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "memoryLibrary",
-          level: 3
+          level: 18
         },
         {
           type: "facility.level",
           facilityId: "oldBroadcastRoom",
-          level: 1
+          level: 15
         }
       ]
     }
@@ -132,7 +132,7 @@ export const FACILITY_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "undergroundPlaza",
-      level: 4
+      level: 15
     }
   },
   {
@@ -146,7 +146,7 @@ export const FACILITY_DEFINITIONS = defineContent([
     unlockRequirement: {
       type: "facility.level",
       facilityId: "nameRecordWall",
-      level: 3
+      level: 15
     }
   },
   {
@@ -164,7 +164,7 @@ export const FACILITY_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "undergroundChapel",
-          level: 8
+          level: 18
         },
         {
           type: "song.purchased",
@@ -188,7 +188,7 @@ export const FACILITY_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "undergroundPassageRepair",
-          level: 5
+          level: 15
         },
         {
           type: "song.purchased",
@@ -216,7 +216,7 @@ export const FACILITY_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "restabilizationCore",
-          level: 3
+          level: 15
         }
       ]
     }
@@ -240,7 +240,7 @@ export const FACILITY_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "deepLayerObservatory",
-          level: 5
+          level: 15
         }
       ]
     }
@@ -264,7 +264,7 @@ export const FACILITY_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "engineeringArchive",
-          level: 5
+          level: 15
         }
       ]
     }
@@ -288,7 +288,7 @@ export const FACILITY_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "prayerEngineeringRuins",
-          level: 3
+          level: 15
         }
       ]
     }
@@ -311,7 +311,7 @@ export const FACILITY_DEFINITIONS = defineContent([
         {
           type: "facility.level",
           facilityId: "reobservationBase",
-          level: 3
+          level: 15
         }
       ]
     }
