@@ -65,20 +65,22 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `alleyStage` | 路地裏ステージ | 初期 | 10 | 1.15 | 0.1 |
 | `neonBoard` | ネオン掲示板 | 路地裏ステージ Lv10 | 80 | 1.18 | 0.35 |
 | `twilightPathGuide` | 薄明通り案内所 | ネオン掲示板 Lv15 | 3000 | 1.22 | 3 |
-| `temporaryBroadcastBooth` | 仮設配信ブース | 薄明通り案内所 Lv15 | 5000 | 1.22 | 4 |
-| `memoryLibrary` | 記憶図書館 | 仮設配信ブース Lv15 | 15000 | 1.25 | 8 |
-| `recordingStorage` | 録音保管庫 | 記憶図書館 Lv15 | 12000 | 1.23 | 6 |
-| `oldBroadcastRoom` | 古い放送室 | 録音保管庫 Lv15 | 26000 | 1.24 | 11 |
-| `undergroundPlaza` | 地下広場 | 記憶図書館 Lv18 / 古い放送室 Lv15 | 20000 | 1.25 | 10 |
-| `nameRecordWall` | 名前の記録壁 | 地下広場 Lv15 | 45000 | 1.26 | 14 |
-| `undergroundChapel` | 地下礼拝堂 | 名前の記録壁 Lv15 | 50000 | 1.26 | 16 |
-| `undergroundPassageRepair` | 地下通路修復区画 | 地下礼拝堂 Lv18 / 礼拝堂のハーモニー取得 | 60000 | 1.28 | 20 |
-| `restabilizationCore` | 再固定中枢 | 地下通路修復区画 Lv15 / 修復の仮歌取得 | 100000 | 1.30 | 25 |
-| `deepLayerObservatory` | 深層観測所 | 廻 1回以上 / 再固定中枢 Lv15 | 300000 | 1.30 | 60 |
-| `engineeringArchive` | 工学記録保管区 | 廻 1回以上 / 深層観測所 Lv15 | 800000 | 1.32 | 120 |
-| `prayerEngineeringRuins` | 祈念工学実験跡地 | 廻 1回以上 / 工学記録保管区 Lv15 | 1500000 | 1.35 | 200 |
-| `reobservationBase` | 再観測拠点 | 廻 2回以上 / 祈念工学実験跡地 Lv15 | 5000000 | 1.35 | 400 |
-| `unnamedTheater` | 名前のない劇場 | 廻 2回以上 / 再観測拠点 Lv15 | 10000000 | 1.40 | 600 |
+| `temporaryBroadcastBooth` | 仮設配信ブース | 薄明通り案内所 Lv15 | 55000 | 1.20 | 18 |
+| `memoryLibrary` | 記憶図書館 | 仮設配信ブース Lv15 | 120000 | 1.20 | 55 |
+| `recordingStorage` | 録音保管庫 | 記憶図書館 Lv15 | 450000 | 1.18 | 140 |
+| `oldBroadcastRoom` | 古い放送室 | 録音保管庫 Lv15 | 500000 | 1.18 | 170 |
+| `undergroundPlaza` | 地下広場 | 記憶図書館 Lv18 / 古い放送室 Lv15 | 900000 | 1.18 | 320 |
+| `nameRecordWall` | 名前の記録壁 | 地下広場 Lv15 | 1100000 | 1.17 | 380 |
+| `undergroundChapel` | 地下礼拝堂 | 名前の記録壁 Lv15 | 1800000 | 1.17 | 650 |
+| `undergroundPassageRepair` | 地下通路修復区画 | 地下礼拝堂 Lv18 / 礼拝堂のハーモニー取得 | 3500000 | 1.16 | 1200 |
+| `restabilizationCore` | 再固定中枢 | 地下通路修復区画 Lv15 / 修復の仮歌取得 | 4200000 | 1.16 | 1500 |
+| `deepLayerObservatory` | 深層観測所 | 廻 1回以上 / 再固定中枢 Lv15 | 8000000 | 1.16 | 4000 |
+| `engineeringArchive` | 工学記録保管区 | 廻 1回以上 / 深層観測所 Lv15 | 22000000 | 1.15 | 10000 |
+| `prayerEngineeringRuins` | 祈念工学実験跡地 | 廻 1回以上 / 工学記録保管区 Lv15 | 60000000 | 1.15 | 24000 |
+| `reobservationBase` | 再観測拠点 | 廻 2回以上 / 祈念工学実験跡地 Lv15 | 160000000 | 1.14 | 65000 |
+| `unnamedTheater` | 名前のない劇場 | 廻 2回以上 / 再観測拠点 Lv15 | 450000000 | 1.14 | 150000 |
+
+施設価格と基礎生産力は、施設順で単調に上がる。新規解放施設は、解放条件として直前に強化してきた施設より高価で高出力な次段階として扱い、ただし後半の累積コストが過度に暴走しないよう `costMultiplier` は段階的に抑える。
 
 地下礼拝堂は序盤施設ではなく、中盤以降の深層施設として扱う。
 地下通路修復区画は Chapter 5 末尾の深層接続施設として扱う。`再固定中枢` は廻本体の起点であり、施設として解放・強化できるようになると廻を実行できる。

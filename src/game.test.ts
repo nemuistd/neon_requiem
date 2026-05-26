@@ -55,6 +55,26 @@ import { FACILITIES, FACILITY_ORDER, FacilityId, IDOL_ORDER, IdolId, RECORD_CONT
 import { validateRequirement } from "./contentValidation";
 import { loadGame, SAVE_KEY } from "./storage";
 
+const EXPECTED_FACILITY_BALANCE_CURVE = {
+  alleyStage: { baseCost: 10, costMultiplier: 1.15, productionPerLevel: 0.1 },
+  neonBoard: { baseCost: 80, costMultiplier: 1.18, productionPerLevel: 0.35 },
+  twilightPathGuide: { baseCost: 3000, costMultiplier: 1.22, productionPerLevel: 3 },
+  temporaryBroadcastBooth: { baseCost: 55000, costMultiplier: 1.2, productionPerLevel: 18 },
+  memoryLibrary: { baseCost: 120000, costMultiplier: 1.2, productionPerLevel: 55 },
+  recordingStorage: { baseCost: 450000, costMultiplier: 1.18, productionPerLevel: 140 },
+  oldBroadcastRoom: { baseCost: 500000, costMultiplier: 1.18, productionPerLevel: 170 },
+  undergroundPlaza: { baseCost: 900000, costMultiplier: 1.18, productionPerLevel: 320 },
+  nameRecordWall: { baseCost: 1100000, costMultiplier: 1.17, productionPerLevel: 380 },
+  undergroundChapel: { baseCost: 1800000, costMultiplier: 1.17, productionPerLevel: 650 },
+  undergroundPassageRepair: { baseCost: 3500000, costMultiplier: 1.16, productionPerLevel: 1200 },
+  restabilizationCore: { baseCost: 4200000, costMultiplier: 1.16, productionPerLevel: 1500 },
+  deepLayerObservatory: { baseCost: 8000000, costMultiplier: 1.16, productionPerLevel: 4000 },
+  engineeringArchive: { baseCost: 22000000, costMultiplier: 1.15, productionPerLevel: 10000 },
+  prayerEngineeringRuins: { baseCost: 60000000, costMultiplier: 1.15, productionPerLevel: 24000 },
+  reobservationBase: { baseCost: 160000000, costMultiplier: 1.14, productionPerLevel: 65000 },
+  unnamedTheater: { baseCost: 450000000, costMultiplier: 1.14, productionPerLevel: 150000 }
+} satisfies Record<FacilityId, { baseCost: number; costMultiplier: number; productionPerLevel: number }>;
+
 describe("resource helpers", () => {
   it("adds, checks, and spends tomorusa without mutating the original state", () => {
     const initialState = createInitialState(1000);
@@ -460,7 +480,7 @@ describe("game state and effects", () => {
     expect(listenerResult.purchased).toBe(true);
     expect(songResult.purchased).toBe(true);
     expect(getManualTomorusaGain(songResult.state)).toBeCloseTo(14 + getTomorusaPerSecond(songResult.state) * 0.05);
-    expect(getFacilityTomorusaPerSecond(listenerResult.state, "temporaryBroadcastBooth")).toBeCloseTo(40 * 1.2 * 1.15 * 1.06);
+    expect(getFacilityTomorusaPerSecond(listenerResult.state, "temporaryBroadcastBooth")).toBeCloseTo(180 * 1.2 * 1.15 * 1.06);
   });
 
   it("unlocks the memory library, Meguri, and the first Ch.4 bond and song effects", () => {
@@ -500,7 +520,7 @@ describe("game state and effects", () => {
     expect(songResult.purchased).toBe(true);
     expect(getBondGainAmount(labelResult.state)).toBeCloseTo(1.25 * 1.1);
     expect(getIdolBond(liveState, "kaminoMeguri")).toBeCloseTo(1.25 * 1.1);
-    expect(getFacilityTomorusaPerSecond(songResult.state, "memoryLibrary")).toBeCloseTo(80 * 1.2 * 1.15 * 1.15);
+    expect(getFacilityTomorusaPerSecond(songResult.state, "memoryLibrary")).toBeCloseTo(550 * 1.2 * 1.15 * 1.15);
   });
 
   it("unlocks recording storage, the old broadcast room, and applies the broadcast equipment manual", () => {
@@ -521,8 +541,8 @@ describe("game state and effects", () => {
 
     expect(isFacilityUnlocked(libraryState, "recordingStorage")).toBe(true);
     expect(isFacilityUnlocked(libraryState, "oldBroadcastRoom")).toBe(true);
-    expect(getFacilityTomorusaPerSecond(libraryState, "recordingStorage")).toBeCloseTo(90 * 1.2 * 1.15);
-    expect(getFacilityTomorusaPerSecond(libraryState, "oldBroadcastRoom")).toBeCloseTo(55 * 1.2 * 1.15);
+    expect(getFacilityTomorusaPerSecond(libraryState, "recordingStorage")).toBeCloseTo(2100 * 1.2 * 1.15);
+    expect(getFacilityTomorusaPerSecond(libraryState, "oldBroadcastRoom")).toBeCloseTo(850 * 1.2 * 1.15);
     expect(getItemCost(libraryState, "broadcastEquipmentManual")).toBe(15000);
     expect(isRecordUnlocked(libraryState, "oldBroadcastRoomEquipmentCheck")).toBe(true);
 
@@ -563,7 +583,7 @@ describe("game state and effects", () => {
     expect(getSongCost(plazaState, "plazaAnthem")).toBe(30000);
     expect(isRecordUnlocked(plazaState, "undergroundPlazaFirstDay")).toBe(true);
     expect(isRecordUnlocked(plazaState, "koharuNameEffect")).toBe(true);
-    expect(getFacilityTomorusaPerSecond(plazaState, "undergroundPlaza")).toBeCloseTo(100 * 1.2 * 1.15 * 1.08);
+    expect(getFacilityTomorusaPerSecond(plazaState, "undergroundPlaza")).toBeCloseTo(3200 * 1.2 * 1.15 * 1.08);
 
     const songResult = purchaseSong(plazaState, "plazaAnthem");
 
@@ -593,7 +613,7 @@ describe("game state and effects", () => {
     expect(isRecordUnlocked(wallState, "nameRecordWallOpeningLog")).toBe(true);
     expect(isRecordUnlocked(wallState, "wallNameStabilityLog")).toBe(true);
     expect(isRecordUnlocked(wallState, "nameFixationObservation")).toBe(true);
-    expect(getFacilityTomorusaPerSecond(wallState, "nameRecordWall")).toBeCloseTo(112 * 1.2 * 1.15 * 1.08);
+    expect(getFacilityTomorusaPerSecond(wallState, "nameRecordWall")).toBeCloseTo(3040 * 1.2 * 1.15 * 1.08);
   });
 
   it("unlocks chapel records without entering the meguri system", () => {
@@ -692,7 +712,7 @@ describe("game state and effects", () => {
         undergroundPassageRepair: { level: 8 }
       }
     }, "deepDistrictBlueprintDiscrepancy")).toBe(false);
-    expect(getFacilityTomorusaPerSecond(itemResult.state, "undergroundPassageRepair")).toBeCloseTo(200 * 1.2 * 1.1 * 1.1 * 1.08);
+    expect(getFacilityTomorusaPerSecond(itemResult.state, "undergroundPassageRepair")).toBeCloseTo(12000 * 1.2 * 1.1 * 1.1 * 1.08);
     expect(getOfflineRewardMultiplier(songResult.state)).toBeCloseTo(1.15 * 1.1);
   });
 
@@ -812,7 +832,7 @@ describe("game state and effects", () => {
       }
     }, ["kasumiyamaMio"]);
 
-    expect(getFacilityTomorusaPerSecond(productionState, "deepLayerObservatory")).toBeCloseTo(300 * 1.2 * 1.35 * 1.05);
+    expect(getFacilityTomorusaPerSecond(productionState, "deepLayerObservatory")).toBeCloseTo(20000 * 1.2 * 1.35 * 1.05);
     expect(getFacilityTomorusaPerSecond(productionState, "alleyStage")).toBeCloseTo(1 * 1.2 * 1.05);
   });
 
@@ -840,7 +860,7 @@ describe("game state and effects", () => {
       }
     };
 
-    expect(getFacilityTomorusaPerSecond(purchasedDeepContentState, "deepLayerObservatory")).toBeCloseTo(600 * 1.2 * 1.12 * 1.25 * 1.05);
+    expect(getFacilityTomorusaPerSecond(purchasedDeepContentState, "deepLayerObservatory")).toBeCloseTo(40000 * 1.2 * 1.12 * 1.25 * 1.05);
     expect(getFacilityTomorusaPerSecond(purchasedDeepContentState, "alleyStage")).toBeCloseTo(1 * 1.2 * 1.05);
   });
 
@@ -1039,7 +1059,7 @@ describe("game state and effects", () => {
     }, ["shiragiriRin"]);
     const preview = getMeguriSettlementPreview(rinJoinedState);
 
-    expect(getFacilityTomorusaPerSecond(rinJoinedState, "reobservationBase")).toBeCloseTo(6000 * 1.2 * 1.1 * 1.15);
+    expect(getFacilityTomorusaPerSecond(rinJoinedState, "reobservationBase")).toBeCloseTo(975000 * 1.2 * 1.1 * 1.15);
     expect(preview.memoryFragmentMultiplier).toBeCloseTo(1.3);
     expect(preview.totalEligibleMemoryFragments).toBe(4);
   });
@@ -1124,7 +1144,7 @@ describe("game state and effects", () => {
     };
     const preview = getMeguriSettlementPreview(songPurchasedState);
 
-    expect(getFacilityTomorusaPerSecond(songPurchasedState, "unnamedTheater")).toBeCloseTo(6000 * 1.2 * 1.1 * 1.3);
+    expect(getFacilityTomorusaPerSecond(songPurchasedState, "unnamedTheater")).toBeCloseTo(1500000 * 1.2 * 1.1 * 1.3);
     expect(preview.memoryFragmentMultiplier).toBeCloseTo(1.2);
     expect(preview.totalEligibleMemoryFragments).toBe(3);
   });
@@ -1192,6 +1212,30 @@ describe("game state and effects", () => {
     expect(itemResult.cost).toBe(100);
     expect(itemResult.state.items.oldNeonTube.purchased).toBe(true);
     expect(getResourceAmount(itemResult.state, TOMORUSA_RESOURCE_ID)).toBe(0);
+  });
+
+  it("matches the planned facility price and production curve", () => {
+    FACILITY_ORDER.forEach((facilityId) => {
+      const facility = FACILITIES[facilityId];
+      const expected = EXPECTED_FACILITY_BALANCE_CURVE[facilityId];
+
+      expect(facility.baseCost, `${facilityId} baseCost`).toBe(expected.baseCost);
+      expect(facility.costMultiplier, `${facilityId} costMultiplier`).toBe(expected.costMultiplier);
+      expect(facility.productionPerLevel, `${facilityId} productionPerLevel`).toBe(expected.productionPerLevel);
+    });
+  });
+
+  it("keeps facility base costs and production increasing through the progression order", () => {
+    FACILITY_ORDER.slice(1).forEach((facilityId, index) => {
+      const previousFacilityId = FACILITY_ORDER[index];
+      const facility = FACILITIES[facilityId];
+      const previousFacility = FACILITIES[previousFacilityId];
+
+      expect(facility.baseCost, `${facilityId} baseCost`).toBeGreaterThan(previousFacility.baseCost);
+      expect(facility.productionPerLevel ?? 0, `${facilityId} productionPerLevel`).toBeGreaterThan(
+        previousFacility.productionPerLevel ?? 0
+      );
+    });
   });
 
   it("evaluates facility and record unlock progression", () => {
