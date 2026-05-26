@@ -470,10 +470,10 @@ describe("game state and effects", () => {
     expect(isIdolUnlocked(guideProgressState, "hibikiTooko")).toBe(true);
     expect(getSongCost(guideProgressState, "prebroadcastAcapella")).toBe(6000);
     expect(getItemCost(guideProgressState, "oldRadioTowerDebris")).toBe(3000);
-    expect(purchaseItem(listenerTooEarlyState, "handwrittenListenerLog").purchased).toBe(false);
+    expect(purchaseItem(listenerTooEarlyState, "regularBroadcastTimetable").purchased).toBe(false);
 
     const radioResult = purchaseItem(guideProgressState, "oldRadioTowerDebris");
-    const listenerResult = purchaseItem(radioResult.state, "handwrittenListenerLog");
+    const listenerResult = purchaseItem(radioResult.state, "regularBroadcastTimetable");
     const songResult = purchaseSong(listenerResult.state, "prebroadcastAcapella");
 
     expect(radioResult.purchased).toBe(true);
@@ -1835,6 +1835,26 @@ describe("save normalization", () => {
 
     expect(result.offlineTomorusa).toBeCloseTo(1.2 * 10 * 0.5 * 1.1);
     expect(getResourceAmount(result.state, TOMORUSA_RESOURCE_ID)).toBeCloseTo(50 + 1.2 * 10 * 0.5 * 1.1);
+  });
+
+  it("migrates the old listener log item purchase to the regular broadcast timetable", () => {
+    setupLocalStorage({
+      [SAVE_KEY]: JSON.stringify({
+        saveVersion: 12,
+        resources: { tomorusa: 0 },
+        activeIdolId: "otowaAkari",
+        items: {
+          handwrittenListenerLog: { purchased: true }
+        },
+        lastSavedAt: 1000
+      })
+    });
+
+    const result = loadGame(1000);
+
+    expect(result.state.saveVersion).toBe(SAVE_VERSION);
+    expect(result.state.items.regularBroadcastTimetable.purchased).toBe(true);
+    expect("handwrittenListenerLog" in result.state.items).toBe(false);
   });
 
   it("falls back to a new state for broken saves", () => {

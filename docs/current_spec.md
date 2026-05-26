@@ -177,7 +177,7 @@ GitHub Pages のデプロイ workflow では、`npm ci` の後に `npm run check
 | `shiftNoticeBoard` | 交代用連絡ボード | ネオン掲示板 Lv5 | 500 | オフライン灯るさ報酬 x1.10 |
 | `recordedGreeting` | 録音済みの短い挨拶 | ネオン掲示板 Lv8 | 600 | 施設の灯るさ生産 x1.03 |
 | `oldRadioTowerDebris` | 古い電波塔の残骸 | 仮設配信ブース Lv3 | 3000 | ライブ1回の灯るさ +5 |
-| `handwrittenListenerLog` | 手書きのリスナー名簿 | 響木 遠子 合流済み / 仮設配信ブース Lv10 | 4000 | 施設の灯るさ生産 x1.06 |
+| `regularBroadcastTimetable` | 定期配信の時刻表 | 響木 遠子 合流済み / 仮設配信ブース Lv10 | 4000 | 施設の灯るさ生産 x1.06 |
 | `fadedBookLabel` | 色あせた書名ラベル | 紙野 巡 合流済み / 記憶図書館 Lv8 | 10000 | 交流増加量 x1.10 |
 | `broadcastEquipmentManual` | 放送室の機材マニュアル | 録音保管庫 Lv5 | 15000 | オフライン灯るさ報酬 x1.10 |
 | `repairToolSet` | 修復用の工具一式 | 継ノ端 桜子 合流済み / 地下通路修復区画 Lv8 | 50000 | 施設の灯るさ生産 x1.08 |

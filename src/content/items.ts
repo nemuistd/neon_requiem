@@ -133,10 +133,10 @@ export const ITEM_DEFINITIONS = defineContent([
     }
   },
   {
-    id: "handwrittenListenerLog",
-    name: "手書きのリスナー名簿",
+    id: "regularBroadcastTimetable",
+    name: "定期配信の時刻表",
     description:
-      "配信を聞いていると思われる人の名前を書き留めたメモ。確認できていない名前がほとんどだが、書いた分だけ届いている可能性が残る。",
+      "配信の時間を、決めていくことにした。受信計の針が振れる時間帯がある。聞いている人がいるなら、そこに合わせようと遠子は言う。時刻表の端には、針が振れた日に小さな印が増えていく。",
     cost: 4000,
     effectDescription: "施設の灯るさ生産 x1.06",
     effects: [

@@ -137,6 +137,7 @@ function parseSave(rawSave: string, now: number): GameState | null {
       saveVersion === 9 ||
       saveVersion === 10 ||
       saveVersion === 11 ||
+      saveVersion === 12 ||
       saveVersion === SAVE_VERSION ||
       saveVersion === null
     ) {
@@ -444,7 +445,12 @@ function getSavedItemPurchased(items: unknown, itemId: ItemId): boolean {
     return false;
   }
 
-  const item = (items as Partial<Record<ItemId, { purchased?: unknown }>>)[itemId];
+  const savedItems = items as Partial<Record<ItemId | "handwrittenListenerLog", { purchased?: unknown }>>;
+  const item = savedItems[itemId];
+
+  if (itemId === "regularBroadcastTimetable") {
+    return item?.purchased === true || savedItems.handwrittenListenerLog?.purchased === true;
+  }
 
   return item?.purchased === true;
 }

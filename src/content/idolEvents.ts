@@ -8,7 +8,7 @@ export const IDOL_EVENT_DEFINITIONS = defineContent([
     title: "灯里・客席の灯",
     revealLevel: "surface",
     body:
-      "ライブの後、灯里は最前列の壊れた椅子を一脚だけ直していた。「誰かがまた座る場所、先に作っておきたいんです」",
+      "ライブの後、灯里は客席の壊れた椅子を直していた。「誰かがまた座る場所、先に作っておきたいんです」",
     unlockRequirement: {
       type: "idol.bond",
       idolId: "otowaAkari",

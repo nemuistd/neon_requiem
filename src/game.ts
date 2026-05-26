@@ -37,7 +37,7 @@ import {
 } from "./engine/effects";
 import { areRequirementsMet, isRequirementMet } from "./engine/requirements";
 
-export const SAVE_VERSION = 12;
+export const SAVE_VERSION = 13;
 export const INITIAL_ACTIVE_IDOL_ID: IdolId = "otowaAkari";
 export const MAX_OFFLINE_SECONDS = 12 * 60 * 60;
 export const BASE_OFFLINE_REWARD_RATE = 0.5;

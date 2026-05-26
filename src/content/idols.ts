@@ -8,7 +8,7 @@ export const IDOL_DEFINITIONS = defineContent([
     reading: "おとは あかり",
     title: "路地裏の歌姫",
     description:
-      "灯里は、寂れた路地裏でもなお歌い続けていた。澄んだ声が響くたび、ひび割れた街路に小さな灯りが戻っていく。",
+      "誰もいない路地裏で、灯里は一人で歌い続けていた。客がいなくても、曲が終わると次を始める。それが自然なことであるかのように。彼女の声が届く場所では、路地裏の空気が少し明るくなる気がする。",
     imageUrl: new URL("../../assets/idol/ComfyUI_00021_.png", import.meta.url).href,
     imagePosition: "center top",
     passiveDescription: "全灯るさ生産 +20%",
@@ -19,13 +19,14 @@ export const IDOL_DEFINITIONS = defineContent([
       }
     ]
   },
+  //こっちのフレーバーテキストも好きなので一旦アーカイブとして残しておく。「結のよく通る歌声は、霞の濃い通路で迷う人々の道標であった。彼女の笑顔は、足元の頼りない道を踏みしめる勇気をくれるのだ。」
   {
     id: "asagiriYui",
     name: "朝霧 結",
     reading: "あさぎり ゆい",
     title: "薄明通りの案内係",
     description:
-      "結のよく通る歌声は、霞の濃い通路で迷う人々の道標であった。彼女の笑顔は、足元の頼りない道を踏みしめる勇気をくれるのだ。",
+      "霞の濃い通路でも、地図のない抜け道でも、結はほとんど迷わない。「前に誰かに教えてもらった気がする」と言う。でも誰に教わったのかは、自分でも分からないらしい。",
     imageUrl: new URL("../../assets/idol/ComfyUI_00027_.png", import.meta.url).href,
     imagePosition: "center top",
     passiveDescription: "全灯るさ生産 +15%",
@@ -47,7 +48,7 @@ export const IDOL_DEFINITIONS = defineContent([
     reading: "ひびき とおこ",
     title: "仮設配信ブースの届け手",
     description:
-      "どこまで届いているかを確認する方法はない。それでも遠子は今日も配信を続ける。曰く、続けていることこそが大事なのだという。",
+      "配信の届く先を確認する方法は、長い間なかった。施設に受信計が加わってから、針が振れた日と振れなかった日の区別がつくようになった。誰が聞いているかは分からないし、遠子は確かめずともよいという。",
     imageUrl: new URL("../../assets/idol/hibiki-tooko.png", import.meta.url).href,
     imagePosition: "center top",
     passiveDescription: "ライブ1回の灯るさ獲得に、秒間施設清算の 5% を加算",
@@ -69,7 +70,7 @@ export const IDOL_DEFINITIONS = defineContent([
     reading: "かみの めぐり",
     title: "記憶図書館の整理係",
     description:
-      "著者が不明の文書が多すぎますね。巡はそう呟きながら、それらをひとつずつ棚に戻す。名前の管理こそが彼女の仕事である。ある種の書物を前にして、特別長く行き先に悩んでいる時があるようだ。",
+      "「著者が不明の文書が多すぎますね」と言いながら、巡はそれらをひとつずつ棚に戻す。名前のないものを正しく分類する方法を、彼女はまだ決めていない。一冊だけ、分類の手が長く止まった場所がある。",
     imageUrl: new URL("../../assets/idol/kamino-meguri.png", import.meta.url).href,
     imagePosition: "center top",
     passiveDescription: "全アイドルの交流増加量 x1.25",
@@ -91,7 +92,8 @@ export const IDOL_DEFINITIONS = defineContent([
     reading: "ひなた こはる",
     title: "地下広場の呼び込み",
     description:
-      "朗らかによく笑い、出会った一人一人をよく記憶している。再会の度にファンを名前で呼んでいるのがその証拠だ。私には必要なことなの、と小春は言う。その言い方の中に、もっと理由があるようにも聞こえてしまう。",
+      //"朗らかによく笑い、出会った一人一人をよく記憶している。再会の度にファンを名前で呼んでいるのがその証拠だ。私には必要なことなの、と小春は言う。その言い方の中に、もっと理由があるようにも聞こえてしまう。"
+      "名前を呼ぶのは礼儀だと言って、再会するたびにファンの名前を呼ぶ。彼女が名前を呼ぶと相手の輪郭が鮮明になる気がする、と言う人がいる。本人はそれを気にしていないらしいが、そう言われると決まって話題が変わる。",
     imageUrl: new URL("../../assets/idol/hinata-koharu.png", import.meta.url).href,
     imagePosition: "center top",
     passiveDescription: "全灯るさ生産 x1.08 / アイテム購入コスト x0.90",
@@ -117,7 +119,7 @@ export const IDOL_DEFINITIONS = defineContent([
     reading: "みづき しの",
     title: "地下礼拝堂の保管係",
     description:
-      "詩乃は、閉ざされた地下礼拝堂で失われた響きを守っていた。その落ち着いた歌声は、まだ見ぬ区画に残された記録と歌の断片を呼び寄せているかのようだ。",
+      "地下礼拝堂で、詩乃は声の届く場所を守っている。出所の分からない記録も捨てない。いつか誰かが意味を分かるかもしれないから、と言う。礼拝堂の記録には、後から削られた形跡のある箇所がある。",
     imageUrl: new URL("../../assets/idol/ComfyUI_00022_.png", import.meta.url).href,
     imagePosition: "center top",
     passiveDescription: "全灯るさ生産 +10%",
@@ -139,7 +141,7 @@ export const IDOL_DEFINITIONS = defineContent([
     reading: "つぎのはた さくらこ",
     title: "地下通路の修復士",
     description:
-      "壊れた訳でもないのに、使われなくなるものがある。桜子はそう言って、修理という言い方を避けている。何を復元しているのかを正確に知っているような手つきで、道も建物も道具もいつの間にか使えるようになっている。",
+      "壊れた訳でもないのに、使われなくなるものがある。桜子はそう言って、修理という言い方を避けている。手を触れれば、物が傷んでいるのか、それとも別の理由で用途を失っているのかは分かる、と言う。",
     imageUrl: new URL("../../assets/idol/tsuginohata-sakurako.png", import.meta.url).href,
     imagePosition: "center top",
     passiveDescription: "オフライン灯るさ報酬 x1.15",
@@ -161,7 +163,7 @@ export const IDOL_DEFINITIONS = defineContent([
     reading: "かすみやま みお",
     title: "深層観測所の番人",
     description:
-      "深層の観測所で、我々が辿り着くよりずっと前から過ごしていたようだ。霞の変化を淡々とした観測記録として残す習慣を続けている。彼女だけは、霞への不明な畏れとは無縁であるように見える。",
+      "深層観測所に、誰かが辿り着くより先からいたようだ。霞の変化を記録する時、感情的な言葉を使わない。霞が増えた場所は廃れると人々は言うが、澪の記録にはその逆の順番で書かれている。",
     imageUrl: new URL("../../assets/idol/kasumiyama-mio.png", import.meta.url).href,
     imagePosition: "center top",
     passiveDescription: "deep施設の灯るさ生産 x1.35",
@@ -193,7 +195,7 @@ export const IDOL_DEFINITIONS = defineContent([
     reading: "ななしろ さつき",
     title: "工学記録の解読者",
     description:
-      "祈念工学の文書を読める数少ない一人。当人は、読めることと理解できることは別だと言い続けている。危険な知識を怖がるより、分からないままでも丁寧に扱うことを選んでいる。",
+      "祈念工学の文書を読める、数少ない人間のひとりだ。読めることと理解できることは別だと言い続けている。ある時から、彼女が訳した断片と夢の中の言葉が一致することがある——どちらが先にあったのかは、まだ分からない。",
     imageUrl: new URL("../../assets/idol/nanashiro-satsuki.png", import.meta.url).href,
     imagePosition: "center top",
     passiveDescription: "歌・アイテム取得コスト x0.85",
@@ -228,7 +230,7 @@ export const IDOL_DEFINITIONS = defineContent([
     reading: "しらぎり りん",
     title: "灯し直しの残響",
     description:
-      "「また来たね」とはっきりと挨拶をくれたのは燐が初めてである。しかし覚えているという訳ではないらしい。何を感じ取っているのだろうか。",
+      "二度、あるいはそれ以上の廻を経て、初めて彼女の元に辿りついた。「また来たね」が彼女の挨拶だ。覚えているわけではなくとも、分かるのだと言う。廻と廻のあいだで何かが引き継がれているという、その感覚だけが彼女には確かにある。",
     imageUrl: new URL("../../assets/idol/shiragiri-rin.png", import.meta.url).href,
     imagePosition: "center top",
     passiveDescription: "廻後の施設生産倍率 x1.15 / 記憶断片の獲得見込み +30%",
