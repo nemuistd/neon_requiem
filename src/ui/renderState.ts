@@ -12,9 +12,11 @@ import { renderRecordCards } from "./renderRecords";
 import { renderSongCards } from "./renderSongs";
 import { renderTabs } from "./renderTabs";
 import type { ActiveTabId, UiElements } from "./types";
+import type { IdolId } from "../definitions";
 
 export type UiRenderOptions = {
   isIdolDetailOpen?: boolean;
+  idolTabDetailId?: IdolId | null;
 };
 
 export function renderState(elements: UiElements, state: GameState, activeTabId: ActiveTabId, options: UiRenderOptions = {}): void {
@@ -26,7 +28,7 @@ export function renderState(elements: UiElements, state: GameState, activeTabId:
   renderLiveValues(elements, state);
   elements.idolList.innerHTML = renderIdolCards(state, resolvedActiveIdolId, options.isIdolDetailOpen ?? false);
   elements.contentList.className = getContentListClassName(effectiveActiveTabId);
-  elements.contentList.innerHTML = renderActiveTabContent(state, effectiveActiveTabId);
+  elements.contentList.innerHTML = renderActiveTabContent(state, effectiveActiveTabId, options.idolTabDetailId ?? null);
 }
 
 export function setMessage(elements: UiElements, message: string): void {
@@ -59,7 +61,7 @@ export function getContentListClassName(activeTabId: ActiveTabId): string {
   return "facility-grid";
 }
 
-export function renderActiveTabContent(state: GameState, activeTabId: ActiveTabId): string {
+export function renderActiveTabContent(state: GameState, activeTabId: ActiveTabId, idolTabDetailId: IdolId | null = null): string {
   if (activeTabId === "song") {
     return renderSongCards(state);
   }
@@ -69,7 +71,7 @@ export function renderActiveTabContent(state: GameState, activeTabId: ActiveTabI
   }
 
   if (activeTabId === "idol") {
-    return renderIdolTabCards(state);
+    return renderIdolTabCards(state, idolTabDetailId);
   }
 
   if (activeTabId === "record") {

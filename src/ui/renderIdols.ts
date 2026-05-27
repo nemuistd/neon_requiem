@@ -57,7 +57,7 @@ export function renderIdolCards(state: GameState, activeIdolId: IdolId, isDetail
           <dl class="idol-details">
             <div>
               <dt>${UI_TEXT.bondLabel}</dt>
-              <dd>${formatBond(getIdolBond(state, activeIdolId))}</dd>
+              <dd>${renderBondProgress(state, activeIdolId)}</dd>
             </div>
             <div>
               <dt>${UI_TEXT.passiveEffectLabel}</dt>
@@ -77,7 +77,7 @@ export function renderIdolCards(state: GameState, activeIdolId: IdolId, isDetail
         </div>
       </div>
 
-      ${isDetailOpen ? renderActiveIdolDetailPanel(state, activeIdolId) : ""}
+      ${isDetailOpen ? renderIdolDetailPanel(state, activeIdolId, "idol-detail-panel") : ""}
 
       <section class="idol-roster" aria-label="${UI_TEXT.idolRosterLabel}">
         <span class="card-kicker">${UI_TEXT.idolRosterLabel}</span>
@@ -89,13 +89,14 @@ export function renderIdolCards(state: GameState, activeIdolId: IdolId, isDetail
   `;
 }
 
-function renderActiveIdolDetailPanel(state: GameState, idolId: IdolId): string {
+function renderIdolDetailPanel(state: GameState, idolId: IdolId, panelId: string, extraClassName = ""): string {
   const idol = IDOLS[idolId];
   const eventIds = getUnlockedIdolEventIds(state, idolId);
   const recordIds = getUnlockedIdolRecordIds(state, idolId);
+  const className = extraClassName ? `idol-detail-panel ${extraClassName}` : "idol-detail-panel";
 
   return `
-      <section class="idol-detail-panel" id="idol-detail-panel" aria-label="${idol.name} ${UI_TEXT.idolDetailPanelLabel}">
+      <section class="${className}" id="${panelId}" aria-label="${idol.name} ${UI_TEXT.idolDetailPanelLabel}">
         <div class="idol-detail-panel-heading">
           <span class="card-kicker">${UI_TEXT.idolDetailPanelLabel}</span>
           <h3>${idol.name}</h3>
@@ -124,10 +125,10 @@ function renderActiveIdolDetailPanel(state: GameState, idolId: IdolId): string {
   `;
 }
 
-export function renderIdolTabCards(state: GameState): string {
+export function renderIdolTabCards(state: GameState, expandedDetailId: IdolId | null = null): string {
   const idolCards = IDOL_ORDER
     .filter((idolId) => isRelatedProgressVisible(state, IDOLS[idolId].unlockRequirement))
-    .map((idolId) => renderIdolTabCard(state, idolId))
+    .map((idolId) => renderIdolTabCard(state, idolId, expandedDetailId))
     .join("");
 
   return `${idolCards}${renderProgressStatusCard(getIdolProgressStatus(state))}`;
@@ -157,13 +158,15 @@ function renderIdolSwitcher(state: GameState, activeIdolId: IdolId): string {
   }).join("");
 }
 
-function renderIdolTabCard(state: GameState, idolId: IdolId): string {
+function renderIdolTabCard(state: GameState, idolId: IdolId, expandedDetailId: IdolId | null): string {
   const idol = IDOLS[idolId];
   const isUnlocked = isIdolUnlocked(state, idolId);
   const isJoined = isIdolJoined(state, idolId);
   const isJoinable = isIdolJoinable(state, idolId);
   const activeIdolId = resolveActiveIdolId(state);
   const isActive = activeIdolId === idolId;
+  const isDetailExpanded = expandedDetailId === idolId;
+  const detailPanelId = `idol-tab-detail-panel-${idolId}`;
   const stateLabel = isActive
     ? UI_TEXT.focusedIdolLabel
     : isJoined
@@ -231,7 +234,7 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
               ? `
             <div>
               <dt>${UI_TEXT.bondLabel}</dt>
-              <dd>${formatBond(getIdolBond(state, idolId))}</dd>
+              <dd>${renderBondProgress(state, idolId)}</dd>
             </div>`
               : ""}
             <div>
@@ -243,33 +246,50 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
               <dd>${getIdolUnlockRequirementText(idolId)}</dd>
             </div>
           </dl>
-          ${isJoined ? renderIdolEventList(state, idolId) : ""}
-          <button
-            class="secondary-action idol-tab-action ${isActive ? "active" : isJoined ? "unlocked" : isJoinable ? "joinable" : "locked"}"
-            type="button"
-            ${isJoinable ? `data-idol-join-id="${idolId}"` : `data-idol-id="${idolId}"`}
-            ${(isJoinable || (isJoined && !isActive)) ? "" : "disabled"}
-          >
-            ${isActive ? UI_TEXT.focusedIdolLabel : isJoinable ? UI_TEXT.joinIdolButtonLabel : isJoined ? UI_TEXT.focusIdolButtonLabel : UI_TEXT.lockedIdolLabel}
-          </button>
+          ${isJoined
+            ? renderJoinedIdolTabActions(idolId, isActive, isDetailExpanded, detailPanelId)
+            : renderSingleIdolTabAction(idolId, isJoinable)}
         </div>
       </div>
+      ${isJoined && isDetailExpanded ? renderIdolDetailPanel(state, idolId, detailPanelId, "idol-tab-detail-panel") : ""}
     </article>
   `;
 }
 
-function renderIdolEventList(state: GameState, idolId: IdolId): string {
-  const eventIds = getUnlockedIdolEventIds(state, idolId);
-
-  if (eventIds.length === 0) {
-    return "";
-  }
-
+function renderJoinedIdolTabActions(idolId: IdolId, isActive: boolean, isDetailExpanded: boolean, detailPanelId: string): string {
   return `
-          <section class="idol-event-list" aria-label="${UI_TEXT.idolEventsLabel}">
-            <span class="card-kicker">${UI_TEXT.idolEventsLabel}</span>
-            ${eventIds.map((eventId) => renderIdolEventCard(state, eventId)).join("")}
-          </section>
+          <div class="idol-tab-action-row">
+            <button
+              class="secondary-action idol-tab-action ${isActive ? "active" : "unlocked"}"
+              type="button"
+              data-idol-id="${idolId}"
+              ${isActive ? "disabled" : ""}
+            >
+              ${isActive ? UI_TEXT.focusedIdolLabel : UI_TEXT.focusIdolButtonLabel}
+            </button>
+            <button
+              class="secondary-action idol-tab-action detail ${isDetailExpanded ? "active" : "unlocked"}"
+              type="button"
+              data-idol-tab-detail-id="${idolId}"
+              aria-expanded="${isDetailExpanded ? "true" : "false"}"
+              aria-controls="${detailPanelId}"
+            >
+              ${isDetailExpanded ? UI_TEXT.closeDetailButtonLabel : UI_TEXT.detailButtonLabel}
+            </button>
+          </div>
+  `;
+}
+
+function renderSingleIdolTabAction(idolId: IdolId, isJoinable: boolean): string {
+  return `
+          <button
+            class="secondary-action idol-tab-action ${isJoinable ? "joinable" : "locked"}"
+            type="button"
+            ${isJoinable ? `data-idol-join-id="${idolId}"` : `data-idol-id="${idolId}"`}
+            ${isJoinable ? "" : "disabled"}
+          >
+            ${isJoinable ? UI_TEXT.joinIdolButtonLabel : UI_TEXT.lockedIdolLabel}
+          </button>
   `;
 }
 
@@ -374,6 +394,77 @@ function hasIdolBondRequirement(requirement: Requirement, idolId: IdolId): boole
   }
 
   return false;
+}
+
+function renderBondProgress(state: GameState, idolId: IdolId): string {
+  const current = getIdolBond(state, idolId);
+  const goal = getNextVisibleBondGoal(state, idolId, current);
+  const ratio = goal <= 0 ? 1 : Math.min(current / goal, 1);
+  const percent = Math.max(0, Math.min(100, ratio * 100));
+
+  return `
+                <div class="idol-bond-progress" data-idol-bond-progress="${idolId}" data-bond-current="${formatBond(current)}" data-bond-goal="${formatBond(goal)}">
+                  <div class="idol-bond-progress-label">
+                    <span>${formatBond(current)} / ${formatBond(goal)}</span>
+                  </div>
+                  <div class="idol-bond-progress-track" aria-hidden="true">
+                    <span style="width: ${percent.toFixed(1)}%;"></span>
+                  </div>
+                </div>
+  `;
+}
+
+function getNextVisibleBondGoal(state: GameState, idolId: IdolId, current: number): number {
+  const goals = getVisibleBondGoals(state, idolId);
+  const nextGoal = goals.find((goal) => goal > current);
+  const highestGoal = goals[goals.length - 1] ?? 1;
+
+  return nextGoal ?? Math.max(current, highestGoal);
+}
+
+function getVisibleBondGoals(state: GameState, idolId: IdolId): number[] {
+  const goals = [
+    ...IDOL_EVENT_ORDER.flatMap((eventId) => {
+      const event = IDOL_EVENTS[eventId];
+
+      if (event.idolId !== idolId || !isRelatedProgressVisible(state, event.unlockRequirement)) {
+        return [];
+      }
+
+      return getIdolBondAmounts(event.unlockRequirement, idolId);
+    }),
+    ...RECORD_ORDER.flatMap((recordId) => {
+      const record = RECORDS[recordId];
+      const isBondRelated = record.unlockRequirements.some((requirement) => hasIdolBondRequirement(requirement, idolId));
+      const isVisible = record.unlockRequirements.every((requirement) => isRelatedProgressVisible(state, requirement));
+
+      if (!isBondRelated || !isVisible) {
+        return [];
+      }
+
+      return record.unlockRequirements.flatMap((requirement) => getIdolBondAmounts(requirement, idolId));
+    })
+  ];
+
+  return Array.from(new Set(goals))
+    .filter((goal) => goal > 0)
+    .sort((left, right) => left - right);
+}
+
+function getIdolBondAmounts(requirement: Requirement, idolId: IdolId): number[] {
+  if (requirement.type === "idol.bond") {
+    return requirement.idolId === idolId ? [requirement.amount] : [];
+  }
+
+  if (requirement.type === "all" || requirement.type === "any") {
+    return requirement.requirements.flatMap((childRequirement) => getIdolBondAmounts(childRequirement, idolId));
+  }
+
+  if (requirement.type === "not") {
+    return getIdolBondAmounts(requirement.requirement, idolId);
+  }
+
+  return [];
 }
 
 function renderRecognitionTrace(state: GameState, idolId: IdolId): string {

@@ -3,6 +3,7 @@ import {
   FACILITY_ORDER,
   IDOL_ORDER
 } from "./definitions";
+import { UI_TEXT } from "./data";
 import { createInitialState } from "./game";
 import { renderFacilityCards } from "./ui/renderFacilities";
 import { renderIdolCards, renderIdolTabCards } from "./ui/renderIdols";
@@ -265,9 +266,96 @@ describe("locked content visibility", () => {
       }
     };
 
-    expect(renderIdolTabCards(baseState)).not.toContain("灯里・客席の灯");
-    expect(renderIdolTabCards(eventReadyState)).toContain("灯里・客席の灯");
-    expect(renderIdolTabCards(eventReadyState)).toContain("data-idol-event-id=\"otowaAkari.firstSeat\"");
+    expect(renderIdolTabCards(baseState, "otowaAkari")).not.toContain("灯里・客席の灯");
+    expect(renderIdolTabCards(eventReadyState, "otowaAkari")).toContain("灯里・客席の灯");
+    expect(renderIdolTabCards(eventReadyState, "otowaAkari")).toContain("data-idol-event-id=\"otowaAkari.firstSeat\"");
+  });
+
+  it("renders idol bond as progress toward the next visible bond unlock", () => {
+    const html = renderIdolTabCards(createInitialState());
+
+    expect(html).toContain("data-idol-bond-progress=\"otowaAkari\"");
+    expect(html).toContain("data-bond-current=\"0\"");
+    expect(html).toContain("data-bond-goal=\"5\"");
+    expect(html).toContain("0 / 5");
+  });
+
+  it("keeps later gated bond goals hidden until their prerequisites are visible", () => {
+    const baseState = createInitialState();
+    const routeHiddenHtml = renderIdolTabCards(baseState);
+    const mioVisibleState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        restabilizationCore: { level: 15 },
+        deepLayerObservatory: { level: 8 }
+      },
+      idols: {
+        ...baseState.idols,
+        kasumiyamaMio: {
+          ...baseState.idols.kasumiyamaMio,
+          joined: true,
+          bond: 5
+        }
+      },
+      meguri: {
+        ...baseState.meguri,
+        count: 1
+      }
+    };
+
+    expect(routeHiddenHtml).not.toContain("data-idol-bond-progress=\"kasumiyamaMio\"");
+    expect(routeHiddenHtml).not.toContain("data-bond-goal=\"20\"");
+    expect(renderIdolTabCards(mioVisibleState)).toContain("data-idol-bond-progress=\"kasumiyamaMio\"");
+    expect(renderIdolTabCards(mioVisibleState)).toContain("data-bond-goal=\"20\"");
+    expect(renderIdolTabCards(mioVisibleState)).toContain("5 / 20");
+  });
+
+  it("splits joined idol tab actions into focus and detail controls", () => {
+    const html = renderIdolTabCards(createInitialState());
+
+    expect(html).toContain("class=\"idol-tab-action-row\"");
+    expect(html).toContain("data-idol-id=\"otowaAkari\"");
+    expect(html).toContain("data-idol-tab-detail-id=\"otowaAkari\"");
+    expect(html).toContain(UI_TEXT.focusedIdolLabel);
+    expect(html).toContain(UI_TEXT.detailButtonLabel);
+  });
+
+  it("keeps joinable idol tab cards on the single join action", () => {
+    const baseState = createInitialState();
+    const yuiReadyState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        alleyStage: { level: 10 },
+        neonBoard: { level: 5 }
+      }
+    };
+    const yuiButtonHtml = getButtonHtml(renderIdolTabCards(yuiReadyState), "asagiriYui");
+
+    expect(yuiButtonHtml).toContain("data-idol-join-id=\"asagiriYui\"");
+    expect(yuiButtonHtml).not.toContain("data-idol-tab-detail-id=\"asagiriYui\"");
+  });
+
+  it("opens idol-tab detail with bond-unlocked records without changing focus", () => {
+    const baseState = createInitialState();
+    const detailReadyState = {
+      ...baseState,
+      idols: {
+        ...baseState.idols,
+        otowaAkari: {
+          ...baseState.idols.otowaAkari,
+          bond: 5
+        }
+      }
+    };
+    const closedHtml = renderIdolTabCards(detailReadyState);
+    const openHtml = renderIdolTabCards(detailReadyState, "otowaAkari");
+
+    expect(closedHtml).not.toContain("id=\"idol-tab-detail-panel-otowaAkari\"");
+    expect(openHtml).toContain("id=\"idol-tab-detail-panel-otowaAkari\"");
+    expect(openHtml).toContain("data-idol-event-id=\"otowaAkari.firstSeat\"");
+    expect(openHtml).toContain("data-record-id=\"idolBondAkariFirstVoice\"");
   });
 
   it("shows twilight memory events only after meguri recognition and renewed bond", () => {
@@ -296,10 +384,10 @@ describe("locked content visibility", () => {
         }
       }
     };
-    const tabHtml = renderIdolTabCards(twilightReadyState);
+    const tabHtml = renderIdolTabCards(twilightReadyState, "otowaAkari");
     const detailHtml = renderIdolCards(twilightReadyState, "otowaAkari", true);
 
-    expect(renderIdolTabCards(renewedBondState)).not.toContain("灯里・一拍遅い返事");
+    expect(renderIdolTabCards(renewedBondState, "otowaAkari")).not.toContain("灯里・一拍遅い返事");
     expect(tabHtml).toContain("灯里・一拍遅い返事");
     expect(tabHtml).toContain("薄明の記憶");
     expect(detailHtml).toContain("data-idol-event-id=\"otowaAkari.twilightFirstPause\"");

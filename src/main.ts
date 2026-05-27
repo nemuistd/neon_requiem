@@ -1,9 +1,10 @@
 import "./style.css";
 import { createFacilityUpgradeMessage, createIdolEventReadMessage, createIdolJoinMessage, createItemPurchaseMessage, createMeguriBuffPurchaseMessage, createMeguriPerformedMessage, createOfflineRewardMessage, createSongPurchaseMessage, UI_TEXT } from "./data";
 import { FACILITIES, IDOL_EVENTS, IDOLS, ITEMS, MEGURI_BUFFS, SONGS } from "./definitions";
+import type { IdolId } from "./definitions";
 import { applyProduction, closeMeguriSettlement, GameState, isMeguriTabUnlocked, joinIdol, markRecordTabSeen, performManualLive, performMeguri, purchaseItem, purchaseMeguriBuff, purchaseSong, readIdolEvent, readRecord, resolveActiveIdolId, SAVE_VERSION, selectActiveIdol, upgradeFacility } from "./game";
 import { loadGame, saveGame, SAVE_KEY } from "./storage";
-import { getFacilityIdFromEvent, getIdolDetailActionFromEvent, getIdolEventIdFromEvent, getIdolIdFromEvent, getIdolJoinIdFromEvent, getItemIdFromEvent, getMeguriActionFromEvent, getMeguriBuffIdFromEvent, getRecordIdFromEvent, getSongIdFromEvent, getTabIdFromEvent, isIdolJoinFromSwitcher } from "./ui/events";
+import { getFacilityIdFromEvent, getIdolDetailActionFromEvent, getIdolEventIdFromEvent, getIdolIdFromEvent, getIdolJoinIdFromEvent, getIdolTabDetailIdFromEvent, getItemIdFromEvent, getMeguriActionFromEvent, getMeguriBuffIdFromEvent, getRecordIdFromEvent, getSongIdFromEvent, getTabIdFromEvent, isIdolJoinFromSwitcher } from "./ui/events";
 import { formatAmount, formatWholeAmount } from "./ui/format";
 import { renderLiveValues } from "./ui/liveValues";
 import { renderState, setMessage } from "./ui/renderState";
@@ -36,6 +37,7 @@ let activeTabId: ActiveTabId = state.meguri.pendingSettlement ? "meguri" : "rest
 let isSettingsOpen = false;
 let isDebugReloading = false;
 let isIdolDetailOpen = false;
+let idolTabDetailId: IdolId | null = null;
 
 function advanceToNow(): void {
   const now = Date.now();
@@ -46,7 +48,19 @@ function advanceToNow(): void {
 }
 
 function renderGameState(): void {
-  renderState(elements, state, activeTabId, { isIdolDetailOpen });
+  renderState(elements, state, activeTabId, { isIdolDetailOpen, idolTabDetailId });
+}
+
+function triggerLiveButtonRipple(): void {
+  elements.liveButton.classList.remove("primary-action-ripple");
+  void elements.liveButton.offsetWidth;
+  elements.liveButton.classList.add("primary-action-ripple");
+}
+
+function triggerTomorusaAmountBounce(): void {
+  elements.lightsAmount.classList.remove("resource-value-pop");
+  void elements.lightsAmount.offsetWidth;
+  elements.lightsAmount.classList.add("resource-value-pop");
 }
 
 function reloadWithSaveSuppressed(): void {
@@ -119,6 +133,8 @@ elements.settingsResetButton.addEventListener("click", () => {
 });
 
 elements.liveButton.addEventListener("click", () => {
+  triggerLiveButtonRipple();
+
   if (state.meguri.pendingSettlement) {
     activeTabId = "meguri";
     renderGameState();
@@ -130,6 +146,7 @@ elements.liveButton.addEventListener("click", () => {
   state = performManualLive(state);
   state = saveGame(state);
   renderGameState();
+  triggerTomorusaAmountBounce();
   setMessage(elements, UI_TEXT.liveSuccessLog);
 });
 
@@ -155,6 +172,10 @@ elements.root.addEventListener("click", (event) => {
     }
 
     activeTabId = tabId;
+
+    if (tabId !== "idol") {
+      idolTabDetailId = null;
+    }
 
     if (tabId === "record") {
       advanceToNow();
@@ -246,6 +267,14 @@ elements.root.addEventListener("click", (event) => {
     return;
   }
 
+  const selectedIdolTabDetailId = getIdolTabDetailIdFromEvent(event);
+
+  if (selectedIdolTabDetailId) {
+    idolTabDetailId = idolTabDetailId === selectedIdolTabDetailId ? null : selectedIdolTabDetailId;
+    renderGameState();
+    return;
+  }
+
   const idolJoinId = getIdolJoinIdFromEvent(event);
 
   if (idolJoinId) {
@@ -261,6 +290,7 @@ elements.root.addEventListener("click", (event) => {
     if (!isIdolJoinFromSwitcher(event)) {
       activeTabId = "idol";
     }
+    idolTabDetailId = null;
     renderGameState();
     setMessage(elements, createIdolJoinMessage(IDOLS[result.idolId].name, IDOLS[result.idolId].passiveDescription));
     return;
@@ -392,8 +422,23 @@ window.addEventListener("keydown", (event) => {
     return;
   }
 
-  if (event.key === "Escape" && isIdolDetailOpen) {
+  if (event.key !== "Escape") {
+    return;
+  }
+
+  let shouldRender = false;
+
+  if (isIdolDetailOpen) {
     isIdolDetailOpen = false;
+    shouldRender = true;
+  }
+
+  if (idolTabDetailId) {
+    idolTabDetailId = null;
+    shouldRender = true;
+  }
+
+  if (shouldRender) {
     renderGameState();
   }
 });

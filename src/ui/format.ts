@@ -11,7 +11,10 @@ export function formatWholeAmount(value: number): string {
 }
 
 export function formatRate(value: number): string {
-  return value.toFixed(2);
+  return value.toLocaleString("ja-JP", {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2
+  });
 }
 
 export function formatBond(value: number): string {

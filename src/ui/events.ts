@@ -108,6 +108,23 @@ export function getIdolDetailActionFromEvent(event: Event): "toggle" | null {
   return button?.dataset.idolDetailAction === "toggle" ? "toggle" : null;
 }
 
+export function getIdolTabDetailIdFromEvent(event: Event): IdolId | null {
+  const target = event.target;
+
+  if (!(target instanceof HTMLElement)) {
+    return null;
+  }
+
+  const button = target.closest<HTMLButtonElement>("[data-idol-tab-detail-id]");
+  const idolId = button?.dataset.idolTabDetailId;
+
+  if (isIdolId(idolId)) {
+    return idolId;
+  }
+
+  return null;
+}
+
 export function getSongIdFromEvent(event: Event): SongId | null {
   const target = event.target;
 
