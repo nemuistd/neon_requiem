@@ -54,11 +54,9 @@ export function renderIdolCards(state: GameState, activeIdolId: IdolId, isDetail
             ${renderRecognitionTrace(state, activeIdolId)}
           </div>
 
+          ${renderBondRow(state, activeIdolId)}
+
           <dl class="idol-details">
-            <div>
-              <dt>${UI_TEXT.bondLabel}</dt>
-              <dd>${renderBondProgress(state, activeIdolId)}</dd>
-            </div>
             <div>
               <dt>${UI_TEXT.passiveEffectLabel}</dt>
               <dd>${isIdolJoined(state, activeIdolId) ? idol.passiveDescription : UI_TEXT.lockedIdolLabel}</dd>
@@ -229,14 +227,8 @@ function renderIdolTabCard(state: GameState, idolId: IdolId, expandedDetailId: I
           <p class="title-line">${idol.title}</p>
           <p>${idol.description}</p>
           ${renderRecognitionTrace(state, idolId)}
+          ${isJoined ? renderBondRow(state, idolId) : ""}
           <dl class="stats-list">
-            ${isJoined
-              ? `
-            <div>
-              <dt>${UI_TEXT.bondLabel}</dt>
-              <dd>${renderBondProgress(state, idolId)}</dd>
-            </div>`
-              : ""}
             <div>
               <dt>${UI_TEXT.passiveEffectLabel}</dt>
               <dd>${isJoined ? idol.passiveDescription : UI_TEXT.unjoinedIdolEffectLabel}</dd>
@@ -396,17 +388,27 @@ function hasIdolBondRequirement(requirement: Requirement, idolId: IdolId): boole
   return false;
 }
 
-function renderBondProgress(state: GameState, idolId: IdolId): string {
+function renderBondRow(state: GameState, idolId: IdolId): string {
   const current = getIdolBond(state, idolId);
   const goal = getNextVisibleBondGoal(state, idolId, current);
+
+  return `
+          <div class="idol-bond-row">
+            <div class="idol-bond-row-header">
+              <span class="idol-bond-title">${UI_TEXT.bondLabel}</span>
+              <span class="idol-bond-value">${formatBond(current)} / ${formatBond(goal)}</span>
+            </div>
+            ${renderBondProgress(idolId, current, goal)}
+          </div>
+  `;
+}
+
+function renderBondProgress(idolId: IdolId, current: number, goal: number): string {
   const ratio = goal <= 0 ? 1 : Math.min(current / goal, 1);
   const percent = Math.max(0, Math.min(100, ratio * 100));
 
   return `
                 <div class="idol-bond-progress" data-idol-bond-progress="${idolId}" data-bond-current="${formatBond(current)}" data-bond-goal="${formatBond(goal)}">
-                  <div class="idol-bond-progress-label">
-                    <span>${formatBond(current)} / ${formatBond(goal)}</span>
-                  </div>
                   <div class="idol-bond-progress-track" aria-hidden="true">
                     <span style="width: ${percent.toFixed(1)}%;"></span>
                   </div>
@@ -423,28 +425,15 @@ function getNextVisibleBondGoal(state: GameState, idolId: IdolId, current: numbe
 }
 
 function getVisibleBondGoals(state: GameState, idolId: IdolId): number[] {
-  const goals = [
-    ...IDOL_EVENT_ORDER.flatMap((eventId) => {
-      const event = IDOL_EVENTS[eventId];
+  const goals = IDOL_EVENT_ORDER.flatMap((eventId) => {
+    const event = IDOL_EVENTS[eventId];
 
-      if (event.idolId !== idolId || !isRelatedProgressVisible(state, event.unlockRequirement)) {
-        return [];
-      }
+    if (event.idolId !== idolId || !isRelatedProgressVisible(state, event.unlockRequirement)) {
+      return [];
+    }
 
-      return getIdolBondAmounts(event.unlockRequirement, idolId);
-    }),
-    ...RECORD_ORDER.flatMap((recordId) => {
-      const record = RECORDS[recordId];
-      const isBondRelated = record.unlockRequirements.some((requirement) => hasIdolBondRequirement(requirement, idolId));
-      const isVisible = record.unlockRequirements.every((requirement) => isRelatedProgressVisible(state, requirement));
-
-      if (!isBondRelated || !isVisible) {
-        return [];
-      }
-
-      return record.unlockRequirements.flatMap((requirement) => getIdolBondAmounts(requirement, idolId));
-    })
-  ];
+    return getIdolBondAmounts(event.unlockRequirement, idolId);
+  });
 
   return Array.from(new Set(goals))
     .filter((goal) => goal > 0)

@@ -271,13 +271,36 @@ describe("locked content visibility", () => {
     expect(renderIdolTabCards(eventReadyState, "otowaAkari")).toContain("data-idol-event-id=\"otowaAkari.firstSeat\"");
   });
 
-  it("renders idol bond as progress toward the next visible bond unlock", () => {
+  it("renders idol bond as progress toward the next visible event unlock", () => {
     const html = renderIdolTabCards(createInitialState());
 
     expect(html).toContain("data-idol-bond-progress=\"otowaAkari\"");
     expect(html).toContain("data-bond-current=\"0\"");
     expect(html).toContain("data-bond-goal=\"5\"");
     expect(html).toContain("0 / 5");
+  });
+
+  it("does not use idol bond records as the next bond progress goal", () => {
+    const baseState = createInitialState();
+    const recordReadyState = {
+      ...baseState,
+      idols: {
+        ...baseState.idols,
+        otowaAkari: {
+          ...baseState.idols.otowaAkari,
+          bond: 5
+        }
+      }
+    };
+    const tabHtml = renderIdolTabCards(recordReadyState);
+    const leftHtml = renderIdolCards(recordReadyState, "otowaAkari");
+
+    expect(tabHtml).toContain("data-idol-bond-progress=\"otowaAkari\"");
+    expect(tabHtml).toContain("data-bond-goal=\"5\"");
+    expect(tabHtml).not.toContain("data-bond-goal=\"20\"");
+    expect(leftHtml).toContain("data-idol-bond-progress=\"otowaAkari\"");
+    expect(leftHtml).toContain("data-bond-goal=\"5\"");
+    expect(leftHtml).not.toContain("data-bond-goal=\"20\"");
   });
 
   it("keeps later gated bond goals hidden until their prerequisites are visible", () => {

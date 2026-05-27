@@ -1036,24 +1036,38 @@ h2 {
   padding-bottom: 8px;
 }
 
-.idol-bond-progress {
+.idol-bond-row {
   display: grid;
-  min-width: min(100%, 150px);
-  gap: 6px;
-  text-align: left;
+  gap: 8px;
+  margin-top: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.idol-bond-progress-label {
+.idol-bond-row-header {
   display: flex;
-  justify-content: flex-end;
-  gap: 8px;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.idol-bond-title {
+  color: #bdaecb;
+}
+
+.idol-bond-value {
   color: #fff8ff;
   font-weight: 800;
   line-height: 1.1;
+  white-space: nowrap;
+}
+
+.idol-bond-progress {
+  width: 100%;
 }
 
 .idol-bond-progress-track {
-  height: 9px;
+  height: 12px;
   overflow: hidden;
   border: 1px solid rgba(127, 233, 255, 0.28);
   border-radius: 999px;
