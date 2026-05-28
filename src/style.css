@@ -1383,6 +1383,18 @@ h2 {
     linear-gradient(135deg, rgba(255, 94, 216, 0.2), rgba(8, 11, 22, 0.86)),
     repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 22px);
   box-shadow: inset 0 0 24px rgba(127, 233, 255, 0.08);
+  overflow: hidden;
+}
+
+.facility-visual-image {
+  background: rgba(8, 11, 22, 0.86);
+}
+
+.facility-visual img {
+  display: block;
+  width: 100%;
+  height: 96px;
+  object-fit: cover;
 }
 
 .facility-visual-undergroundChapel {

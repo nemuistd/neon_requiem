@@ -47,6 +47,8 @@ export type FacilityDefinition = {
   id: string;
   name: string;
   description: string;
+  imageUrl?: string;
+  imagePosition?: string;
   tags?: string[];
   baseCost: number;
   costMultiplier: number;

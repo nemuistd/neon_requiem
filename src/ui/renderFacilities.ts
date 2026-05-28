@@ -39,7 +39,7 @@ function renderFacilityCard(state: GameState, facilityId: FacilityId): string {
       <article class="card stage-card locked-card">
         <h2 class="facility-title">${UI_TEXT.unknownFacilityLabel}</h2>
         <div class="facility-card-main">
-          <div class="facility-visual" aria-hidden="true"></div>
+          ${renderFacilityVisual()}
           <div class="facility-card-body">
             <p>${UI_TEXT.unknownFacilityDescription}</p>
             <dl class="stats-list">
@@ -62,7 +62,7 @@ function renderFacilityCard(state: GameState, facilityId: FacilityId): string {
     <article class="card stage-card">
       <h2 class="facility-title">${facility.name}</h2>
       <div class="facility-card-main">
-        <div class="facility-visual facility-visual-${facilityId}" aria-hidden="true"></div>
+        ${renderFacilityVisual(facility.imageUrl, facility.imagePosition, facilityId)}
         <div class="facility-card-body">
           <dl class="stats-list">
             <div>
@@ -82,6 +82,20 @@ function renderFacilityCard(state: GameState, facilityId: FacilityId): string {
         ${facility.name}を強化
       </button>
     </article>
+  `;
+}
+
+function renderFacilityVisual(imageUrl?: string, imagePosition = "center", facilityId?: FacilityId): string {
+  const facilityClass = facilityId ? ` facility-visual-${facilityId}` : "";
+
+  if (!imageUrl) {
+    return `<div class="facility-visual${facilityClass}" aria-hidden="true"></div>`;
+  }
+
+  return `
+    <div class="facility-visual facility-visual-image${facilityClass}" aria-hidden="true">
+      <img src="${imageUrl}" alt="" style="object-position: ${imagePosition};" />
+    </div>
   `;
 }
 
