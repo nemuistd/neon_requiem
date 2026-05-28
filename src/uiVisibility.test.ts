@@ -147,7 +147,7 @@ describe("locked content visibility", () => {
     expect(renderSongCards(baseState)).not.toContain("礼拝堂のハーモニー");
     expect(renderItemCards(baseState)).toContain("未確認の備品");
     expect(renderItemCards(baseState)).not.toContain("古いネオン管");
-    expect(renderIdolTabCards(chapelVisibleState)).toContain("未確認のアイドル");
+    expect(renderIdolTabCards(chapelVisibleState)).toContain("？？？");
     expect(renderIdolTabCards(chapelVisibleState)).not.toContain("深月 詩乃");
   });
 
@@ -194,7 +194,7 @@ describe("locked content visibility", () => {
     expect(renderSongCards(baseState)).not.toContain("data-progress-status");
     expect(renderItemCards(baseState)).toContain("未確認の備品");
     expect(renderItemCards(baseState)).not.toContain("data-progress-status");
-    expect(renderIdolTabCards(chapelVisibleState)).toContain("未確認のアイドル");
+    expect(renderIdolTabCards(chapelVisibleState)).toContain("？？？");
     expect(renderIdolTabCards(chapelVisibleState)).not.toContain("data-progress-status");
   });
 

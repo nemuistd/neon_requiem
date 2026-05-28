@@ -61,7 +61,7 @@ export const UI_TEXT = {
   unknownFacilityDescription: "霞の向こうに、復興できそうな区画の輪郭だけが見えている。",
   unknownSongLabel: "未確認の歌",
   unknownItemLabel: "未確認の備品",
-  unknownIdolLabel: "未確認のアイドル",
+  unknownIdolLabel: "？？？",
   unknownContentDescription: "関連する復興が進むと、詳細を確認できるようになる。",
   progressStatusHiddenLabel: "手がかり",
   progressStatusHiddenTitle: "まだ手がかりがあります",
