@@ -200,7 +200,6 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
     <article class="card idol-tab-card locked-card">
       <div class="idol-tab-header">
         <div>
-          <span class="card-kicker">${stateLabel}</span>
           <h2>${UI_TEXT.unknownIdolLabel}</h2>
         </div>
         <span class="idol-tab-state">${stateLabel}</span>
@@ -237,7 +236,6 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
     <article class="card idol-tab-card ${isJoined ? "unlocked-card" : isJoinable ? "joinable-card" : "locked-card"} ${isActive ? "active-card" : ""}">
       <div class="idol-tab-header">
         <div>
-          <span class="card-kicker">${stateLabel}</span>
           <h2>${idol.name}</h2>
         </div>
         <span class="idol-tab-state">${stateLabel}</span>
