@@ -795,10 +795,15 @@ h2 {
 }
 
 .tab-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 54px;
+  padding: 0 16px;
   border: 1px solid transparent;
   border-right: 1px solid rgba(127, 233, 255, 0.14);
   color: #bdaecb;
+  text-align: center;
   background: rgba(13, 10, 22, 0.72);
   transition:
     border-color 140ms ease,
@@ -807,10 +812,18 @@ h2 {
     background 140ms ease;
 }
 
+.tab-button[hidden] {
+  display: none;
+}
+
 .tab-button[data-tab-id="song"],
 .tab-button[data-tab-id="item"] {
   position: relative;
-  padding-right: 34px;
+}
+
+.tab-button[data-tab-id="song"][data-song-unlock-count],
+.tab-button[data-tab-id="item"][data-item-unlock-count] {
+  padding-right: 44px;
 }
 
 .tab-button[data-tab-id="song"]::after,
@@ -850,11 +863,15 @@ h2 {
 
 .tab-button[data-tab-id="record"] {
   position: relative;
-  padding-right: 34px;
+}
+
+.tab-button[data-tab-id="record"][data-record-unread-count],
+.tab-button[data-tab-id="record"][data-record-annotation-unread-count] {
+  padding-right: 44px;
 }
 
 .tab-button[data-tab-id="record"][data-record-unread-count][data-record-annotation-unread-count] {
-  padding-right: 68px;
+  padding-right: 78px;
 }
 
 .tab-button[data-tab-id="record"]::before,
