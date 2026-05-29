@@ -419,6 +419,35 @@ describe("locked content visibility", () => {
     expect(detailHtml).toContain("data-idol-event-id=\"otowaAkari.twilightFirstPause\"");
   });
 
+  it("shows meguri recognition as a quiet bond label", () => {
+    const baseState = createInitialState();
+    const recognizedState = {
+      ...baseState,
+      idols: {
+        ...baseState.idols,
+        otowaAkari: {
+          ...baseState.idols.otowaAkari,
+          bond: 5
+        }
+      },
+      meguri: {
+        ...baseState.meguri,
+        count: 1,
+        idolRecognition: {
+          ...baseState.meguri.idolRecognition,
+          otowaAkari: true
+        }
+      }
+    };
+    const leftHtml = renderIdolCards(recognizedState, "otowaAkari");
+    const tabHtml = renderIdolTabCards(recognizedState);
+
+    expect(leftHtml).toContain("交流（既視感）");
+    expect(leftHtml).not.toContain("class=\"recognition-trace\"");
+    expect(tabHtml).toContain("交流（既視感）");
+    expect(tabHtml).not.toContain("class=\"recognition-trace\"");
+  });
+
   it("lets the left idol switcher join idols that are ready to be invited", () => {
     const baseState = createInitialState();
     const yuiReadyState = {

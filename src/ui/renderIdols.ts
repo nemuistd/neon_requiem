@@ -51,7 +51,6 @@ export function renderIdolCards(state: GameState, activeIdolId: IdolId): string 
             <p class="reading">${idol.reading}</p>
             <p class="title-line">${idol.title}</p>
             <p>${idol.description}</p>
-            ${renderRecognitionTrace(state, activeIdolId)}
           </div>
 
           ${renderBondRow(state, activeIdolId)}
@@ -245,7 +244,6 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
         <div class="idol-tab-body">
           <p class="title-line">${idol.title}</p>
           <p>${idol.description}</p>
-          ${renderRecognitionTrace(state, idolId)}
           ${isJoined ? renderBondRow(state, idolId) : ""}
           <dl class="stats-list">
             <div>
@@ -392,11 +390,12 @@ function getUnlockedIdolRecordIds(state: GameState, idolId: IdolId): RecordId[] 
 function renderBondRow(state: GameState, idolId: IdolId): string {
   const current = getIdolBond(state, idolId);
   const goal = getNextVisibleBondGoal(state, idolId, current);
+  const bondLabel = hasIdolRecognition(state, idolId) ? UI_TEXT.bondRecognitionLabel : UI_TEXT.bondLabel;
 
   return `
           <div class="idol-bond-row">
             <div class="idol-bond-row-header">
-              <span class="idol-bond-title">${UI_TEXT.bondLabel}</span>
+              <span class="idol-bond-title">${bondLabel}</span>
               <span class="idol-bond-value">${formatBond(current)} / ${formatBond(goal)}</span>
             </div>
             ${renderBondProgress(idolId, current, goal)}
@@ -455,19 +454,6 @@ function getIdolBondAmounts(requirement: Requirement, idolId: IdolId): number[] 
   }
 
   return [];
-}
-
-function renderRecognitionTrace(state: GameState, idolId: IdolId): string {
-  if (!hasIdolRecognition(state, idolId)) {
-    return "";
-  }
-
-  return `
-            <p class="recognition-trace">
-              <span>${UI_TEXT.idolRecognitionTraceLabel}</span>
-              ${UI_TEXT.idolRecognitionTraceText}
-            </p>
-  `;
 }
 
 function renderUnknownIdolVisual(className: string): string {

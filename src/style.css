@@ -1495,22 +1495,6 @@ h2 {
     linear-gradient(135deg, rgba(255, 224, 115, 0.12), rgba(8, 11, 22, 0.92));
 }
 
-.recognition-trace {
-  margin-top: 12px;
-  padding: 10px 12px;
-  border-left: 2px solid rgba(255, 224, 115, 0.5);
-  color: #e8d4ff;
-  background: rgba(255, 224, 115, 0.07);
-}
-
-.recognition-trace span {
-  display: block;
-  margin-bottom: 4px;
-  color: #ffe073;
-  font-size: 0.76rem;
-  font-weight: 900;
-}
-
 .meguri-panel {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));

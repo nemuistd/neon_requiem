@@ -12,6 +12,7 @@ export const UI_TEXT = {
   messageLabel: "最新メッセージ",
   activeIdolLabel: "注目アイドル",
   bondLabel: "交流",
+  bondRecognitionLabel: "交流（既視感）",
   passiveEffectLabel: "パッシブ効果",
   noActiveEffectLabel: "効果なし",
   baseProductionLabel: "基礎生産",
@@ -160,7 +161,6 @@ export const UI_TEXT = {
   readIdolEventButtonLabel: "読む",
   idolEventReadLog: "交流イベントを確認しました。",
   idolRecognitionTraceLabel: "以前の廻の痕跡",
-  idolRecognitionTraceText: "名前を呼ばれた感触だけが、かすかに残っている。",
   autoSavedLog: "オートセーブしました。"
 } as const;
 
