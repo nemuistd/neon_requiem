@@ -245,7 +245,6 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
       <div class="idol-tab-main">
         ${renderIdolVisual(idol, "idol-tab-portrait")}
         <div class="idol-tab-body">
-          <p class="reading">${idol.reading}</p>
           <p class="title-line">${idol.title}</p>
           <p>${idol.description}</p>
           ${renderRecognitionTrace(state, idolId)}
