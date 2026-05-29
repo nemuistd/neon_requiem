@@ -4,7 +4,7 @@ import { FACILITIES, IDOL_EVENTS, IDOLS, ITEMS, MEGURI_BUFFS, SONGS } from "./de
 import type { IdolId } from "./definitions";
 import { applyProduction, closeMeguriSettlement, GameState, isMeguriTabUnlocked, joinIdol, markRecordTabSeen, performManualLive, performMeguri, purchaseItem, purchaseMeguriBuff, purchaseSong, readIdolEvent, readRecord, resolveActiveIdolId, SAVE_VERSION, selectActiveIdol, upgradeFacility } from "./game";
 import { loadGame, saveGame, SAVE_KEY } from "./storage";
-import { getFacilityIdFromEvent, getIdolDetailActionFromEvent, getIdolEventIdFromEvent, getIdolIdFromEvent, getIdolJoinIdFromEvent, getIdolTabDetailIdFromEvent, getItemIdFromEvent, getMeguriActionFromEvent, getMeguriBuffIdFromEvent, getRecordIdFromEvent, getSongIdFromEvent, getTabIdFromEvent, isIdolJoinFromSwitcher } from "./ui/events";
+import { getFacilityIdFromEvent, getIdolDetailActionFromEvent, getIdolDetailIdFromEvent, getIdolEventIdFromEvent, getIdolIdFromEvent, getIdolJoinIdFromEvent, getItemIdFromEvent, getMeguriActionFromEvent, getMeguriBuffIdFromEvent, getRecordIdFromEvent, getSongIdFromEvent, getTabIdFromEvent, isIdolJoinFromSwitcher } from "./ui/events";
 import { formatAmount, formatWholeAmount } from "./ui/format";
 import { renderLiveValues } from "./ui/liveValues";
 import { renderState, setMessage } from "./ui/renderState";
@@ -36,8 +36,7 @@ let lastTickAt = Date.now();
 let activeTabId: ActiveTabId = state.meguri.pendingSettlement ? "meguri" : "restoration";
 let isSettingsOpen = false;
 let isDebugReloading = false;
-let isIdolDetailOpen = false;
-let idolTabDetailId: IdolId | null = null;
+let openIdolDetailId: IdolId | null = null;
 
 function advanceToNow(): void {
   const now = Date.now();
@@ -48,7 +47,7 @@ function advanceToNow(): void {
 }
 
 function renderGameState({ preserveContentScroll = false } = {}): void {
-  renderState(elements, state, activeTabId, { isIdolDetailOpen, idolTabDetailId, preserveContentScroll });
+  renderState(elements, state, activeTabId, { openIdolDetailId, preserveContentScroll });
 }
 
 function renderCurrentView(): void {
@@ -160,6 +159,12 @@ elements.root.addEventListener("click", (event) => {
     return;
   }
 
+  if (event.target instanceof HTMLElement && event.target.classList.contains("idol-detail-modal")) {
+    openIdolDetailId = null;
+    renderCurrentView();
+    return;
+  }
+
   const tabId = getTabIdFromEvent(event);
 
   if (tabId) {
@@ -176,10 +181,6 @@ elements.root.addEventListener("click", (event) => {
     }
 
     activeTabId = tabId;
-
-    if (tabId !== "idol") {
-      idolTabDetailId = null;
-    }
 
     if (tabId === "record") {
       advanceToNow();
@@ -265,16 +266,16 @@ elements.root.addEventListener("click", (event) => {
 
   const idolDetailAction = getIdolDetailActionFromEvent(event);
 
-  if (idolDetailAction === "toggle") {
-    isIdolDetailOpen = !isIdolDetailOpen;
+  if (idolDetailAction === "close") {
+    openIdolDetailId = null;
     renderCurrentView();
     return;
   }
 
-  const selectedIdolTabDetailId = getIdolTabDetailIdFromEvent(event);
+  const selectedIdolDetailId = getIdolDetailIdFromEvent(event);
 
-  if (selectedIdolTabDetailId) {
-    idolTabDetailId = idolTabDetailId === selectedIdolTabDetailId ? null : selectedIdolTabDetailId;
+  if (selectedIdolDetailId) {
+    openIdolDetailId = selectedIdolDetailId;
     renderCurrentView();
     return;
   }
@@ -296,7 +297,7 @@ elements.root.addEventListener("click", (event) => {
     if (!joinsFromSwitcher) {
       activeTabId = "idol";
     }
-    idolTabDetailId = null;
+    openIdolDetailId = null;
     renderGameState({ preserveContentScroll: activeTabId === previousTabId });
     setMessage(elements, createIdolJoinMessage(IDOLS[result.idolId].name, IDOLS[result.idolId].passiveDescription));
     return;
@@ -431,19 +432,8 @@ window.addEventListener("keydown", (event) => {
     return;
   }
 
-  let shouldRender = false;
-
-  if (isIdolDetailOpen) {
-    isIdolDetailOpen = false;
-    shouldRender = true;
-  }
-
-  if (idolTabDetailId) {
-    idolTabDetailId = null;
-    shouldRender = true;
-  }
-
-  if (shouldRender) {
+  if (openIdolDetailId) {
+    openIdolDetailId = null;
     renderCurrentView();
   }
 });

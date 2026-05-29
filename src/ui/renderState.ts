@@ -5,7 +5,7 @@ import {
 } from "../game";
 import { renderLiveValues } from "./liveValues";
 import { renderFacilityCards } from "./renderFacilities";
-import { renderIdolCards, renderIdolTabCards } from "./renderIdols";
+import { renderIdolCards, renderIdolDetailModal, renderIdolTabCards } from "./renderIdols";
 import { renderItemCards } from "./renderItems";
 import { renderMeguriPanel } from "./renderMeguri";
 import { renderRecordCards } from "./renderRecords";
@@ -15,8 +15,7 @@ import type { ActiveTabId, UiElements } from "./types";
 import type { IdolId } from "../definitions";
 
 export type UiRenderOptions = {
-  isIdolDetailOpen?: boolean;
-  idolTabDetailId?: IdolId | null;
+  openIdolDetailId?: IdolId | null;
   preserveContentScroll?: boolean;
 };
 
@@ -30,9 +29,14 @@ export function renderState(elements: UiElements, state: GameState, activeTabId:
   elements.root.classList.toggle("settlement-active", state.meguri.pendingSettlement);
   renderTabs(elements, state, effectiveActiveTabId);
   renderLiveValues(elements, state);
-  elements.idolList.innerHTML = renderIdolCards(state, resolvedActiveIdolId, options.isIdolDetailOpen ?? false);
+  elements.idolList.innerHTML = renderIdolCards(state, resolvedActiveIdolId);
   elements.contentList.className = nextContentListClassName;
-  elements.contentList.innerHTML = renderActiveTabContent(state, effectiveActiveTabId, options.idolTabDetailId ?? null);
+  elements.contentList.innerHTML = renderActiveTabContent(state, effectiveActiveTabId);
+  elements.root.querySelector(".idol-detail-modal")?.remove();
+
+  if (options.openIdolDetailId) {
+    elements.root.insertAdjacentHTML("beforeend", renderIdolDetailModal(state, options.openIdolDetailId));
+  }
 
   if (options.preserveContentScroll === true) {
     elements.contentList.scrollTop = previousContentScrollTop;
@@ -70,7 +74,7 @@ export function getContentListClassName(activeTabId: ActiveTabId): string {
   return "facility-grid";
 }
 
-export function renderActiveTabContent(state: GameState, activeTabId: ActiveTabId, idolTabDetailId: IdolId | null = null): string {
+export function renderActiveTabContent(state: GameState, activeTabId: ActiveTabId): string {
   if (activeTabId === "song") {
     return renderSongCards(state);
   }
@@ -80,7 +84,7 @@ export function renderActiveTabContent(state: GameState, activeTabId: ActiveTabI
   }
 
   if (activeTabId === "idol") {
-    return renderIdolTabCards(state, idolTabDetailId);
+    return renderIdolTabCards(state);
   }
 
   if (activeTabId === "record") {

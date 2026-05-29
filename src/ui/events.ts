@@ -96,7 +96,7 @@ export function getIdolEventIdFromEvent(event: Event): IdolEventId | null {
   return null;
 }
 
-export function getIdolDetailActionFromEvent(event: Event): "toggle" | null {
+export function getIdolDetailActionFromEvent(event: Event): "close" | null {
   const target = event.target;
 
   if (!(target instanceof HTMLElement)) {
@@ -105,18 +105,18 @@ export function getIdolDetailActionFromEvent(event: Event): "toggle" | null {
 
   const button = target.closest<HTMLButtonElement>("[data-idol-detail-action]");
 
-  return button?.dataset.idolDetailAction === "toggle" ? "toggle" : null;
+  return button?.dataset.idolDetailAction === "close" ? "close" : null;
 }
 
-export function getIdolTabDetailIdFromEvent(event: Event): IdolId | null {
+export function getIdolDetailIdFromEvent(event: Event): IdolId | null {
   const target = event.target;
 
   if (!(target instanceof HTMLElement)) {
     return null;
   }
 
-  const button = target.closest<HTMLButtonElement>("[data-idol-tab-detail-id]");
-  const idolId = button?.dataset.idolTabDetailId;
+  const button = target.closest<HTMLButtonElement>("[data-idol-detail-id]");
+  const idolId = button?.dataset.idolDetailId;
 
   if (isIdolId(idolId)) {
     return idolId;

@@ -6,7 +6,7 @@ import {
 import { UI_TEXT } from "./data";
 import { createInitialState } from "./game";
 import { renderFacilityCards } from "./ui/renderFacilities";
-import { renderIdolCards, renderIdolTabCards } from "./ui/renderIdols";
+import { renderIdolCards, renderIdolDetailModal, renderIdolTabCards } from "./ui/renderIdols";
 import { renderItemCards } from "./ui/renderItems";
 import { renderRecordCards } from "./ui/renderRecords";
 import { renderSongCards } from "./ui/renderSongs";
@@ -266,9 +266,9 @@ describe("locked content visibility", () => {
       }
     };
 
-    expect(renderIdolTabCards(baseState, "otowaAkari")).not.toContain("灯里・客席の灯");
-    expect(renderIdolTabCards(eventReadyState, "otowaAkari")).toContain("灯里・客席の灯");
-    expect(renderIdolTabCards(eventReadyState, "otowaAkari")).toContain("data-idol-event-id=\"otowaAkari.firstSeat\"");
+    expect(renderIdolDetailModal(baseState, "otowaAkari")).not.toContain("灯里・客席の灯");
+    expect(renderIdolDetailModal(eventReadyState, "otowaAkari")).toContain("灯里・客席の灯");
+    expect(renderIdolDetailModal(eventReadyState, "otowaAkari")).toContain("data-idol-event-id=\"otowaAkari.firstSeat\"");
   });
 
   it("renders idol bond as progress toward the next visible event unlock", () => {
@@ -339,7 +339,7 @@ describe("locked content visibility", () => {
 
     expect(html).toContain("class=\"idol-tab-action-row\"");
     expect(html).toContain("data-idol-id=\"otowaAkari\"");
-    expect(html).toContain("data-idol-tab-detail-id=\"otowaAkari\"");
+    expect(html).toContain("data-idol-detail-id=\"otowaAkari\"");
     expect(html).toContain(UI_TEXT.focusedIdolLabel);
     expect(html).toContain(UI_TEXT.detailButtonLabel);
   });
@@ -357,10 +357,10 @@ describe("locked content visibility", () => {
     const yuiButtonHtml = getButtonHtml(renderIdolTabCards(yuiReadyState), "asagiriYui");
 
     expect(yuiButtonHtml).toContain("data-idol-join-id=\"asagiriYui\"");
-    expect(yuiButtonHtml).not.toContain("data-idol-tab-detail-id=\"asagiriYui\"");
+    expect(yuiButtonHtml).not.toContain("data-idol-detail-id=\"asagiriYui\"");
   });
 
-  it("opens idol-tab detail with bond-unlocked records without changing focus", () => {
+  it("renders idol detail modal with bond-unlocked records without changing focus", () => {
     const baseState = createInitialState();
     const detailReadyState = {
       ...baseState,
@@ -373,10 +373,13 @@ describe("locked content visibility", () => {
       }
     };
     const closedHtml = renderIdolTabCards(detailReadyState);
-    const openHtml = renderIdolTabCards(detailReadyState, "otowaAkari");
+    const openHtml = renderIdolDetailModal(detailReadyState, "otowaAkari");
 
-    expect(closedHtml).not.toContain("id=\"idol-tab-detail-panel-otowaAkari\"");
-    expect(openHtml).toContain("id=\"idol-tab-detail-panel-otowaAkari\"");
+    expect(closedHtml).not.toContain("class=\"idol-detail-modal\"");
+    expect(openHtml).toContain("class=\"idol-detail-modal\"");
+    expect(openHtml).toContain("role=\"dialog\"");
+    expect(openHtml).toContain("aria-modal=\"true\"");
+    expect(openHtml).toContain("data-idol-detail-action=\"close\"");
     expect(openHtml).toContain("data-idol-event-id=\"otowaAkari.firstSeat\"");
     expect(openHtml).toContain("data-record-id=\"idolBondAkariFirstVoice\"");
   });
@@ -407,10 +410,10 @@ describe("locked content visibility", () => {
         }
       }
     };
-    const tabHtml = renderIdolTabCards(twilightReadyState, "otowaAkari");
-    const detailHtml = renderIdolCards(twilightReadyState, "otowaAkari", true);
+    const tabHtml = renderIdolDetailModal(twilightReadyState, "otowaAkari");
+    const detailHtml = renderIdolDetailModal(twilightReadyState, "otowaAkari");
 
-    expect(renderIdolTabCards(renewedBondState, "otowaAkari")).not.toContain("灯里・一拍遅い返事");
+    expect(renderIdolDetailModal(renewedBondState, "otowaAkari")).not.toContain("灯里・一拍遅い返事");
     expect(tabHtml).toContain("灯里・一拍遅い返事");
     expect(tabHtml).toContain("薄明の記憶");
     expect(detailHtml).toContain("data-idol-event-id=\"otowaAkari.twilightFirstPause\"");
@@ -434,7 +437,7 @@ describe("locked content visibility", () => {
     expect(yuiButtonHtml).not.toContain("disabled");
   });
 
-  it("shows unlocked idol events and idol scene records in the left detail panel", () => {
+  it("opens left idol details through the shared detail modal", () => {
     const baseState = createInitialState();
     const detailReadyState = {
       ...baseState,
@@ -447,10 +450,12 @@ describe("locked content visibility", () => {
       }
     };
     const closedHtml = renderIdolCards(detailReadyState, "otowaAkari");
-    const openHtml = renderIdolCards(detailReadyState, "otowaAkari", true);
+    const openHtml = renderIdolDetailModal(detailReadyState, "otowaAkari");
 
     expect(closedHtml).not.toContain("class=\"idol-detail-panel\"");
+    expect(closedHtml).toContain("data-idol-detail-id=\"otowaAkari\"");
     expect(openHtml).toContain("idol-detail-panel");
+    expect(openHtml).toContain("class=\"idol-detail-modal\"");
     expect(openHtml).toContain("data-idol-event-id=\"otowaAkari.firstSeat\"");
     expect(openHtml).toContain("data-record-id=\"idolBondAkariFirstVoice\"");
   });
@@ -471,7 +476,7 @@ describe("locked content visibility", () => {
         }
       }
     };
-    const openHtml = renderIdolCards(detailReadyState, "hibikiTooko", true);
+    const openHtml = renderIdolDetailModal(detailReadyState, "hibikiTooko");
 
     expect(openHtml).toContain("data-record-id=\"tookoFirstBroadcast\"");
   });

@@ -36,7 +36,7 @@ import {
 } from "./progressStatus";
 import { getIdolUnlockRequirementText } from "./requirementText";
 
-export function renderIdolCards(state: GameState, activeIdolId: IdolId, isDetailOpen = false): string {
+export function renderIdolCards(state: GameState, activeIdolId: IdolId): string {
   const idol = IDOLS[activeIdolId];
 
   return `
@@ -66,16 +66,13 @@ export function renderIdolCards(state: GameState, activeIdolId: IdolId, isDetail
           <button
             class="detail-action"
             type="button"
-            data-idol-detail-action="toggle"
-            aria-expanded="${isDetailOpen ? "true" : "false"}"
-            aria-controls="idol-detail-panel"
+            data-idol-detail-id="${activeIdolId}"
+            aria-haspopup="dialog"
           >
-            ${isDetailOpen ? UI_TEXT.closeDetailButtonLabel : UI_TEXT.detailButtonLabel}
+            ${UI_TEXT.detailButtonLabel}
           </button>
         </div>
       </div>
-
-      ${isDetailOpen ? renderIdolDetailPanel(state, activeIdolId, "idol-detail-panel") : ""}
 
       <section class="idol-roster" aria-label="${UI_TEXT.idolRosterLabel}">
         <span class="card-kicker">${UI_TEXT.idolRosterLabel}</span>
@@ -84,6 +81,33 @@ export function renderIdolCards(state: GameState, activeIdolId: IdolId, isDetail
         </div>
       </section>
     </article>
+  `;
+}
+
+export function renderIdolDetailModal(state: GameState, idolId: IdolId): string {
+  const idol = IDOLS[idolId];
+  const titleId = `idol-detail-modal-title-${idolId}`;
+
+  return `
+      <section class="idol-detail-modal" aria-hidden="false">
+        <div class="idol-detail-modal-surface" role="dialog" aria-modal="true" aria-labelledby="${titleId}">
+          <div class="idol-detail-modal-header">
+            <div>
+              <span class="card-kicker">${UI_TEXT.idolDetailPanelLabel}</span>
+              <h2 id="${titleId}">${idol.name}</h2>
+            </div>
+            <button
+              class="settings-icon-button"
+              type="button"
+              data-idol-detail-action="close"
+              aria-label="${UI_TEXT.closeButtonLabel}"
+            >
+              ${UI_TEXT.closeButtonLabel}
+            </button>
+          </div>
+          ${renderIdolDetailPanel(state, idolId, `idol-detail-modal-panel-${idolId}`, "idol-detail-modal-panel")}
+        </div>
+      </section>
   `;
 }
 
@@ -123,10 +147,10 @@ function renderIdolDetailPanel(state: GameState, idolId: IdolId, panelId: string
   `;
 }
 
-export function renderIdolTabCards(state: GameState, expandedDetailId: IdolId | null = null): string {
+export function renderIdolTabCards(state: GameState): string {
   const idolCards = IDOL_ORDER
     .filter((idolId) => isRelatedProgressVisible(state, IDOLS[idolId].unlockRequirement))
-    .map((idolId) => renderIdolTabCard(state, idolId, expandedDetailId))
+    .map((idolId) => renderIdolTabCard(state, idolId))
     .join("");
 
   return `${idolCards}${renderProgressStatusCard(getIdolProgressStatus(state))}`;
@@ -156,15 +180,13 @@ function renderIdolSwitcher(state: GameState, activeIdolId: IdolId): string {
   }).join("");
 }
 
-function renderIdolTabCard(state: GameState, idolId: IdolId, expandedDetailId: IdolId | null): string {
+function renderIdolTabCard(state: GameState, idolId: IdolId): string {
   const idol = IDOLS[idolId];
   const isUnlocked = isIdolUnlocked(state, idolId);
   const isJoined = isIdolJoined(state, idolId);
   const isJoinable = isIdolJoinable(state, idolId);
   const activeIdolId = resolveActiveIdolId(state);
   const isActive = activeIdolId === idolId;
-  const isDetailExpanded = expandedDetailId === idolId;
-  const detailPanelId = `idol-tab-detail-panel-${idolId}`;
   const stateLabel = isActive
     ? UI_TEXT.focusedIdolLabel
     : isJoined
@@ -239,16 +261,15 @@ function renderIdolTabCard(state: GameState, idolId: IdolId, expandedDetailId: I
             </div>
           </dl>
           ${isJoined
-            ? renderJoinedIdolTabActions(idolId, isActive, isDetailExpanded, detailPanelId)
+            ? renderJoinedIdolTabActions(idolId, isActive)
             : renderSingleIdolTabAction(idolId, isJoinable)}
         </div>
       </div>
-      ${isJoined && isDetailExpanded ? renderIdolDetailPanel(state, idolId, detailPanelId, "idol-tab-detail-panel") : ""}
     </article>
   `;
 }
 
-function renderJoinedIdolTabActions(idolId: IdolId, isActive: boolean, isDetailExpanded: boolean, detailPanelId: string): string {
+function renderJoinedIdolTabActions(idolId: IdolId, isActive: boolean): string {
   return `
           <div class="idol-tab-action-row">
             <button
@@ -260,13 +281,12 @@ function renderJoinedIdolTabActions(idolId: IdolId, isActive: boolean, isDetailE
               ${isActive ? UI_TEXT.focusedIdolLabel : UI_TEXT.focusIdolButtonLabel}
             </button>
             <button
-              class="secondary-action idol-tab-action detail ${isDetailExpanded ? "active" : "unlocked"}"
+              class="secondary-action idol-tab-action detail unlocked"
               type="button"
-              data-idol-tab-detail-id="${idolId}"
-              aria-expanded="${isDetailExpanded ? "true" : "false"}"
-              aria-controls="${detailPanelId}"
+              data-idol-detail-id="${idolId}"
+              aria-haspopup="dialog"
             >
-              ${isDetailExpanded ? UI_TEXT.closeDetailButtonLabel : UI_TEXT.detailButtonLabel}
+              ${UI_TEXT.detailButtonLabel}
             </button>
           </div>
   `;

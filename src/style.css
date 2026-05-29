@@ -863,6 +863,7 @@ h2 {
 .record-card-heading > :first-child,
 .idol-tab-header > div,
 .idol-detail-panel-heading > div,
+.idol-detail-modal-header > div,
 .idol-event-heading > div,
 .meguri-heading > :first-child,
 .meguri-buff-title > :first-child {
@@ -1947,6 +1948,17 @@ h2 {
   backdrop-filter: blur(6px);
 }
 
+.idol-detail-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(4, 5, 10, 0.78);
+  backdrop-filter: blur(6px);
+}
+
 .settings-panel-surface {
   width: min(100%, 420px);
   padding: 16px;
@@ -1960,7 +1972,32 @@ h2 {
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
+.idol-detail-modal-surface {
+  width: min(100%, 980px);
+  max-height: min(88vh, 860px);
+  overflow: auto;
+  padding: 16px;
+  border: 1px solid rgba(255, 210, 115, 0.28);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent),
+    rgba(15, 13, 26, 0.96);
+  box-shadow:
+    0 0 32px rgba(255, 94, 216, 0.14),
+    0 0 38px rgba(120, 239, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  overscroll-behavior: contain;
+}
+
 .settings-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.idol-detail-modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1971,6 +2008,15 @@ h2 {
 .settings-panel-header h2 {
   margin: 0;
   font-size: 1.12rem;
+}
+
+.idol-detail-modal-header h2 {
+  margin: 4px 0 0;
+  font-size: 1.2rem;
+}
+
+.idol-detail-modal-panel {
+  margin-top: 0;
 }
 
 .settings-icon-button,
@@ -2173,6 +2219,14 @@ h2 {
 @media (max-width: 720px) {
   .game-shell {
     padding: 10px;
+  }
+
+  .idol-detail-modal {
+    padding: 10px;
+  }
+
+  .idol-detail-modal-surface {
+    max-height: 92vh;
   }
 
   .top-panel,
