@@ -174,7 +174,7 @@ function renderIdolSwitcher(state: GameState, activeIdolId: IdolId): string {
         aria-pressed="${isActive ? "true" : "false"}"
       >
         <span>${isUnlocked ? idol.name : UI_TEXT.unknownIdolLabel}</span>
-        <small>${isJoined ? idol.reading : isUnlocked ? UI_TEXT.joinableIdolLabel : getIdolUnlockRequirementText(idolId)}</small>
+        ${isJoined ? "" : `<small>${isUnlocked ? UI_TEXT.joinableIdolLabel : getIdolUnlockRequirementText(idolId)}</small>`}
       </button>
     `;
   }).join("");
