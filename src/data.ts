@@ -98,14 +98,6 @@ export const UI_TEXT = {
   meguriReadyLabel: "再固定準備",
   meguriSettledLabel: "廻後清算",
   meguriCountLabel: "廻回数",
-  meguriDashboardLabel: "廻後の見取り図",
-  meguriDashboardPurchasedBuffCountLabel: "取得済みバフ",
-  meguriDashboardAnnotationCountLabel: "追記解放",
-  meguriDashboardRecognitionCountLabel: "痕跡アイドル",
-  meguriDashboardNextGoalLabel: "次の目印",
-  meguriDashboardNextGoalReadAnnotations: "追記が増えた記録を読み直す",
-  meguriDashboardNextGoalChooseBuff: "次の清算で未取得バフを選ぶ",
-  meguriDashboardNextGoalContinueMeguri: "次の廻で断片と痕跡をもう少し増やす",
   ch9OpenEndKicker: "Ch.9 収束",
   ch9OpenEndStateLabel: "選択可能",
   ch9OpenEndTitle: "再び灯るものへ",
@@ -113,16 +105,12 @@ export const UI_TEXT = {
     "封書は答えを示すことはなく、判断を読み手に委ねている。街の復興を続けても、もう一度廻って痕跡を重ねてもよい。",
   ch9OpenEndContinueButtonLabel: "復興を続ける",
   ch9OpenEndMeguriButtonLabel: "もう一度廻る",
-  meguriAnnotationIndexLabel: "追記索引",
-  meguriAnnotationIndexEmptyLabel: "追記なし",
-  meguriAnnotationIndexEmptyText: "廻後バフで追記が解放されると、ここに控えが残ります。",
-  meguriAnnotationIndexUnreadLabel: "追記未読",
-  meguriAnnotationIndexReadLabel: "追記既読",
-  meguriAnnotationIndexRelatedBuffLabel: "関連バフ",
-  meguriAnnotationIndexUnknownBuffLabel: "不明",
-  meguriAnnotationIndexOpenRecordsButtonLabel: "記録タブで読む",
+  meguriAnnotationNoticeLabel: "追記の更新",
+  meguriAnnotationNoticeText: "追記が増えた記録があります。",
+  meguriAnnotationOpenRecordsButtonLabel: "記録タブで読む",
   meguriPreviewLabel: "獲得見込み",
   meguriNextFragmentLabel: "次の記憶断片",
+  meguriResetDetailsSummary: "引き継ぎ / リセットを確認",
   meguriCarryOverLabel: "引き継ぐもの",
   meguriResetLabel: "リセットされるもの",
   meguriCarryOverText: "記録、既読状態、記憶断片、廻後バフ、廻回数、以前の廻の痕跡。",
@@ -191,10 +179,6 @@ export function createMeguriPerformedMessage(memoryFragments: string): string {
 
 export function createMeguriNextFragmentMessage(tomorusa: string): string {
   return `あと ${tomorusa} 灯るさで +1 記憶断片`;
-}
-
-export function createMeguriDashboardNextGoalFragmentMessage(memoryFragments: string): string {
-  return `次の未取得バフまで記憶断片あと ${memoryFragments}`;
 }
 
 export function createMeguriBuffPurchaseMessage(buffName: string, cost: string): string {

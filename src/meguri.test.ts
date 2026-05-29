@@ -22,7 +22,7 @@ import { getMemoryFragmentMultiplierFromEffects, getRebirthBonusMultiplierFromEf
 import { isRequirementMet } from "./engine/requirements";
 import { validateRequirement } from "./contentValidation";
 import { UI_TEXT } from "./data";
-import { MEGURI_BUFFS, RECORDS } from "./definitions";
+import { RECORDS } from "./definitions";
 import { renderMeguriPanel } from "./ui/renderMeguri";
 import { renderRecordCards } from "./ui/renderRecords";
 import {
@@ -265,7 +265,7 @@ describe("meguri economy", () => {
     expect(html).toContain('data-meguri-action="openRecords"');
   });
 
-  it("renders a compact post-meguri dashboard during regular progress", () => {
+  it("keeps regular meguri progress focused on reset preparation", () => {
     const preMeguriHtml = renderMeguriPanel(createMeguriReadyState(createInitialState()));
     expect(preMeguriHtml).not.toContain('data-meguri-dashboard="true"');
 
@@ -302,14 +302,14 @@ describe("meguri economy", () => {
     };
     const html = renderMeguriPanel(postMeguriState);
 
-    expect(html).toContain('data-meguri-dashboard="true"');
-    expect(html).toContain(UI_TEXT.meguriDashboardLabel);
-    expect(html).toContain("data-meguri-dashboard-loop>第1廻</strong>");
-    expect(html).toContain("data-meguri-dashboard-memory-fragments>6</strong>");
-    expect(html).toContain("data-meguri-dashboard-purchased-buffs>1 / 4</strong>");
-    expect(html).toContain("data-meguri-dashboard-annotations>1</strong>");
-    expect(html).toContain("data-meguri-dashboard-recognition>1</strong>");
-    expect(html).toContain(UI_TEXT.meguriDashboardNextGoalReadAnnotations);
+    expect(html).not.toContain('data-meguri-dashboard="true"');
+    expect(html).not.toContain("廻後の見取り図");
+    expect(html).toContain(UI_TEXT.meguriReadyLabel);
+    expect(html).toContain("data-meguri-memory-fragments>6</dd>");
+    expect(html).toContain("data-meguri-preview");
+    expect(html).toContain("data-meguri-next-fragment");
+    expect(html).toContain(UI_TEXT.meguriResetDetailsSummary);
+    expect(html).toContain('class="primary-action meguri-perform-action"');
     expect(postMeguriState.meguri).not.toHaveProperty("dashboard");
   });
 
@@ -338,9 +338,9 @@ describe("meguri economy", () => {
     expect(html.match(/data-meguri-action="perform"/g)).toHaveLength(2);
   });
 
-  it("shows a post-meguri annotation index without duplicating annotation body text", () => {
+  it("shows only a compact unread annotation notice during regular progress", () => {
     const preMeguriHtml = renderMeguriPanel(createMeguriReadyState(createInitialState()));
-    expect(preMeguriHtml).not.toContain('data-meguri-annotation-index="true"');
+    expect(preMeguriHtml).not.toContain('data-meguri-annotation-notice="true"');
 
     const initialState = createInitialState();
     const unreadState = {
@@ -368,12 +368,13 @@ describe("meguri economy", () => {
     const unreadHtml = renderMeguriPanel(unreadState);
     const annotationBody = RECORDS.lightResponseObservation.bodyAnnotation ?? "";
 
-    expect(unreadHtml).toContain('data-meguri-annotation-index="true"');
-    expect(unreadHtml).toContain(UI_TEXT.meguriAnnotationIndexLabel);
-    expect(unreadHtml).toContain(RECORDS.lightResponseObservation.title);
-    expect(unreadHtml).toContain(MEGURI_BUFFS.footstepResonance.name);
-    expect(unreadHtml).toContain(UI_TEXT.meguriAnnotationIndexUnreadLabel);
+    expect(unreadHtml).toContain('data-meguri-annotation-notice="true"');
+    expect(unreadHtml).toContain(UI_TEXT.meguriAnnotationNoticeLabel);
+    expect(unreadHtml).toContain(UI_TEXT.meguriAnnotationNoticeText);
+    expect(unreadHtml).toContain(UI_TEXT.meguriAnnotationOpenRecordsButtonLabel);
     expect(unreadHtml).toContain('data-meguri-action="openRecords"');
+    expect(unreadHtml).not.toContain("追記索引");
+    expect(unreadHtml).not.toContain(RECORDS.lightResponseObservation.title);
     expect(annotationBody.length).toBeGreaterThan(0);
     expect(unreadHtml).not.toContain(annotationBody);
 
@@ -389,8 +390,9 @@ describe("meguri economy", () => {
         }
       }
     });
-    expect(readHtml).toContain(UI_TEXT.meguriAnnotationIndexReadLabel);
-    expect(readHtml).not.toContain(UI_TEXT.meguriAnnotationIndexUnreadLabel);
+    expect(readHtml).not.toContain('data-meguri-annotation-notice="true"');
+    expect(readHtml).not.toContain(UI_TEXT.meguriAnnotationNoticeLabel);
+    expect(readHtml).not.toContain(UI_TEXT.meguriAnnotationNoticeText);
   });
 });
 
