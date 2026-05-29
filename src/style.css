@@ -961,13 +961,11 @@ h2 {
 
 .stage-card {
   display: flex;
-  min-height: 250px;
   flex-direction: column;
 }
 
 .song-card {
   display: flex;
-  min-height: 300px;
   flex-direction: column;
 }
 
@@ -1924,7 +1922,7 @@ h2 {
 }
 
 .stage-card .secondary-action {
-  margin-top: auto;
+  margin-top: 14px;
   min-height: 46px;
   font-size: 0.94rem;
 }
