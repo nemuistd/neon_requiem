@@ -1,9 +1,9 @@
 export const GAME_TITLE = "NEON REQUIEM";
 
 export const UI_TEXT = {
-  heroEyebrow: "地下第七層・仮設礼拝ステージ",
+  heroEyebrow: "",
   subtitle: "灯里の歌で静寂を押し返し、忘れられた路地に灯るさを戻す。",
-  compactSubtitle: "地下都市復興ライブ",
+  compactSubtitle: "ライブで、街にもう一度灯りを",
   resourcePanelLabel: "現在の資源",
   perSecondLabel: "毎秒",
   liveSectionLabel: "ライブ",

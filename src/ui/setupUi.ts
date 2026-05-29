@@ -6,11 +6,15 @@ import {
 import type { UiElements } from "./types";
 
 export function setupUi(root: HTMLElement): UiElements {
+  const heroEyebrow = UI_TEXT.heroEyebrow
+    ? `<p class="eyebrow">${UI_TEXT.heroEyebrow}</p>`
+    : "";
+
   root.innerHTML = `
     <main class="game-shell">
       <header class="top-panel">
         <div class="brand-block">
-          <p class="eyebrow">${UI_TEXT.heroEyebrow}</p>
+          ${heroEyebrow}
           <h1>${GAME_TITLE}</h1>
           <p class="subtitle">${UI_TEXT.compactSubtitle}</p>
         </div>
