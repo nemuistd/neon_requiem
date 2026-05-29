@@ -17,18 +17,27 @@ import type { IdolId } from "../definitions";
 export type UiRenderOptions = {
   isIdolDetailOpen?: boolean;
   idolTabDetailId?: IdolId | null;
+  preserveContentScroll?: boolean;
 };
 
 export function renderState(elements: UiElements, state: GameState, activeTabId: ActiveTabId, options: UiRenderOptions = {}): void {
   const resolvedActiveIdolId = resolveActiveIdolId(state);
   const effectiveActiveTabId = state.meguri.pendingSettlement ? "meguri" : activeTabId;
+  const nextContentListClassName = getContentListClassName(effectiveActiveTabId);
+  const previousContentScrollTop = elements.contentList.scrollTop;
+  const previousWindowScrollY = window.scrollY;
 
   elements.root.classList.toggle("settlement-active", state.meguri.pendingSettlement);
   renderTabs(elements, state, effectiveActiveTabId);
   renderLiveValues(elements, state);
   elements.idolList.innerHTML = renderIdolCards(state, resolvedActiveIdolId, options.isIdolDetailOpen ?? false);
-  elements.contentList.className = getContentListClassName(effectiveActiveTabId);
+  elements.contentList.className = nextContentListClassName;
   elements.contentList.innerHTML = renderActiveTabContent(state, effectiveActiveTabId, options.idolTabDetailId ?? null);
+
+  if (options.preserveContentScroll === true) {
+    elements.contentList.scrollTop = previousContentScrollTop;
+    window.scrollTo(window.scrollX, previousWindowScrollY);
+  }
 }
 
 export function setMessage(elements: UiElements, message: string): void {
