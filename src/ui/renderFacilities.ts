@@ -13,7 +13,8 @@ import {
   isFacilityUnlocked,
   TOMORUSA_RESOURCE_ID
 } from "../game";
-import { formatAmount, formatRate } from "./format";
+import { formatAmount, formatDetailedAmount, formatDetailedRate, formatRate } from "./format";
+import { renderNumberDetail } from "./numberDetail";
 import { shouldRenderFacilityCard } from "./contentVisibility";
 import {
   getFacilityProgressStatus,
@@ -100,14 +101,16 @@ function renderFacilityVisual(imageUrl?: string, imagePosition = "center", facil
 }
 
 function renderFacilityStats(state: GameState, facilityId: FacilityId, upgradeCost: number): string {
+  const production = getFacilityTomorusaPerSecond(state, facilityId);
+
   return `
     <div>
       <dt>価格</dt>
-      <dd data-facility-cost="${facilityId}">${formatAmount(upgradeCost)} 灯るさ</dd>
+      <dd data-facility-cost="${facilityId}">${renderNumberDetail(`${formatAmount(upgradeCost)} 灯るさ`, `${formatDetailedAmount(upgradeCost)} 灯るさ`)}</dd>
     </div>
     <div>
       <dt>生産</dt>
-      <dd data-facility-production="${facilityId}">${formatRate(getFacilityTomorusaPerSecond(state, facilityId))} 灯るさ / 秒</dd>
+      <dd data-facility-production="${facilityId}">${renderNumberDetail(`${formatRate(production)} 灯るさ / 秒`, `${formatDetailedRate(production)} 灯るさ / 秒`)}</dd>
     </div>
   `;
 }

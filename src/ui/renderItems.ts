@@ -13,7 +13,8 @@ import {
   TOMORUSA_RESOURCE_ID
 } from "../game";
 import { isRelatedProgressVisible } from "./contentVisibility";
-import { formatAmount } from "./format";
+import { formatAmount, formatDetailedAmount } from "./format";
+import { renderNumberDetail } from "./numberDetail";
 import {
   getItemProgressStatus,
   renderProgressStatusCard
@@ -83,7 +84,7 @@ function renderItemCard(state: GameState, itemId: ItemId): string {
         </div>
         <div>
           <dt>${UI_TEXT.itemPriceLabel}</dt>
-          <dd data-item-cost="${itemId}">${formatAmount(cost)} 灯るさ</dd>
+          <dd data-item-cost="${itemId}">${renderNumberDetail(`${formatAmount(cost)} 灯るさ`, `${formatDetailedAmount(cost)} 灯るさ`)}</dd>
         </div>
         <div>
           <dt>${UI_TEXT.unlockRequirementLabel}</dt>

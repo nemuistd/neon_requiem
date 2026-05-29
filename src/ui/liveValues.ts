@@ -27,14 +27,18 @@ import {
   MEMORY_FRAGMENT_RESOURCE_ID,
   TOMORUSA_RESOURCE_ID
 } from "../game";
-import { formatAmount, formatRate, formatWholeAmount } from "./format";
+import { formatAmount, formatDetailedAmount, formatDetailedRate, formatRate, formatWholeAmount } from "./format";
+import { setNumberDetail } from "./numberDetail";
 import type { UiElements } from "./types";
 
 export function renderLiveValues(elements: UiElements, state: GameState): void {
-  elements.lightsAmount.textContent = formatAmount(getResourceAmount(state, TOMORUSA_RESOURCE_ID));
+  const tomorusa = getResourceAmount(state, TOMORUSA_RESOURCE_ID);
+  const tomorusaPerSecond = getTomorusaPerSecond(state);
+
+  setNumberDetail(elements.lightsAmount, formatAmount(tomorusa), `${formatDetailedAmount(tomorusa)} 灯るさ`);
   elements.memoryFragmentsAmount.textContent = formatWholeAmount(getResourceAmount(state, MEMORY_FRAGMENT_RESOURCE_ID));
   elements.memoryFragmentResource.hidden = state.meguri.count <= 0;
-  elements.lightsPerSecond.textContent = `${formatRate(getTomorusaPerSecond(state))} / 秒`;
+  setNumberDetail(elements.lightsPerSecond, `${formatRate(tomorusaPerSecond)} / 秒`, `${formatDetailedRate(tomorusaPerSecond)} 灯るさ / 秒`);
   elements.liveButton.disabled = state.meguri.pendingSettlement;
   elements.liveButton.textContent = state.meguri.pendingSettlement ? UI_TEXT.meguriSettlementOpenLabel : UI_TEXT.liveButton;
   updateFacilityLiveValues(elements, state);
@@ -55,11 +59,13 @@ export function updateFacilityLiveValues(elements: UiElements, state: GameState)
     }
 
     if (costElement) {
-      costElement.textContent = `${formatAmount(getFacilityUpgradeCost(state, facilityId))} 灯るさ`;
+      const cost = getFacilityUpgradeCost(state, facilityId);
+      setNumberDetail(costElement, `${formatAmount(cost)} 灯るさ`, `${formatDetailedAmount(cost)} 灯るさ`);
     }
 
     if (productionElement) {
-      productionElement.textContent = `${formatRate(getFacilityTomorusaPerSecond(state, facilityId))} 灯るさ / 秒`;
+      const production = getFacilityTomorusaPerSecond(state, facilityId);
+      setNumberDetail(productionElement, `${formatRate(production)} 灯るさ / 秒`, `${formatDetailedRate(production)} 灯るさ / 秒`);
     }
 
     if (upgradeButton) {
@@ -75,7 +81,7 @@ export function updateSongLiveValues(elements: UiElements, state: GameState): vo
     const purchaseButton = elements.contentList.querySelector<HTMLButtonElement>(`[data-song-id="${songId}"]`);
 
     if (costElement) {
-      costElement.textContent = `${formatAmount(cost)} 灯るさ`;
+      setNumberDetail(costElement, `${formatAmount(cost)} 灯るさ`, `${formatDetailedAmount(cost)} 灯るさ`);
     }
 
     if (purchaseButton) {
@@ -91,7 +97,7 @@ export function updateItemLiveValues(elements: UiElements, state: GameState): vo
     const purchaseButton = elements.contentList.querySelector<HTMLButtonElement>(`[data-item-id="${itemId}"]`);
 
     if (costElement) {
-      costElement.textContent = `${formatAmount(cost)} 灯るさ`;
+      setNumberDetail(costElement, `${formatAmount(cost)} 灯るさ`, `${formatDetailedAmount(cost)} 灯るさ`);
     }
 
     if (purchaseButton) {

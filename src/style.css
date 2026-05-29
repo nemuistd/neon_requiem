@@ -128,7 +128,7 @@ h2 {
   position: relative;
   min-height: 72px;
   padding: 12px 14px;
-  overflow: hidden;
+  overflow: visible;
   border-left: 1px solid rgba(255, 94, 216, 0.22);
   background: rgba(8, 11, 22, 0.42);
 }
@@ -139,6 +139,88 @@ h2 {
   font-size: 1.55rem;
   line-height: 1.1;
   transform-origin: left center;
+}
+
+.number-detail {
+  position: relative;
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  cursor: help;
+  font: inherit;
+  overflow: visible;
+  background: transparent;
+  text-align: inherit;
+  vertical-align: baseline;
+}
+
+.number-detail:focus {
+  outline: none;
+}
+
+.number-detail:focus-visible {
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 2px rgba(127, 233, 255, 0.34),
+    0 0 18px rgba(255, 94, 216, 0.2);
+}
+
+.number-detail-popover {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 8px);
+  right: 0;
+  width: max-content;
+  max-width: min(72vw, 24rem);
+  padding: 7px 9px;
+  border: 1px solid rgba(127, 233, 255, 0.45);
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent),
+    rgba(7, 9, 18, 0.96);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.36),
+    0 0 18px rgba(255, 94, 216, 0.2);
+  color: #fff8ff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.35;
+  opacity: 0;
+  pointer-events: none;
+  text-align: left;
+  text-shadow: none;
+  transform: translateY(4px);
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease,
+    visibility 140ms ease;
+  visibility: hidden;
+  white-space: normal;
+  word-break: keep-all;
+}
+
+.number-detail-popover::before {
+  position: absolute;
+  top: -5px;
+  right: 12px;
+  width: 8px;
+  height: 8px;
+  border-top: 1px solid rgba(127, 233, 255, 0.45);
+  border-left: 1px solid rgba(127, 233, 255, 0.45);
+  background: rgba(7, 9, 18, 0.96);
+  content: "";
+  transform: rotate(45deg);
+}
+
+.number-detail:hover .number-detail-popover,
+.number-detail:focus .number-detail-popover,
+.number-detail:focus-visible .number-detail-popover {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
 }
 
 .resource-value-pop {
