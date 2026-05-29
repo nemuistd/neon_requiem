@@ -46,9 +46,7 @@ export function renderIdolCards(state: GameState, activeIdolId: IdolId): string 
 
         <div class="idol-info-panel">
           <div class="idol-summary">
-            <span class="card-kicker">${UI_TEXT.activeIdolLabel}</span>
-            <h2>${idol.name}</h2>
-            <p class="reading">${idol.reading}</p>
+            <h2 class="idol-name" aria-label="${idol.name} ${idol.reading}">${renderIdolNameWithRuby(idol)}</h2>
             <p class="title-line">${idol.title}</p>
             <p>${idol.description}</p>
           </div>
@@ -58,7 +56,7 @@ export function renderIdolCards(state: GameState, activeIdolId: IdolId): string 
           <dl class="idol-details">
             <div>
               <dt>${UI_TEXT.passiveEffectLabel}</dt>
-              <dd>${isIdolJoined(state, activeIdolId) ? idol.passiveDescription : UI_TEXT.lockedIdolLabel}</dd>
+              <dd>${isIdolJoined(state, activeIdolId) ? renderPassiveEffectDescription(idol.passiveDescription) : UI_TEXT.lockedIdolLabel}</dd>
             </div>
           </dl>
 
@@ -74,7 +72,6 @@ export function renderIdolCards(state: GameState, activeIdolId: IdolId): string 
       </div>
 
       <section class="idol-roster" aria-label="${UI_TEXT.idolRosterLabel}">
-        <span class="card-kicker">${UI_TEXT.idolRosterLabel}</span>
         <div class="idol-switcher">
           ${renderIdolSwitcher(state, activeIdolId)}
         </div>
@@ -248,7 +245,7 @@ function renderIdolTabCard(state: GameState, idolId: IdolId): string {
           <dl class="stats-list">
             <div>
               <dt>${UI_TEXT.passiveEffectLabel}</dt>
-              <dd>${isJoined ? idol.passiveDescription : UI_TEXT.unjoinedIdolEffectLabel}</dd>
+              <dd>${isJoined ? renderPassiveEffectDescription(idol.passiveDescription) : UI_TEXT.unjoinedIdolEffectLabel}</dd>
             </div>
             <div>
               <dt>${UI_TEXT.unlockRequirementLabel}</dt>
@@ -337,6 +334,37 @@ function renderIdolEventCard(state: GameState, eventId: IdolEventId): string {
 
 function getIdolEventKindLabel(eventKind: "normal" | "twilightMemory"): string {
   return eventKind === "twilightMemory" ? UI_TEXT.idolTwilightMemoryEventLabel : UI_TEXT.idolNormalEventLabel;
+}
+
+function renderIdolNameWithRuby(idol: IdolDefinition): string {
+  const nameParts = splitByWhitespace(idol.name);
+  const readingParts = splitByWhitespace(idol.reading);
+
+  if (nameParts.length === 0 || nameParts.length !== readingParts.length) {
+    return `<ruby>${idol.name}<rt>${idol.reading}</rt></ruby>`;
+  }
+
+  return nameParts
+    .map((namePart, index) => `<ruby>${namePart}<rt>${readingParts[index]}</rt></ruby>`)
+    .join(" ");
+}
+
+function splitByWhitespace(value: string): string[] {
+  return value.trim().split(/\s+/).filter(Boolean);
+}
+
+function renderPassiveEffectDescription(passiveDescription: string): string {
+  const effectLines = passiveDescription.split(" / ").map((effectLine) => effectLine.trim()).filter(Boolean);
+
+  if (effectLines.length <= 1) {
+    return passiveDescription;
+  }
+
+  return `
+    <ul class="effect-line-list">
+      ${effectLines.map((effectLine) => `<li>${effectLine}</li>`).join("")}
+    </ul>
+  `;
 }
 
 function renderIdolRecordCard(state: GameState, recordId: RecordId): string {

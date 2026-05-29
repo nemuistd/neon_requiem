@@ -504,13 +504,31 @@ h2 {
   text-shadow: 0 0 22px rgba(255, 94, 216, 0.34);
 }
 
+.idol-card h2.idol-name {
+  margin-top: 4px;
+  margin-bottom: 10px;
+  line-height: 1.25;
+}
+
+.idol-name ruby {
+  ruby-align: center;
+  ruby-position: over;
+}
+
+.idol-name rt {
+  color: #d9c7e7;
+  font-size: 0.42em;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-shadow: none;
+}
+
 .idol-card p,
 .card p {
   color: #dcd0e7;
   line-height: 1.65;
 }
 
-.reading,
 .title-line {
   margin-bottom: 8px;
 }
@@ -555,6 +573,21 @@ h2 {
   text-align: right;
 }
 
+.effect-line-list {
+  display: grid;
+  gap: 4px;
+  justify-items: end;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: right;
+}
+
+.effect-line-list li {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
 .detail-action,
 .secondary-action {
   width: 100%;
@@ -582,7 +615,7 @@ h2 {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 10px;
-  margin-top: 10px;
+  margin-top: 0;
 }
 
 .idol-switch,
