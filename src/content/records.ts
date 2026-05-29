@@ -62,7 +62,8 @@ export const RECORD_DEFINITIONS = defineContent([
   {
     id: "idolBondAkariFirstVoice",
     title: "灯里・最初の呼び声",
-    category: "交流メモ",
+    category: "アイドルの様子",
+    relatedIdolId: "otowaAkari",
     revealLevel: "surface",
     body:
       "ライブの後、灯里は客席から名前を呼ばれたことに少し遅れて気づいた。返事は小さかったが、片づけの間もその席の方を何度か見ていた。次の告知にも、自分の名前をきちんと書いてほしいと頼まれた。",
@@ -78,7 +79,8 @@ export const RECORD_DEFINITIONS = defineContent([
   {
     id: "idolBondAkariRegularSeat",
     title: "灯里・いつもの席",
-    category: "交流メモ",
+    category: "アイドルの様子",
+    relatedIdolId: "otowaAkari",
     revealLevel: "surface",
     body:
       "折りたたみ椅子のひとつに、誰が決めたわけでもない指定席ができた。灯里は曲の始まりにそこを一度見る。誰も座っていない日でも、そこへ向けて歌うと、路地裏ステージの空気が少し落ち着く。",
@@ -125,7 +127,8 @@ export const RECORD_DEFINITIONS = defineContent([
   {
     id: "idolBondYuiGuideNote",
     title: "結・案内メモの端",
-    category: "交流メモ",
+    category: "アイドルの様子",
+    relatedIdolId: "asagiriYui",
     revealLevel: "uncanny",
     body:
       "結は、ネオン掲示板の横に小さな案内メモを足した。曲がり角の説明は妙に正確で、読んだ人は暗い通路でも迷いにくいという。本人は、前に誰かが教えてくれた気がするとだけ言っている。",
@@ -211,7 +214,8 @@ export const RECORD_DEFINITIONS = defineContent([
   {
     id: "tookoFirstBroadcast",
     title: "遠子・最初の放送",
-    category: "交流メモ",
+    category: "アイドルの様子",
+    relatedIdolId: "hibikiTooko",
     revealLevel: "surface",
     body:
       "響木 遠子が最初の放送を行った。内容は路地裏ステージの公演告知、施設案内、遠子の挨拶で、約十五分。放送後に遠子は機材を点検していた。受信確認について訊くと、雑音が少し返ってきた、とだけ答えた。誰かが聞いていたかは分からない。でも続ける。",
@@ -393,7 +397,8 @@ export const RECORD_DEFINITIONS = defineContent([
   {
     id: "idolBondShinoStorageShelf",
     title: "詩乃・保管棚の前",
-    category: "交流メモ",
+    category: "アイドルの様子",
+    relatedIdolId: "mizukiShino",
     revealLevel: "uncanny",
     body:
       "詩乃は地下礼拝堂の保管棚を開ける前に、必ず短く声をかける。返事はないが、棚札の番号が読みやすくなることがある。失われた歌の持ち主へ挨拶しているのだと、彼女は静かに説明した。",
@@ -942,7 +947,8 @@ export const RECORD_DEFINITIONS = defineContent([
   {
     id: "rinFirstWords",
     title: "燐・最初の言葉",
-    category: "交流メモ",
+    category: "アイドルの様子",
+    relatedIdolId: "shiragiriRin",
     revealLevel: "deep",
     body:
       "白霧 燐と最初に話した。「初めまして」と言うと、燐は「そうかな」と言った。確信ではなく、疑問として。それから「以前もここに来たね」と続けた。覚えているのかと訊くと、「覚えているというより、感じている」と答えた。言い方が正確かどうかは分からない。でも、その感覚は少しだけ分かった。",

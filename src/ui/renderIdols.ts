@@ -368,24 +368,8 @@ function getUnlockedIdolRecordIds(state: GameState, idolId: IdolId): RecordId[] 
   return RECORD_ORDER.filter((recordId) => {
     const record = RECORDS[recordId];
 
-    return isRecordUnlocked(state, recordId) && record.unlockRequirements.some((requirement) => hasIdolBondRequirement(requirement, idolId));
+    return record.category === "アイドルの様子" && record.relatedIdolId === idolId && isRecordUnlocked(state, recordId);
   });
-}
-
-function hasIdolBondRequirement(requirement: Requirement, idolId: IdolId): boolean {
-  if (requirement.type === "idol.bond") {
-    return requirement.idolId === idolId;
-  }
-
-  if (requirement.type === "all" || requirement.type === "any") {
-    return requirement.requirements.some((childRequirement) => hasIdolBondRequirement(childRequirement, idolId));
-  }
-
-  if (requirement.type === "not") {
-    return hasIdolBondRequirement(requirement.requirement, idolId);
-  }
-
-  return false;
 }
 
 function renderBondRow(state: GameState, idolId: IdolId): string {

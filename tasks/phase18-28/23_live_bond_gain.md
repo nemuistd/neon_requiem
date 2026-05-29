@@ -36,7 +36,7 @@ function performManualLive(state: GameState): GameState
 ## 禁止
 
 - UI表示追加はまだしない。
-- 交流メモ追加はまだしない。
+- `アイドルの様子` 追加はまだしない。
 - 新アイドル追加はしない。
 
 ## 検証

@@ -293,6 +293,14 @@ function validateRecords(): string[] {
       errors.push(...validateSurfaceRecordTerms(recordId, record.body));
     }
 
+    if (record.category === "アイドルの様子" && !record.relatedIdolId) {
+      errors.push(`record "${recordId}": idol scene record requires relatedIdolId.`);
+    }
+
+    if (record.relatedIdolId !== undefined && !Object.prototype.hasOwnProperty.call(IDOLS, record.relatedIdolId)) {
+      errors.push(`record "${recordId}": references missing related idol "${record.relatedIdolId}".`);
+    }
+
     record.unlockRequirements.forEach((requirement) => {
       errors.push(...validateRequirement(`record "${recordId}"`, requirement));
     });

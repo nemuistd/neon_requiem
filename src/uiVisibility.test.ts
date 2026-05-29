@@ -434,7 +434,7 @@ describe("locked content visibility", () => {
     expect(yuiButtonHtml).not.toContain("disabled");
   });
 
-  it("shows unlocked idol events and idol bond records in the left detail panel", () => {
+  it("shows unlocked idol events and idol scene records in the left detail panel", () => {
     const baseState = createInitialState();
     const detailReadyState = {
       ...baseState,
@@ -453,6 +453,27 @@ describe("locked content visibility", () => {
     expect(openHtml).toContain("idol-detail-panel");
     expect(openHtml).toContain("data-idol-event-id=\"otowaAkari.firstSeat\"");
     expect(openHtml).toContain("data-record-id=\"idolBondAkariFirstVoice\"");
+  });
+
+  it("shows idol scene records in the left detail panel even when they unlock from facility progress", () => {
+    const baseState = createInitialState();
+    const detailReadyState = {
+      ...baseState,
+      facilities: {
+        ...baseState.facilities,
+        temporaryBroadcastBooth: { level: 8 }
+      },
+      idols: {
+        ...baseState.idols,
+        hibikiTooko: {
+          ...baseState.idols.hibikiTooko,
+          joined: true
+        }
+      }
+    };
+    const openHtml = renderIdolCards(detailReadyState, "hibikiTooko", true);
+
+    expect(openHtml).toContain("data-record-id=\"tookoFirstBroadcast\"");
   });
 });
 

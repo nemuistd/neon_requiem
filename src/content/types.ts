@@ -79,7 +79,8 @@ export type ItemDefinition = {
 export type RecordDefinition = {
   id: string;
   title: string;
-  category: "復旧報告" | "観測記録" | "施設ログ" | "断片記憶" | "交流メモ";
+  category: "復旧報告" | "観測記録" | "施設ログ" | "断片記憶" | "アイドルの様子";
+  relatedIdolId?: string;
   revealLevel: RevealLevel;
   body: string;
   bodyAnnotation?: string;
