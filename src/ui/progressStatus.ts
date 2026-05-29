@@ -13,6 +13,7 @@ import {
   isFacilityUnlocked,
   isIdolUnlocked,
   isItemUnlocked,
+  isMeguriTabUnlocked,
   isSongUnlocked
 } from "../game";
 import {
@@ -73,18 +74,20 @@ export function getIdolProgressStatus(state: GameState): ProgressStatus {
   return IDOL_ORDER.length > visibleIdolIds.length ? "hidden" : "complete";
 }
 
-export function renderProgressStatusCard(status: ProgressStatus): string {
+export function renderProgressStatusCard(status: ProgressStatus, state: GameState): string {
   if (status === "none") {
     return "";
   }
 
   const isHidden = status === "hidden";
+  const hiddenTitle = isMeguriTabUnlocked(state) ? UI_TEXT.progressStatusHiddenMeguriTitle : UI_TEXT.progressStatusHiddenTitle;
+  const text = isHidden ? "" : UI_TEXT.progressStatusCompleteText;
 
   return `
     <article class="card progress-status-card" data-progress-status="${status}">
       <span class="card-kicker">${isHidden ? UI_TEXT.progressStatusHiddenLabel : UI_TEXT.progressStatusCompleteLabel}</span>
-      <h2>${isHidden ? UI_TEXT.progressStatusHiddenTitle : UI_TEXT.progressStatusCompleteTitle}</h2>
-      <p>${isHidden ? UI_TEXT.progressStatusHiddenText : UI_TEXT.progressStatusCompleteText}</p>
+      <h2>${isHidden ? hiddenTitle : UI_TEXT.progressStatusCompleteTitle}</h2>
+      ${text ? `<p>${text}</p>` : ""}
     </article>
   `;
 }

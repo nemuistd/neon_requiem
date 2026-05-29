@@ -28,7 +28,7 @@ export function renderFacilityCards(state: GameState): string {
     .map((facilityId) => renderFacilityCard(state, facilityId))
     .join("");
 
-  return `${facilityCards}${renderProgressStatusCard(getFacilityProgressStatus(state))}`;
+  return `${facilityCards}${renderProgressStatusCard(getFacilityProgressStatus(state), state)}`;
 }
 
 function renderFacilityCard(state: GameState, facilityId: FacilityId): string {

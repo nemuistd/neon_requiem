@@ -229,15 +229,24 @@ describe("locked content visibility", () => {
         neonBoard: { level: 5 }
       }
     };
+    const preMeguriHiddenText = "復興や加入を進めると、新たな発見があります。";
+    const meguriHiddenText = "復興・加入・廻を進めると、新たな発見があります。";
 
     expect(renderFacilityCards(postCoreState)).toContain("data-progress-status=\"hidden\"");
-    expect(renderFacilityCards(postCoreState)).toContain("まだ手がかりがあります");
+    expect(renderFacilityCards(postCoreState)).toContain(meguriHiddenText);
+    expect(renderFacilityCards(postCoreState)).not.toContain("まだ見つけられることがあります。");
     expect(renderSongCards(firstSongVisibleState)).toContain("data-progress-status=\"hidden\"");
-    expect(renderSongCards(firstSongVisibleState)).toContain("まだ手がかりがあります");
+    expect(renderSongCards(firstSongVisibleState)).toContain(preMeguriHiddenText);
+    expect(renderSongCards(firstSongVisibleState)).not.toContain(meguriHiddenText);
+    expect(renderSongCards(firstSongVisibleState)).not.toContain("まだ見つけられることがあります。");
     expect(renderItemCards(earlyItemsVisibleState)).toContain("data-progress-status=\"hidden\"");
-    expect(renderItemCards(earlyItemsVisibleState)).toContain("まだ手がかりがあります");
+    expect(renderItemCards(earlyItemsVisibleState)).toContain(preMeguriHiddenText);
+    expect(renderItemCards(earlyItemsVisibleState)).not.toContain(meguriHiddenText);
+    expect(renderItemCards(earlyItemsVisibleState)).not.toContain("まだ見つけられることがあります。");
     expect(renderIdolTabCards(yuiVisibleState)).toContain("data-progress-status=\"hidden\"");
-    expect(renderIdolTabCards(yuiVisibleState)).toContain("まだ手がかりがあります");
+    expect(renderIdolTabCards(yuiVisibleState)).toContain(preMeguriHiddenText);
+    expect(renderIdolTabCards(yuiVisibleState)).not.toContain(meguriHiddenText);
+    expect(renderIdolTabCards(yuiVisibleState)).not.toContain("まだ見つけられることがあります。");
   });
 
   it("shows a bottom completion status after all implemented candidates are visible", () => {

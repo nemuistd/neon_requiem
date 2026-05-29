@@ -27,7 +27,7 @@ export function renderSongCards(state: GameState): string {
     .map((songId) => renderSongCard(state, songId))
     .join("");
 
-  return `${songCards}${renderProgressStatusCard(getSongProgressStatus(state))}`;
+  return `${songCards}${renderProgressStatusCard(getSongProgressStatus(state), state)}`;
 }
 
 function renderSongCard(state: GameState, songId: SongId): string {

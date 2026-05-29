@@ -27,7 +27,7 @@ export function renderItemCards(state: GameState): string {
     .map((itemId) => renderItemCard(state, itemId))
     .join("");
 
-  return `${itemCards}${renderProgressStatusCard(getItemProgressStatus(state))}`;
+  return `${itemCards}${renderProgressStatusCard(getItemProgressStatus(state), state)}`;
 }
 
 function renderItemCard(state: GameState, itemId: ItemId): string {

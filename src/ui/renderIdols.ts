@@ -149,7 +149,7 @@ export function renderIdolTabCards(state: GameState): string {
     .map((idolId) => renderIdolTabCard(state, idolId))
     .join("");
 
-  return `${idolCards}${renderProgressStatusCard(getIdolProgressStatus(state))}`;
+  return `${idolCards}${renderProgressStatusCard(getIdolProgressStatus(state), state)}`;
 }
 
 function renderIdolSwitcher(state: GameState, activeIdolId: IdolId): string {
